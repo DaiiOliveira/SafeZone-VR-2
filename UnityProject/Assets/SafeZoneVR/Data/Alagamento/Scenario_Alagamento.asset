@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: beeb8aec705d34b4784b1bf9739b672b, type: 3}
+  m_Name: Scenario_Alagamento
+  m_EditorClassIdentifier: Assembly-CSharp::SafeZoneVR.ScenarioSO
+  m_ScenarioId: alagamento_em_casa
+  m_DisplayName: Alagamento em Casa
+  m_Description: "Chuva forte, alerta da Defesa Civil e a \xE1gua come\xE7ando a
+    subir na rua. Pratique as decis\xF5es certas dentro de casa: proteger documentos,
+    desligar energia, fechar o registro, montar o kit e evacuar pela rota segura."
+  m_SceneName: Alagamento_EmCasa
+  m_IsAvailable: 1
+  m_TargetTimeSeconds: 240
+  m_GoodTimeSeconds: 420
+  m_Steps:
+  - {fileID: 11400000, guid: 8a157ff9ae84149448f5d3fd1c98a249, type: 2}
+  - {fileID: 11400000, guid: b3dadd3a9df05674eaa6b3a23438de23, type: 2}
+  - {fileID: 11400000, guid: 2f9047b905243bb4eaea2d6a0ba3d9f5, type: 2}
+  - {fileID: 11400000, guid: 11d581cd00a960a419bed9d95972371b, type: 2}
+  - {fileID: 11400000, guid: 935e15aef1ad9074396e167ed0a3d290, type: 2}
+  m_RecapCards:
+  - {fileID: 11400000, guid: b0f25131165491044909ae8be63fdd9f, type: 2}
+  - {fileID: 11400000, guid: 133e2ec20512f0648a7211f928bae7ee, type: 2}
+  - {fileID: 11400000, guid: 901849b6a3c13f145adbdd7632ecfa9d, type: 2}
+  - {fileID: 11400000, guid: d522689545dced646bf397471ee74fb3, type: 2}
+  - {fileID: 11400000, guid: 81a0fc178a04a964d867622593ffcb0f, type: 2}
+  - {fileID: 11400000, guid: 00f5f1195c68cbc45b118be8f68234c3, type: 2}

@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 751fd6a59db87bd42b6dcbd69034fe2d, type: 3}
+  m_Name: Card_06_Cuidar
+  m_EditorClassIdentifier: Assembly-CSharp::SafeZoneVR.EducationCardSO
+  m_Title: Cuide de quem precisa
+  m_TipText: "Auxilie crian\xE7as, idosos e pessoas com dificuldade de locomo\xE7\xE3o.
+    Animais de estima\xE7\xE3o tamb\xE9m sofrem com a \xE1gua: garanta a seguran\xE7a
+    deles."
+  m_Source: "Defesa Civil / MDR \u2014 Como agir? Alagamentos e Inunda\xE7\xF5es"

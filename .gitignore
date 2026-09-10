@@ -1,0 +1,75 @@
+# SafeZone VR — .gitignore
+# O projeto Unity fica em UnityProject/, por isso as regras do Unity apontam para essa subpasta.
+# Importante: os arquivos .meta DEVEM ser versionados (guardam os GUIDs que ligam cenas, prefabs e materiais).
+
+# ---------------------------------------------------------------- Unity: pastas geradas (recriadas ao abrir o projeto)
+/UnityProject/[Ll]ibrary/
+/UnityProject/[Tt]emp/
+/UnityProject/[Oo]bj/
+/UnityProject/[Bb]uild/
+/UnityProject/[Bb]uilds/
+/UnityProject/[Ll]ogs/
+/UnityProject/[Uu]ser[Ss]ettings/
+/UnityProject/[Mm]emoryCaptures/
+/UnityProject/[Rr]ecordings/
+/UnityProject/.utmp/
+
+# Backups automáticos de cena criados após um fechamento inesperado do Unity
+/UnityProject/[Aa]ssets/_Recovery/
+/UnityProject/[Aa]ssets/_Recovery.meta
+
+# Ferramentas da Asset Store e plugins de IDE
+/UnityProject/[Aa]ssets/AssetStoreTools*
+/UnityProject/[Aa]ssets/Plugins/Editor/JetBrains*
+
+# Addressables (conteúdo gerado no build)
+/UnityProject/[Aa]ssets/[Ss]treamingAssets/aa.meta
+/UnityProject/[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# Burst, Gradle (build Android) e exportações
+*_BurstDebugInformation_DoNotShip/
+.gradle/
+ExportedObj/
+.consulo/
+
+# ---------------------------------------------------------------- IDEs e soluções (o Unity recria)
+*.csproj
+*.unityproj
+*.sln
+*.slnx
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+.idea/
+.vs/
+.vsconfig
+
+# ---------------------------------------------------------------- Builds
+*.apk
+*.aab
+*.unitypackage
+*.app
+*.symbols.zip
+
+# Relatórios de crash
+sysinfo.txt
+crashlytics-build.properties
+
+# Configurações locais do Claude Code (a compartilhada, .claude/settings.json, pode ser versionada)
+.claude/settings.local.json
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+desktop.ini

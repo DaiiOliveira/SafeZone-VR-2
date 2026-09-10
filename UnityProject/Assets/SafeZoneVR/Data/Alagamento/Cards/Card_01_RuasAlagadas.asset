@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 751fd6a59db87bd42b6dcbd69034fe2d, type: 3}
+  m_Name: Card_01_RuasAlagadas
+  m_EditorClassIdentifier: Assembly-CSharp::SafeZoneVR.EducationCardSO
+  m_Title: Nunca atravesse ruas alagadas
+  m_TipText: "Nunca atravesse pontes, ruas ou avenidas alagadas, mesmo de carro,
+    moto ou bicicleta: a for\xE7a da \xE1gua pode arrast\xE1-lo. Prefira um local
+    alto e espere o n\xEDvel baixar."
+  m_Source: "Defesa Civil / MDR \u2014 Como agir? Alagamentos e Inunda\xE7\xF5es"
