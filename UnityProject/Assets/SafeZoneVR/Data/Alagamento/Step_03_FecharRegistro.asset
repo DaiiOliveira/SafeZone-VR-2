@@ -20,3 +20,4 @@ MonoBehaviour:
   m_LocationHint: "Garagem (junto \xE0 parede da casa)"
   m_WhyItMatters: "Fechar o registro impede que a \xE1gua contaminada do alagamento
     entre na rede interna da casa."
+  m_OrderGroup: 0

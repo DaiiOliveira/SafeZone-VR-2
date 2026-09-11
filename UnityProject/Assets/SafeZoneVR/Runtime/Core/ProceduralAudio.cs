@@ -76,6 +76,95 @@ namespace SafeZoneVR
             return Build(name, data);
         }
 
+        /// <summary>Granizo: loop de "tics" curtos e agudos, sem estalos altos.</summary>
+        public static AudioClip CreateHailLoop(string name, float seconds = 3f, float hitsPerSecond = 90f, float volume = 0.35f)
+        {
+            var n = Mathf.CeilToInt(seconds * k_SampleRate);
+            var data = new float[n];
+            var rng = new System.Random(5);
+            var hits = Mathf.RoundToInt(seconds * hitsPerSecond);
+            for (var h = 0; h < hits; h++)
+            {
+                var start = rng.Next(n);
+                var len = 220 + rng.Next(440);                                   // 10–30 ms
+                var amp = (float)(0.3 + rng.NextDouble() * 0.7) * volume;
+                var freq = 1800f + (float)rng.NextDouble() * 2500f;
+                for (var i = 0; i < len; i++)
+                {
+                    var idx = (start + i) % n;                                   // dá a volta: loop sem emenda
+                    data[idx] += Mathf.Sin(2f * Mathf.PI * freq * i / k_SampleRate) * Mathf.Exp(-i / (len * 0.25f)) * amp;
+                }
+            }
+            Clamp(data);
+            return Build(name, data);
+        }
+
+        /// <summary>Crepitar do fogo: ruído grave + estalinhos esparsos. Loop.</summary>
+        public static AudioClip CreateCrackleLoop(string name, float seconds = 3f, float volume = 0.3f)
+        {
+            var n = Mathf.CeilToInt(seconds * k_SampleRate);
+            var data = new float[n];
+            var rng = new System.Random(3);
+            var lp = 0f;
+            for (var i = 0; i < n; i++)
+            {
+                lp += 0.05f * ((float)(rng.NextDouble() * 2.0 - 1.0) - lp);
+                data[i] = lp * 1.5f * volume;
+            }
+            var pops = Mathf.RoundToInt(seconds * 14f);
+            for (var h = 0; h < pops; h++)
+            {
+                var start = rng.Next(n);
+                var len = 60 + rng.Next(160);
+                var amp = (float)(0.2 + rng.NextDouble() * 0.5) * volume;
+                for (var i = 0; i < len; i++)
+                    data[(start + i) % n] += (float)(rng.NextDouble() * 2.0 - 1.0) * Mathf.Exp(-i / (len * 0.3f)) * amp;
+            }
+            Clamp(data);
+            return Build(name, data);
+        }
+
+        /// <summary>Detector de fumaça "suave": três bipes de 1,8 kHz e uma pausa. Loop de 2 s.</summary>
+        public static AudioClip CreateSmokeAlarmLoop(string name, float volume = 0.18f)
+        {
+            var n = k_SampleRate * 2;
+            var data = new float[n];
+            for (var b = 0; b < 3; b++)
+            {
+                var start = (int)(b * 0.3f * k_SampleRate);
+                var len = (int)(0.18f * k_SampleRate);
+                for (var i = 0; i < len; i++)
+                {
+                    var env = Mathf.Min(1f, i / 200f) * Mathf.Min(1f, (len - i) / 200f);
+                    data[start + i] = Mathf.Sin(2f * Mathf.PI * 1800f * i / k_SampleRate) * env * volume;
+                }
+            }
+            return Build(name, data);
+        }
+
+        /// <summary>Sirene ao longe: dois tons alternados (650/900 Hz) a cada 0,6 s, abafados. Loop de 2,4 s.</summary>
+        public static AudioClip CreateDistantSirenLoop(string name, float volume = 0.25f)
+        {
+            var n = (int)(2.4f * k_SampleRate);
+            var data = new float[n];
+            float phase = 0f, lp = 0f;
+            for (var i = 0; i < n; i++)
+            {
+                var t = (float)i / k_SampleRate;
+                var freq = Mathf.Lerp(650f, 900f, 0.5f + 0.5f * Mathf.Sign(Mathf.Sin(t * Mathf.PI / 0.6f)));
+                phase += 2f * Mathf.PI * freq / k_SampleRate;
+                lp += 0.12f * (Mathf.Sin(phase) - lp);
+                data[i] = lp * volume;
+            }
+            return Build(name, data);
+        }
+
+        static void Clamp(float[] data)
+        {
+            for (var i = 0; i < data.Length; i++)
+                data[i] = Mathf.Clamp(data[i], -1f, 1f);
+        }
+
         static AudioClip Build(string name, float[] data)
         {
             var clip = AudioClip.Create(name, data.Length, 1, k_SampleRate, false);

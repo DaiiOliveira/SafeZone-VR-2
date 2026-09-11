@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21c9f0aa890208543bb8852f8216881b, type: 3}
+  m_Name: Step_06_Porta
+  m_EditorClassIdentifier: Assembly-CSharp::SafeZoneVR.MissionStepSO
+  m_StepId: inc_06_porta
+  m_OrderIndex: 5
+  m_Title: Feche a porta sem trancar
+  m_InstructionText: "J\xE1 do lado de fora, feche a porta da frente. N\xE3o tranque:
+    os Bombeiros podem precisar passar."
+  m_LocationHint: Porta da frente
+  m_WhyItMatters: "A porta fechada segura o fogo e a fuma\xE7a l\xE1 dentro; destrancada,
+    n\xE3o atrapalha quem precisa entrar ou sair."
+  m_OrderGroup: 0

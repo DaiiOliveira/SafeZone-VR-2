@@ -9,10 +9,13 @@ namespace SafeZoneVR.Editor
         public static void BuildEverything()
         {
             SafeZoneDataBuilder.Build();
+            HousePrefabBuilder.Build();
             AlagamentoGameplayBuilder.Build();
+            IncendioGameplayBuilder.Build();
+            GranizoGameplayBuilder.Build();
             MainMenuBuilder.Build();
             QuestProjectConfigurator.Apply();
-            EditorUtility.DisplayDialog("SafeZone VR", "Tudo montado: dados, fase Alagamento, menu principal e configurações do projeto.", "OK");
+            EditorUtility.DisplayDialog("SafeZone VR", "Tudo montado: dados, prefab da casa, fases Alagamento/Incêndio/Granizo, menu principal e configurações do projeto.", "OK");
         }
     }
 }

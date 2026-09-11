@@ -11,6 +11,8 @@ namespace SafeZoneVR.Editor
     {
         public const string k_MenuScenePath = "Assets/Scenes/MainMenu.unity";
         public const string k_AlagamentoScenePath = "Assets/Scenes/Fases/Alagamento_EmCasa.unity";
+        public const string k_IncendioScenePath = "Assets/Scenes/Fases/Incendio_EmCasa.unity";
+        public const string k_GranizoScenePath = "Assets/Scenes/Fases/Granizo_Praca.unity";
         const string k_PerformanceUrpPath = "Assets/Settings/Project Configuration/Performance URP Config.asset";
         const string k_QualityUrpPath = "Assets/Settings/Project Configuration/Quality URP Config.asset";
 
@@ -51,8 +53,9 @@ namespace SafeZoneVR.Editor
             var scenes = new List<EditorBuildSettingsScene>();
             if (System.IO.File.Exists(k_MenuScenePath))
                 scenes.Add(new EditorBuildSettingsScene(k_MenuScenePath, true));
-            if (System.IO.File.Exists(k_AlagamentoScenePath))
-                scenes.Add(new EditorBuildSettingsScene(k_AlagamentoScenePath, true));
+            foreach (var path in new[] { k_AlagamentoScenePath, k_IncendioScenePath, k_GranizoScenePath })
+                if (System.IO.File.Exists(path))
+                    scenes.Add(new EditorBuildSettingsScene(path, true));
             EditorBuildSettings.scenes = scenes.ToArray();
         }
 

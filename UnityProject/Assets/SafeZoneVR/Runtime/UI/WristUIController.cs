@@ -128,6 +128,7 @@ namespace SafeZoneVR
                 m_ScenarioManager.onStepCompleted.AddListener(OnStepCompleted);
                 m_ScenarioManager.onStepProgress.AddListener(OnStepProgress);
                 m_ScenarioManager.onMistake.AddListener(OnMistake);
+                m_ScenarioManager.onInfo.AddListener(OnInfo);
                 m_ScenarioManager.onScenarioComplete.AddListener(OnScenarioComplete);
                 OnStepChanged(m_ScenarioManager.currentStep);
             }
@@ -148,6 +149,7 @@ namespace SafeZoneVR
                 m_ScenarioManager.onStepCompleted.RemoveListener(OnStepCompleted);
                 m_ScenarioManager.onStepProgress.RemoveListener(OnStepProgress);
                 m_ScenarioManager.onMistake.RemoveListener(OnMistake);
+                m_ScenarioManager.onInfo.RemoveListener(OnInfo);
                 m_ScenarioManager.onScenarioComplete.RemoveListener(OnScenarioComplete);
             }
         }
@@ -253,6 +255,11 @@ namespace SafeZoneVR
         void OnMistake(string message)
         {
             ShowWarning("Atenção: " + message, new Color(1f, 0.8f, 0.4f));
+        }
+
+        void OnInfo(string message)
+        {
+            ShowWarning(message, new Color(0.6f, 0.85f, 1f));   // azul-claro = informação
         }
 
         void OnScenarioComplete()

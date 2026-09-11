@@ -20,3 +20,4 @@ MonoBehaviour:
   m_LocationHint: "Cozinha, banheiro e quarto \u2192 mochila na entrada"
   m_WhyItMatters: "Um kit com \xE1gua, rem\xE9dios, roupas e lanterna permite sair
     r\xE1pido de casa. N\xE3o use velas: risco de inc\xEAndio."
+  m_OrderGroup: 0

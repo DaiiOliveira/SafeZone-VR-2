@@ -45,6 +45,9 @@ namespace SafeZoneVR
         StringEvent m_OnMistake = new StringEvent();
 
         [SerializeField]
+        StringEvent m_OnInfo = new StringEvent();
+
+        [SerializeField]
         UnityEvent m_OnScenarioComplete = new UnityEvent();
 
         readonly HashSet<string> m_CompletedStepIds = new HashSet<string>();
@@ -88,6 +91,7 @@ namespace SafeZoneVR
         public MissionStepEvent onStepCompleted => m_OnStepCompleted;
         public MissionStepProgressEvent onStepProgress => m_OnStepProgress;
         public StringEvent onMistake => m_OnMistake;
+        public StringEvent onInfo => m_OnInfo;
         public UnityEvent onScenarioComplete => m_OnScenarioComplete;
 
         public MissionStepSO currentStep { get; private set; }
@@ -191,7 +195,6 @@ namespace SafeZoneVR
             }
 
             var steps = m_Scenario.steps;
-            var expectedIndex = m_CompletedStepIds.Count;
             var actualIndex = IndexOfStep(steps, step);
             if (actualIndex < 0)
             {
@@ -199,7 +202,7 @@ namespace SafeZoneVR
                 return;
             }
 
-            if (actualIndex != expectedIndex)
+            if (!IsInOrder(steps, actualIndex))
                 outOfOrderCount++;
 
             m_CompletedStepIds.Add(step.stepId);
@@ -216,6 +219,27 @@ namespace SafeZoneVR
             {
                 FinishScenario();
             }
+        }
+
+        /// <summary>Em ordem = todos os passos anteriores já feitos, exceto os do mesmo grupo de ordem (≠ 0).</summary>
+        bool IsInOrder(IReadOnlyList<MissionStepSO> steps, int index)
+        {
+            var group = steps[index].orderGroup;
+            for (var i = 0; i < index; i++)
+            {
+                var s = steps[i];
+                if (m_CompletedStepIds.Contains(s.stepId)) continue;
+                if (group != 0 && s.orderGroup == group) continue;
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>Mensagem informativa (alerta oficial, fala de NPC). Aparece no relógio e não conta como erro.</summary>
+        public void ShowInfo(string message)
+        {
+            if (!string.IsNullOrEmpty(message))
+                m_OnInfo.Invoke(message);
         }
 
         /// <summary>

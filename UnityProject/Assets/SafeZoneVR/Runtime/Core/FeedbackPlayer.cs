@@ -94,6 +94,18 @@ namespace SafeZoneVR
             PlaySfx(m_ProgressClip, 0.5f);
         }
 
+        /// <summary>Ajusta o volume da chuva ambiente (ex.: aumenta no granizo, reduz depois).</summary>
+        public void SetRainVolume(float volume)
+        {
+            m_RainVolume = Mathf.Clamp01(volume);
+            if (m_Ambience != null)
+            {
+                m_Ambience.volume = m_RainVolume;
+                if (m_RainVolume > 0f && !m_Ambience.isPlaying)
+                    m_Ambience.Play();
+            }
+        }
+
         void OnStepCompleted(MissionStepSO step)
         {
             PlaySfx(m_StepClip);

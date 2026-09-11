@@ -1,17 +1,36 @@
-# SafeZone VR — Guia de configuração (fase Alagamento em Casa)
+# SafeZone VR — Guia de configuração (fases Alagamento, Incêndio e Granizo)
 
 Toda a camada de gameplay é **gerada por scripts de Editor** sobre a casa modelada. Você não precisa
 montar validadores à mão: abra o menu **SafeZone VR > Build** no Unity.
 
 | Menu | O que faz |
 |------|-----------|
-| `0. Montar tudo` | Executa os quatro passos abaixo em sequência. |
-| `1. Dados` | Cria/atualiza os ScriptableObjects: 5 passos, 6 cards, cenário Alagamento, cenários futuros (bloqueados) e o catálogo em `Resources/ScenarioCatalog`. |
+| `0. Montar tudo` | Executa todos os passos abaixo em sequência. |
+| `1. Dados` | Cria/atualiza os ScriptableObjects das três fases (passos, cards, cenários) e o catálogo em `Resources/ScenarioCatalog` (Alagamento, Incêndio em Casa, Granizo). |
+| `1b. Prefab da casa` | Converte a geometria solta da cena Alagamento no prefab `Prefabs/Casa_SafeZone` (reaproveitado pelas fases Incêndio e Granizo) e abre o vão da janela da cozinha. |
 | `2. Fase Alagamento` | Abre `Scenes/Fases/Alagamento_EmCasa`, remove o gameplay antigo e recria tudo sob `SafeZone_Gameplay` (idempotente: pode rodar quantas vezes quiser). |
+| `2b. Fase Incêndio` | Cria/abre `Scenes/Fases/Incendio_EmCasa` (casa via prefab) e monta panela em chamas, gás, tampa, janela, benjamim/rack, fumaça, porta operável, vizinho e Bombeiros. |
+| `2c. Fase Granizo` | Cria/abre `Scenes/Fases/Granizo_Praca`: praça, UBS, abrigos errados, vagas, Seu Joaquim, granizo por partículas (layer `HailBlockers`), gelo e a fase "Depois" na casa. |
 | `3. Menu principal` | Gera a cena `Scenes/MainMenu` (sobrescreve). |
 | `4. Configurações do projeto` | Nome do produto, Android/Quest (IL2CPP, ARM64, Vulkan, min SDK 32), URP e cenas no Build Settings. |
 
-## O que a fase contém
+Os helpers comuns de cena vivem em `Editor/ScenarioSceneKit.cs` (XR Origin, materiais, teleporte, colisores, itens,
+sockets, relógio de pulso com botão *Ligar*, painéis, painel de ligação 199/193, NPCs, legenda de fase).
+
+## Fases Incêndio em Casa e Granizo
+
+Especificações completas em `Documentos_Cenarios/Incendio.md` e `Documentos_Cenarios/Granizo.md` (missões,
+decisões inseguras, cards, componentes e roteiro de teste). Componentes compartilhados novos em `Runtime/`:
+`ScenarioPhaseSwitcher` (estados do ambiente), `ActivateOnStepCompleted`, `CompanionFollower` (NPC por waypoints),
+`EmergencyCallPanel`, `StepCompleteOnInteractCount`, `StepCompleteOnStayInZone`, `StepCompleteOnCompanionInZone`,
+`StepCompleteOnChoice`/`DecisionOption`, `StepCompleteOnOpenings`/`ToggleOpening`, `StepCompleteOnAllConditions`,
+`FireController`, `SmokeLayer`, `LidCooldown`, `HailController`, `InspectableSign`, `SimpleLoopSound`.
+Passos com o mesmo `orderGroup` (≠ 0) podem ser feitos em qualquer ordem sem contar "fora de ordem".
+
+**Névoa no build (Incêndio):** em *Project Settings → Graphics → Shader Stripping* mantenha a névoa
+**Exponential Squared** incluída, senão a fumaça funciona no Editor e some no Quest.
+
+## O que a fase Alagamento contém
 
 | Passo | Ação do jogador | Validador | Onde |
 |-------|-----------------|-----------|------|

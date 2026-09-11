@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 751fd6a59db87bd42b6dcbd69034fe2d, type: 3}
+  m_Name: Card_09_PrevencaoCozinha
+  m_EditorClassIdentifier: Assembly-CSharp::SafeZoneVR.EducationCardSO
+  m_Title: "Preven\xE7\xE3o: cozinha e g\xE1s"
+  m_TipText: "N\xE3o deixe o fog\xE3o ligado sem supervis\xE3o e mantenha as crian\xE7as
+    longe dele. Fa\xE7a a manuten\xE7\xE3o do g\xE1s e n\xE3o guarde \xE1lcool, gasolina,
+    panos ou \xF3leos perto de fontes de calor. Prefira lanternas a velas."
+  m_Source: "Corpo de Bombeiros Militar de Santa Catarina \u2014 Inc\xEAndio em Edifica\xE7\xE3o"

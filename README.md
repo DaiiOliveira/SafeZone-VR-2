@@ -66,6 +66,44 @@ Ao final: relatório com estrelas (tempo + erros), pontuação, melhor resultado
 Interface diegética: relógio no pulso esquerdo (missão, tempo, nível da água, bússola para o objetivo)
 e painel de conforto (teleporte/contínuo, giro, vinheta, modo sentado, recentrar).
 
+### Cenário implementado: Incêndio em casa
+
+Fonte: orientações dos Corpos de Bombeiros Militares (SC, AL, CE e Vitória/ES). A casa é a mesma do
+Alagamento (prefab `Casa_SafeZone`). Dois momentos: um princípio de incêndio controlável (panela) e um
+incêndio que sai do controle (benjamim atrás da TV).
+
+| # | Missão | Orientação oficial |
+|---|--------|--------------------|
+| 1 | Fechar o botão do fogão e o registro do botijão | Cortar o gás que alimenta o fogo |
+| 2 | Abafar a panela com a tampa (nunca água) | Sem ar o fogo apaga; água em óleo espalha as chamas |
+| 3 | Abrir a janela da cozinha e deixar esfriar | Ventilar a fumaça tóxica; tampa cedo reacende |
+| 4 | Desligar o quadro de energia (faíscas na TV) | Nunca água em aparelho energizado |
+| 5 | Sair abaixado pela porta da frente | Fumaça fica no alto; não combater sozinho |
+| 6 | Fechar a porta sem trancar | Segura fogo e fumaça sem atrapalhar o socorro |
+| 7 | Ligar 193 do lado de fora | Socorro sem ficar perto do fogo |
+| 8 | Impedir o vizinho de entrar | Nenhum objeto vale o risco |
+
+Decisões inseguras: jogar água no óleo/na TV, tirar a tampa cedo, salvar notebook/TV, abafar o fogo grande,
+ficar em pé na fumaça, trancar a porta, voltar para dentro. Modo sentado: fumaça mais alta, sem penalidade.
+
+### Cenário implementado: Granizo
+
+Fonte: *Como agir? Granizo* (MDR/CENAD). Começa na praça do bairro e termina na casa do jogador.
+
+| # | Missão | Orientação da Defesa Civil |
+|---|--------|-----------------------------|
+| 1 | Indicar ao motorista a vaga segura (longe de placa e torre) | Não estacionar perto de torres e placas |
+| 2 | Ajudar o Seu Joaquim (andador) | Auxiliar idosos e pessoas com dificuldade |
+| 3 | Levá-lo à UBS de alvenaria | Abrigo resistente, sem risco de destelhamento |
+| 4 | Esperar o granizo passar dentro da UBS | Permanecer em local seguro |
+| 5 | Voltar pela calçada com corrimão | Piso escorregadio depois do granizo |
+| 6 | Conferir o forro do quarto | Telhas quebradas enfraquecem o telhado |
+| 7 | Sair do quarto imediatamente | Risco de desabamento: sair na hora |
+| 8 | Ligar 199 ou 193 | Comunicar às autoridades |
+
+Decisões inseguras: abrigar-se sob a árvore, no ponto de ônibus metálico ou na barraca; sair durante o
+granizo; usar a rampa gelada; subir na escada do telhado; voltar ao quarto.
+
 ---
 
 ## Tecnologia
@@ -88,11 +126,12 @@ SafeZone-VR/
 ├── SafeZone_VR_Requisitos_e_Skills.md     # Requisitos funcionais e não funcionais
 └── UnityProject/
     ├── Assets/
-    │   ├── Scenes/Fases/                  # Cenas das fases (Alagamento_EmCasa)
+    │   ├── Scenes/Fases/                  # Alagamento_EmCasa, Incendio_EmCasa, Granizo_Praca
     │   └── SafeZoneVR/
     │       ├── Data/                      # ScriptableObjects: cenários, missões, cards
     │       ├── Editor/                    # Geradores de cena e de dados das fases
     │       ├── Materials/
+    │       ├── Prefabs/                   # Casa_SafeZone (casa reaproveitada pelas fases)
     │       └── Runtime/
     │           ├── Core/                  # ScenarioManager, identificação de objetos
     │           ├── UI/                    # Interface de pulso e relatório final
@@ -114,8 +153,9 @@ conteúdo — não reescrever sistemas.
 2. Clone este repositório e abra a pasta `UnityProject/` pelo Unity Hub.
 3. Aguarde a importação dos pacotes (a primeira abertura demora — a pasta `Library/` é gerada
    localmente e não faz parte do repositório).
-4. Abra a cena `Assets/Scenes/MainMenu.unity` (menu) ou `Assets/Scenes/Fases/Alagamento_EmCasa.unity`
-   (fase). Sem headset, o **XR Interaction Simulator** é criado automaticamente no Play.
+4. Abra a cena `Assets/Scenes/MainMenu.unity` (menu) ou uma fase em `Assets/Scenes/Fases/`
+   (`Alagamento_EmCasa`, `Incendio_EmCasa`, `Granizo_Praca`). Sem headset, o **XR Interaction Simulator**
+   é criado automaticamente no Play.
 5. Para regenerar dados, fase, menu e configurações: menu **SafeZone VR > Build > 0. Montar tudo**
    (detalhes em `Assets/SafeZoneVR/CONFIGURATION_GUIDE.md`).
 6. Para rodar no headset: `File > Build Settings`, plataforma **Android**, com o Quest conectado
@@ -125,7 +165,8 @@ conteúdo — não reescrever sistemas.
 
 ## Próximos passos
 
-- Novos cenários a partir das demais cartilhas: deslizamento, enxurrada, vendaval, granizo.
+- Arte definitiva para as fases Incêndio e Granizo (NPCs, chamas, UBS, praça); os primitivos são placeholders.
+- Revisão dos textos do Incêndio por um oficial do Corpo de Bombeiros e PDFs das fontes em `Documentos_Orientações_Defesa_Civil/`.
 - Sistema de pontuação comparativa entre tentativas.
 - Narração em áudio das orientações, para acessibilidade.
 - Modo de exibição para escolas e ações da Defesa Civil.
@@ -134,8 +175,8 @@ conteúdo — não reescrever sistemas.
 
 ## Créditos e fontes
 
-As orientações reproduzidas no jogo são de material público da **Defesa Civil** e do
-**Ministério do Desenvolvimento Regional**. Este é um projeto educativo, sem fins lucrativos, e
+As orientações reproduzidas no jogo são de material público da **Defesa Civil**, do
+**Ministério do Desenvolvimento Regional** e dos **Corpos de Bombeiros Militares** (incêndio residencial). Este é um projeto educativo, sem fins lucrativos, e
 não substitui as instruções das autoridades locais durante uma emergência real.
 
 **Em caso de emergência: Defesa Civil 199 · Bombeiros 193 · SAMU 192**

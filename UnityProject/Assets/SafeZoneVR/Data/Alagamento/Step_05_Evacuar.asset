@@ -20,3 +20,4 @@ MonoBehaviour:
   m_LocationHint: "Rua, em frente \xE0 casa"
   m_WhyItMatters: "Procure um local alto e espere a \xE1gua baixar. Nunca atravesse
     ruas alagadas, nem mesmo de carro."
+  m_OrderGroup: 0

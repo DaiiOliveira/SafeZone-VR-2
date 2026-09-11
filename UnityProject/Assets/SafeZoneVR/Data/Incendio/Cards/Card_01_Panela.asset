@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 751fd6a59db87bd42b6dcbd69034fe2d, type: 3}
+  m_Name: Card_01_Panela
+  m_EditorClassIdentifier: Assembly-CSharp::SafeZoneVR.EducationCardSO
+  m_Title: Fogo na panela
+  m_TipText: "Feche o registro do fog\xE3o e o do botij\xE3o. Abafe a panela com
+    a tampa ou com um pano \xFAmido e bem torcido e espere esfriar antes de destampar.
+    Nunca jogue \xE1gua."
+  m_Source: "Corpo de Bombeiros Militar do Cear\xE1 \u2014 Fogo em panela com \xF3leo"

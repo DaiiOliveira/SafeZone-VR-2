@@ -112,7 +112,7 @@ namespace SafeZoneVR.Editor
 
             // Painel do menu
             var ui = new GameObject("UI");
-            var options = AlagamentoGameplayBuilder.CreateOptionsPanel(ui.transform, cam.transform, false);
+            var options = ScenarioSceneKit.CreateOptionsPanel(ui.transform, cam.transform, false);
 
             var menuGo = UIBuilderUtil.Child(ui.transform, "MainMenuPanel");
             menuGo.transform.position = new Vector3(0f, 1.45f, 1.9f);
