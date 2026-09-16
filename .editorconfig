@@ -1,0 +1,71 @@
+# Regras de análise do SafeZone VR.
+# Os analisadores UNT* vêm do Microsoft.Unity.Analyzers, que já está no projeto via
+# com.unity.feature.development (pacotes ide.visualstudio / ide.rider). Este arquivo só
+# ajusta a severidade — nada precisa ser instalado. Rider, Visual Studio e `dotnet build`
+# passam a marcar os problemas abaixo.
+
+root = true
+
+[*.cs]
+indent_style = space
+indent_size = 4
+end_of_line = crlf
+charset = utf-8-bom
+insert_final_newline = true
+csharp_new_line_before_open_brace = all
+
+# --- Estilo da base de código (convenção da Unity, já seguida nos scripts) ---
+dotnet_naming_rule.campos_privados.severity = suggestion
+dotnet_naming_rule.campos_privados.symbols = campo_privado
+dotnet_naming_rule.campos_privados.style = prefixo_m
+dotnet_naming_symbols.campo_privado.applicable_kinds = field
+dotnet_naming_symbols.campo_privado.applicable_accessibilities = private
+dotnet_naming_symbols.campo_privado.required_modifiers =
+dotnet_naming_style.prefixo_m.required_prefix = m_
+dotnet_naming_style.prefixo_m.capitalization = pascal_case
+
+dotnet_naming_rule.constantes.severity = suggestion
+dotnet_naming_rule.constantes.symbols = constante
+dotnet_naming_rule.constantes.style = prefixo_k
+dotnet_naming_symbols.constante.applicable_kinds = field
+dotnet_naming_symbols.constante.applicable_accessibilities = *
+dotnet_naming_symbols.constante.required_modifiers = const
+dotnet_naming_style.prefixo_k.required_prefix = k_
+dotnet_naming_style.prefixo_k.capitalization = pascal_case
+
+dotnet_naming_rule.estaticos.severity = suggestion
+dotnet_naming_rule.estaticos.symbols = estatico_privado
+dotnet_naming_rule.estaticos.style = prefixo_s
+dotnet_naming_symbols.estatico_privado.applicable_kinds = field
+dotnet_naming_symbols.estatico_privado.applicable_accessibilities = private
+dotnet_naming_symbols.estatico_privado.required_modifiers = static
+dotnet_naming_style.prefixo_s.required_prefix = s_
+dotnet_naming_style.prefixo_s.capitalization = pascal_case
+
+# --- Erros de verdade: quebram comportamento em runtime ---
+dotnet_diagnostic.UNT0006.severity = error   # assinatura errada de mensagem da Unity (Update(int) nunca é chamado)
+dotnet_diagnostic.UNT0007.severity = error   # ?? em UnityEngine.Object ignora o objeto destruído
+dotnet_diagnostic.UNT0008.severity = error   # ?. em UnityEngine.Object, mesmo problema
+dotnet_diagnostic.UNT0023.severity = error   # ??= em UnityEngine.Object, mesmo problema
+dotnet_diagnostic.UNT0010.severity = error   # new MonoBehaviour() — use AddComponent
+dotnet_diagnostic.UNT0011.severity = error   # new ScriptableObject() — use CreateInstance
+dotnet_diagnostic.UNT0014.severity = error   # GetComponent<T> com tipo que nunca casa
+dotnet_diagnostic.UNT0030.severity = error   # Destroy(transform)
+
+# --- Desempenho: caro num Quest 3, que roda a 72–90 Hz ---
+dotnet_diagnostic.UNT0002.severity = warning # comparação de tag por string aloca
+dotnet_diagnostic.UNT0018.severity = warning # System.Reflection em Update/FixedUpdate
+dotnet_diagnostic.UNT0022.severity = warning # position e rotation separados (use SetPositionAndRotation)
+dotnet_diagnostic.UNT0026.severity = warning # GetComponent aloca — prefira TryGetComponent
+dotnet_diagnostic.UNT0028.severity = warning # API de física que aloca (use as versões NonAlloc)
+dotnet_diagnostic.UNT0017.severity = warning # SetPixels é lento
+
+# --- Higiene ---
+dotnet_diagnostic.UNT0001.severity = warning # mensagem da Unity vazia: custa uma chamada por frame à toa
+dotnet_diagnostic.UNT0003.severity = warning # GetComponent não-genérico
+dotnet_diagnostic.UNT0004.severity = warning # Time.fixedDeltaTime no Update
+dotnet_diagnostic.UNT0005.severity = warning # Time.deltaTime no FixedUpdate
+
+# Campos [SerializeField] privados não são "nunca atribuídos" — quem atribui é o inspetor.
+dotnet_diagnostic.CS0649.severity = none
+dotnet_diagnostic.IDE0051.severity = none
