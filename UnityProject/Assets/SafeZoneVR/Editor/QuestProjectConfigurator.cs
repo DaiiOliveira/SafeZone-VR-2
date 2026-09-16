@@ -82,8 +82,8 @@ namespace SafeZoneVR.Editor
             PlayerSettings.stripEngineCode = true;
             PlayerSettings.gcIncremental = true;                 // evita picos de GC no meio do quadro
 
-            // O runtime da Meta não sobe com a entrada GameActivity (padrão do Unity 6): o app abre e fecha.
-            PlayerSettings.Android.applicationEntry = AndroidApplicationEntry.Activity;
+            // No Unity 6 a regra de validação do MetaQuestFeature (pacote OpenXR) exige GameActivity.
+            PlayerSettings.Android.applicationEntry = AndroidApplicationEntry.GameActivity;
 
             // Quest 3/3S: API 32 é o mínimo aceito pela Meta; o alvo acompanha o SDK instalado.
             PlayerSettings.Android.minSdkVersion = (AndroidSdkVersions)32;
@@ -256,7 +256,7 @@ namespace SafeZoneVR.Editor
             sb.AppendLine("[SafeZone VR] Configurações do APK (Quest):");
             sb.AppendLine("  app: " + PlayerSettings.GetApplicationIdentifier(NamedBuildTarget.Android) + " v" + PlayerSettings.bundleVersion + " (code " + PlayerSettings.Android.bundleVersionCode + ")");
             sb.AppendLine("  suporte Android instalado: " + BuildPipeline.IsBuildTargetSupported(BuildTargetGroup.Android, BuildTarget.Android) + " | alvo ativo: " + EditorUserBuildSettings.activeBuildTarget);
-            sb.AppendLine("  entrada: " + PlayerSettings.Android.applicationEntry + " (precisa ser Activity)");
+            sb.AppendLine("  entrada: " + PlayerSettings.Android.applicationEntry + " (o MetaQuestFeature exige GameActivity no Unity 6)");
             sb.AppendLine("  backend: " + PlayerSettings.GetScriptingBackend(NamedBuildTarget.Android) + " / " + PlayerSettings.Android.targetArchitectures + " / " + PlayerSettings.GetIl2CppCodeGeneration(NamedBuildTarget.Android));
             sb.AppendLine("  SDK: min " + PlayerSettings.Android.minSdkVersion + " alvo " + PlayerSettings.Android.targetSdkVersion);
             sb.AppendLine("  gráficos: " + string.Join(",", PlayerSettings.GetGraphicsAPIs(BuildTarget.Android)) + " | blit " + PlayerSettings.Android.blitType + " | texturas " + string.Join(",", PlayerSettings.Android.textureCompressionFormats));

@@ -190,7 +190,7 @@ O que a configuração aplica, e por quê:
 
 | Ajuste | Motivo |
 |---|---|
-| Entrada do Android = **Activity** | O runtime da Meta não sobe com `GameActivity` (padrão do Unity 6): o app abre e fecha |
+| Entrada do Android = **GameActivity** | Regra de validação do `MetaQuestFeature` (pacote OpenXR) para Unity 6 |
 | IL2CPP + **ARM64** | Única arquitetura aceita pelo Quest |
 | **Vulkan** (sem OpenGLES) | API recomendada pela Meta no Quest 3 |
 | **Single Pass Instanced** + projeção simétrica + *optimize buffer discards* | Uma passada de render para os dois olhos e menos banda de memória |
