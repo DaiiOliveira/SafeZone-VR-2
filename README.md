@@ -126,12 +126,14 @@ SafeZone-VR/
 ├── SafeZone_VR_Requisitos_e_Skills.md     # Requisitos funcionais e não funcionais
 └── UnityProject/
     ├── Assets/
+    │   ├── Casa/                          # Modelo DC_Casa.fbx (casa das três fases) + importador
+    │   ├── Praca/                         # Modelo DC_Praca.fbx (praça do Granizo) + importador
     │   ├── Scenes/Fases/                  # Alagamento_EmCasa, Incendio_EmCasa, Granizo_Praca
     │   └── SafeZoneVR/
     │       ├── Data/                      # ScriptableObjects: cenários, missões, cards
-    │       ├── Editor/                    # Geradores de cena e de dados das fases
+    │       ├── Editor/                    # Geradores de cena, configuração do Quest e build do APK
     │       ├── Materials/
-    │       ├── Prefabs/                   # Casa_SafeZone (casa reaproveitada pelas fases)
+    │       ├── Models/                    # DC_Hub.fbx (hub do menu principal)
     │       └── Runtime/
     │           ├── Core/                  # ScenarioManager, identificação de objetos
     │           ├── UI/                    # Interface de pulso e relatório final
@@ -158,8 +160,51 @@ conteúdo — não reescrever sistemas.
    é criado automaticamente no Play.
 5. Para regenerar dados, fase, menu e configurações: menu **SafeZone VR > Build > 0. Montar tudo**
    (detalhes em `Assets/SafeZoneVR/CONFIGURATION_GUIDE.md`).
-6. Para rodar no headset: `File > Build Settings`, plataforma **Android**, com o Quest conectado
-   em modo desenvolvedor.
+6. Para rodar no headset, veja **Como gerar o APK** abaixo.
+
+---
+
+## Como gerar o APK (Meta Quest)
+
+1. Menu **SafeZone VR > Build > 4. Configurações do projeto (Quest 3)** — aplica tudo que o APK
+   precisa (é chamado automaticamente antes de cada build, então serve só para conferir).
+2. Menu **SafeZone VR > Build > 5. Gerar APK (release)**. O arquivo sai em
+   `UnityProject/Builds/SafeZoneVR-<versão>-release.apk` (a pasta `Builds/` não vai para o Git).
+   Para investigar performance, use o **5b** e conecte o Profiler.
+3. Instale no headset com o Quest em modo desenvolvedor:
+
+```bash
+adb install -r Builds/SafeZoneVR-1.0-release.apk
+```
+
+Build automatizado (CI ou terminal, com o Unity fechado):
+
+```bash
+Unity.exe -quit -batchmode -projectPath UnityProject -executeMethod SafeZoneVR.Editor.SafeZoneApkBuilder.BuildFromCommandLine
+```
+
+**Conferir o que está valendo:** menu **SafeZone VR > Build > 4b. Conferir configurações do APK**
+imprime o relatório no Console.
+
+O que a configuração aplica, e por quê:
+
+| Ajuste | Motivo |
+|---|---|
+| Entrada do Android = **Activity** | O runtime da Meta não sobe com `GameActivity` (padrão do Unity 6): o app abre e fecha |
+| IL2CPP + **ARM64** | Única arquitetura aceita pelo Quest |
+| **Vulkan** (sem OpenGLES) | API recomendada pela Meta no Quest 3 |
+| **Single Pass Instanced** + projeção simétrica + *optimize buffer discards* | Uma passada de render para os dois olhos e menos banda de memória |
+| **Foveated rendering** (SRP Foveation) | Menos GPU nas bordas da imagem, onde o olho não repara |
+| Texturas **ASTC** | Formato nativo do Quest; ETC2 gasta mais memória |
+| *Blit type* = **Never** | Quem apresenta a imagem é o compositor do headset; o blit extra é desperdício |
+| URP: MSAA 4x, sem HDR, sem depth/opaque texture, 1 cascata de sombra | Antialiasing barato e menos banda, que é o gargalo do Quest |
+| Renderizador **Forward+**, luzes adicionais *per pixel* | A casa tem mais de 20 luzes em tempo real; no Forward comum elas não acenderiam |
+| Espaço de cor **Linear**, sem splash da Unity | Exigência do URP em VR e entrada direta no menu |
+| *Bake collision meshes*, *incremental GC*, *strip engine code* | Carregamento mais rápido e menos picos de quadro |
+
+**Assinatura:** o build usa o keystore de debug, que serve para sideload (`adb`, SideQuest).
+Para publicar na Meta Store é preciso criar um keystore próprio em
+`Edit > Project Settings > Player > Publishing Settings` e guardar a senha fora do repositório.
 
 ---
 
