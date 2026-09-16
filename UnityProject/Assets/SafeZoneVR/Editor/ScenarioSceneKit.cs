@@ -985,7 +985,7 @@ namespace SafeZoneVR.Editor
         public static IntroBriefingPanel CreateIntroPanel(Transform parent, Transform camera, ScenarioManager manager, string title, string introText)
         {
             var go = UIBuilderUtil.Child(parent, "IntroBriefingPanel");
-            UIBuilderUtil.AddLazyFollow(go, camera, new Vector3(0f, -0.05f, 1.5f), 3f);
+            UIBuilderUtil.AddLazyFollow(go, camera, new Vector3(0f, 0.06f, 1.5f), 3f);
             var canvas = UIBuilderUtil.CreateWorldCanvas("Canvas", go.transform, new Vector2(760f, 620f), 0.001f);
             var panel = canvas.transform;
             UIBuilderUtil.FullPanel(panel, "Background", UIBuilderUtil.PanelColor);
@@ -1004,8 +1004,9 @@ namespace SafeZoneVR.Editor
         public static EndReportPanelController CreateEndReportPanel(Transform parent, Transform camera, ScenarioManager manager)
         {
             var go = UIBuilderUtil.Child(parent, "EndReportPanel");
-            UIBuilderUtil.AddLazyFollow(go, camera, new Vector3(0f, -0.05f, 1.6f), 3f);
-            var canvas = UIBuilderUtil.CreateWorldCanvas("Canvas", go.transform, new Vector2(860f, 760f), 0.001f);
+            UIBuilderUtil.AddLazyFollow(go, camera, new Vector3(0f, 0.02f, 1.95f), 3f);
+            // 0,0016 m por pixel: o painel fica com 1,38 m x 1,22 m, bem mais legível no headset.
+            var canvas = UIBuilderUtil.CreateWorldCanvas("Canvas", go.transform, new Vector2(860f, 760f), 0.0016f);
             var panel = canvas.transform;
             UIBuilderUtil.FullPanel(panel, "Background", UIBuilderUtil.PanelColor);
             UIBuilderUtil.Panel(panel, "HeaderBar", UIBuilderUtil.AccentGreen, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -70f), Vector2.zero);

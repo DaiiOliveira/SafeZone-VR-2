@@ -124,6 +124,10 @@ namespace SafeZoneVR
 
             if (m_ScenarioManager != null)
             {
+                // O relógio só aparece quando a fase começa: antes disso ele fica na frente do briefing,
+                // bem em cima do botão "Começar".
+                m_ScenarioManager.onScenarioStarted.AddListener(ShowPanel);
+                SetPanelVisible(m_ScenarioManager.hasStarted);
                 m_ScenarioManager.onStepChanged.AddListener(OnStepChanged);
                 m_ScenarioManager.onStepCompleted.AddListener(OnStepCompleted);
                 m_ScenarioManager.onStepProgress.AddListener(OnStepProgress);
@@ -145,6 +149,7 @@ namespace SafeZoneVR
         {
             if (m_ScenarioManager != null)
             {
+                m_ScenarioManager.onScenarioStarted.RemoveListener(ShowPanel);
                 m_ScenarioManager.onStepChanged.RemoveListener(OnStepChanged);
                 m_ScenarioManager.onStepCompleted.RemoveListener(OnStepCompleted);
                 m_ScenarioManager.onStepProgress.RemoveListener(OnStepProgress);
@@ -152,6 +157,19 @@ namespace SafeZoneVR
                 m_ScenarioManager.onInfo.RemoveListener(OnInfo);
                 m_ScenarioManager.onScenarioComplete.RemoveListener(OnScenarioComplete);
             }
+        }
+
+        void ShowPanel()
+        {
+            SetPanelVisible(true);
+        }
+
+        void SetPanelVisible(bool visible)
+        {
+            if (m_PanelRoot != null)
+                m_PanelRoot.SetActive(visible);
+            if (m_CompassArrow != null)
+                m_CompassArrow.gameObject.SetActive(visible);
         }
 
         void Update()

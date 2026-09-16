@@ -1,3 +1,4 @@
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace SafeZoneVR
@@ -7,11 +8,29 @@ namespace SafeZoneVR
     {
         public const string k_DefaultMenuScene = "MainMenu";
 
+        // Uma troca de cena de cada vez: dois cliques seguidos (ou em totens diferentes) carregavam
+        // duas cenas em sequência e a fase que abria não era a escolhida.
+        static bool s_Loading;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetState()
+        {
+            s_Loading = false;
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            SceneManager.sceneLoaded += OnSceneLoaded;
+        }
+
+        static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            s_Loading = false;
+        }
+
         public static void LoadScene(string sceneName)
         {
-            if (string.IsNullOrEmpty(sceneName))
+            if (string.IsNullOrEmpty(sceneName) || s_Loading)
                 return;
 
+            s_Loading = true;
             PlayerLocator.Invalidate();
 
             var fader = ScreenFader.instance;
