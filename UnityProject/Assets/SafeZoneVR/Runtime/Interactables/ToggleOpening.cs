@@ -3,19 +3,15 @@ using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Janela ou porta que abre/fecha com um toque (select), com animação curta. O collider do XRSimpleInteractable
-    /// fica na moldura/maçaneta; o collider sólido da folha fica na própria folha.
-    /// </summary>
     [RequireComponent(typeof(XRSimpleInteractable))]
     public class ToggleOpening : MonoBehaviour
     {
-        [SerializeField] Transform m_Hinge;                 // pivô da folha
+        [SerializeField] Transform m_Hinge;
         [SerializeField] Vector3 m_Axis = Vector3.up;
         [SerializeField] float m_OpenAngle = 80f;
         [SerializeField] float m_DegreesPerSecond = 240f;
         [SerializeField] bool m_StartsOpen;
-        [SerializeField] BoolEvent m_OnStateChanged = new BoolEvent();   // true = aberta
+        [SerializeField] BoolEvent m_OnStateChanged = new BoolEvent();
         Quaternion m_Closed; float m_Target; bool m_IsOpen;
 
         public bool isOpen => m_IsOpen;

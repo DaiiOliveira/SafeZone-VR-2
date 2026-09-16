@@ -8,16 +8,12 @@ using UnityEngine.UI;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Painel world-space para ligar 199/193/190/192. Números aceitos disparam <see cref="onAcceptedCall"/>.
-    /// A corrotina roda no painel, que precisa estar ativo: o botão "Fechar" só desativa o <see cref="root"/> (filho).
-    /// </summary>
     public class EmergencyCallPanel : MonoBehaviour
     {
         [Serializable] public class Line { public string number; public string label; [TextArea] public string reply; public Button button; }
 
         [SerializeField] GameObject m_Root;
-        [SerializeField] Button m_OpenButton;      // botão "Ligar" do relógio
+        [SerializeField] Button m_OpenButton;
         [SerializeField] Button m_CloseButton;
         [SerializeField] TextMeshProUGUI m_ReplyText;
         [SerializeField] List<Line> m_Lines = new List<Line>();
@@ -47,7 +43,6 @@ namespace SafeZoneVR
 
         public void Toggle() { if (m_Root != null) m_Root.SetActive(!m_Root.activeSelf); }
 
-        /// <summary>Simula a ligação para um número (também usado em testes).</summary>
         public void Call(string number)
         {
             var line = m_Lines.Find(l => l.number == number);

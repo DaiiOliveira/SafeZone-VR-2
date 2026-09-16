@@ -2,7 +2,6 @@ using UnityEngine;
 
 namespace SafeZoneVR
 {
-    /// <summary>Devolve itens que caíram fora do mundo à posição inicial.</summary>
     public class RespawnIfFallen : MonoBehaviour
     {
         [SerializeField]

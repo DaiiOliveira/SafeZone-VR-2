@@ -3,9 +3,6 @@ using UnityEngine;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Acesso barato à posição do jogador (câmera do XR Origin) sem Find() em Update.
-    /// </summary>
     public static class PlayerLocator
     {
         static XROrigin s_Origin;
@@ -46,7 +43,6 @@ namespace SafeZoneVR
             return true;
         }
 
-        /// <summary>Posição dos pés: XZ da cabeça, Y do XR Origin.</summary>
         public static bool TryGetFeetPosition(out Vector3 position)
         {
             if (!TryGetHeadPosition(out position))

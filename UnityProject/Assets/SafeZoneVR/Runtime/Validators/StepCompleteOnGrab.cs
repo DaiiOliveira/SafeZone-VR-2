@@ -5,10 +5,6 @@ using UnityEngine.XR.Interaction.Toolkit.Interactors;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Conclui o passo quando o jogador pega (select) o interagível indicado com a mão/raio.
-    /// Sockets não contam como "pegar".
-    /// </summary>
     public class StepCompleteOnGrab : StepValidatorBase
     {
         [SerializeField]
@@ -49,7 +45,6 @@ namespace SafeZoneVR
             Complete();
         }
 
-        /// <summary>Permite ligar via UnityEvent no Inspector, se preferir.</summary>
         public void OnGrabbed()
         {
             Complete();

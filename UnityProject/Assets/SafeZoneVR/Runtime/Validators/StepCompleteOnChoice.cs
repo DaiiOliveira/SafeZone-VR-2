@@ -4,7 +4,6 @@ using UnityEngine.Events;
 
 namespace SafeZoneVR
 {
-    /// <summary>Conclui ao escolher a <see cref="DecisionOption"/> correta; erradas registram o erro e deixam tentar de novo.</summary>
     public class StepCompleteOnChoice : StepValidatorBase
     {
         [SerializeField] List<DecisionOption> m_Options = new List<DecisionOption>();

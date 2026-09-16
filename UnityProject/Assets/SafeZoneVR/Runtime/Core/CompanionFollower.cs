@@ -7,16 +7,12 @@ using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// NPC que anda por uma rota fixa de waypoints quando é selecionado (ou por <see cref="StartFollowing"/>).
-    /// Espera quando o jogador fica para trás. Sem NavMesh: rota fixa e sem obstáculos.
-    /// </summary>
     public class CompanionFollower : MonoBehaviour
     {
-        [SerializeField] XRBaseInteractable m_TalkInteractable;          // o próprio corpo do NPC
+        [SerializeField] XRBaseInteractable m_TalkInteractable;
         [SerializeField] List<Transform> m_Waypoints = new List<Transform>();
         [SerializeField] float m_Speed = 0.8f;
-        [SerializeField] float m_MaxLeadDistance = 3f;                   // distância máxima à frente do jogador
+        [SerializeField] float m_MaxLeadDistance = 3f;
         [SerializeField] TextMeshPro m_SpeechBubble;
         [SerializeField] UnityEvent m_OnStartedFollowing = new UnityEvent();
         int m_Index; bool m_Following;
@@ -42,7 +38,6 @@ namespace SafeZoneVR
             m_OnStartedFollowing.Invoke();
         }
 
-        /// <summary>Troca a rota (ex.: vizinho indo ao portão e depois ao ponto de encontro).</summary>
         public void Restart(List<Transform> newRoute, bool follow = true)
         {
             m_Waypoints = newRoute;
@@ -57,7 +52,6 @@ namespace SafeZoneVR
             var pos = transform.position;
             var target = m_Waypoints[m_Index].position;
 
-            // Jogador ficou para trás (longe e do lado oposto ao destino): espera por ele.
             if (PlayerLocator.TryGetFeetPosition(out var player))
             {
                 var toPlayer = player - pos;
@@ -66,7 +60,7 @@ namespace SafeZoneVR
 
             var next = Vector3.MoveTowards(pos, new Vector3(target.x, pos.y, target.z), m_Speed * Time.deltaTime);
             if (Physics.Raycast(next + Vector3.up, Vector3.down, out var hit, 2f, ~0, QueryTriggerInteraction.Ignore))
-                next.y = hit.point.y;                                        // acompanha degraus e desníveis
+                next.y = hit.point.y;
             var dir = target - pos; dir.y = 0f;
             if (dir.sqrMagnitude > 0.001f)
                 transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 5f * Time.deltaTime);

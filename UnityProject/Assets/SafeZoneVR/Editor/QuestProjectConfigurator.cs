@@ -11,11 +11,6 @@ using UnityEngine.XR.OpenXR;
 
 namespace SafeZoneVR.Editor
 {
-    /// <summary>
-    /// Aplica as configurações de projeto recomendadas para gerar o APK do Meta Quest 3/3S (RNF01):
-    /// identidade do app, Android/IL2CPP/ARM64, Vulkan, OpenXR com perfis da Meta, URP de performance
-    /// e as cenas no Build Settings. <see cref="Validate"/> imprime um relatório do que está valendo.
-    /// </summary>
     public static class QuestProjectConfigurator
     {
         public const string k_MenuScenePath = "Assets/Scenes/MainMenu.unity";
@@ -26,10 +21,8 @@ namespace SafeZoneVR.Editor
         const string k_QualityUrpPath = "Assets/Settings/Project Configuration/Quality URP Config.asset";
         const string k_AndroidRendererPath = "Assets/Settings/Project Configuration/Android Preset.asset";
 
-        // Índice do nível de qualidade usado no headset (o que aponta para o Performance URP Config).
         const string k_AndroidQualityLevel = "Low";
 
-        // A casa tem mais de 20 luzes pontuais em tempo real; sem isso o interior sai apagado no build.
         const int k_AdditionalLightsPerObject = 8;
 
         [MenuItem("SafeZone VR/Build/4. Configurações do projeto (Quest 3)")]
@@ -62,9 +55,8 @@ namespace SafeZoneVR.Editor
             PlayerSettings.companyName = "SafeZone VR";
             PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android, "com.safezonevr.app");
             PlayerSettings.defaultInterfaceOrientation = UIOrientation.LandscapeLeft;
-            PlayerSettings.colorSpace = ColorSpace.Linear;      // obrigatório para VR com URP
+            PlayerSettings.colorSpace = ColorSpace.Linear;
 
-            // Splash da Unity fica de pé em licença Personal; sem ela, o app entra direto no menu.
             PlayerSettings.SplashScreen.show = false;
             PlayerSettings.SplashScreen.showUnityLogo = false;
         }
@@ -72,16 +64,14 @@ namespace SafeZoneVR.Editor
         static void ApplyAndroidPlayer()
         {
             PlayerSettings.SetScriptingBackend(NamedBuildTarget.Android, ScriptingImplementation.IL2CPP);
-            PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;   // Quest é só ARM64
+            PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;
             PlayerSettings.SetIl2CppCodeGeneration(NamedBuildTarget.Android, Il2CppCodeGeneration.OptimizeSpeed);
             PlayerSettings.SetManagedStrippingLevel(NamedBuildTarget.Android, ManagedStrippingLevel.Minimal);
             PlayerSettings.stripEngineCode = true;
-            PlayerSettings.gcIncremental = true;                 // evita picos de GC no meio do quadro
+            PlayerSettings.gcIncremental = true;
 
-            // No Unity 6 a regra de validação do MetaQuestFeature (pacote OpenXR) exige GameActivity.
             PlayerSettings.Android.applicationEntry = AndroidApplicationEntry.GameActivity;
 
-            // Quest 3/3S: API 32 é o mínimo aceito pela Meta; o alvo acompanha o SDK instalado.
             PlayerSettings.Android.minSdkVersion = (AndroidSdkVersions)32;
             if ((int)PlayerSettings.Android.targetSdkVersion < 32)
                 PlayerSettings.Android.targetSdkVersion = AndroidSdkVersions.AndroidApiLevelAuto;
@@ -91,15 +81,13 @@ namespace SafeZoneVR.Editor
             PlayerSettings.SetMobileMTRendering(NamedBuildTarget.Android, true);
             PlayerSettings.MTRendering = true;
             PlayerSettings.gpuSkinning = true;
-            // Sem blit extra para o backbuffer: no VR quem apresenta a imagem é o compositor do headset.
+
             PlayerSettings.Android.blitType = AndroidBlitType.Never;
 
-            // ASTC é o formato de textura do Quest (o "Generic" sobe ETC2 e gasta mais memória).
             PlayerSettings.Android.textureCompressionFormats = new[] { TextureCompressionFormat.ASTC };
             EditorUserBuildSettings.androidBuildSubtarget = MobileTextureSubtarget.ASTC;
-            EditorUserBuildSettings.buildAppBundle = false;      // APK para sideload via adb/SideQuest
+            EditorUserBuildSettings.buildAppBundle = false;
 
-            // Colisores de malha "cozidos" no build: carrega mais rápido e não exige Read/Write nas malhas.
             PlayerSettings.bakeCollisionMeshes = true;
         }
 
@@ -117,14 +105,13 @@ namespace SafeZoneVR.Editor
             }
 
             var so = new SerializedObject(settings);
-            SetInt(so, "m_renderMode", 1);              // Single Pass Instanced: uma passada para os dois olhos
-            SetBool(so, "m_optimizeBufferDiscards", true);   // Vulkan: descarta buffers e economiza banda
-            SetBool(so, "m_symmetricProjection", true);      // Quest 3: uma projeção só para os dois olhos
-            SetInt(so, "m_foveatedRenderingApi", 1);         // SRP Foveation (foveated rendering do URP)
+            SetInt(so, "m_renderMode", 1);
+            SetBool(so, "m_optimizeBufferDiscards", true);
+            SetBool(so, "m_symmetricProjection", true);
+            SetInt(so, "m_foveatedRenderingApi", 1);
             so.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(settings);
 
-            // Perfis de controle da Meta e recursos do Quest.
             foreach (var feature in settings.GetFeatures())
             {
                 switch (feature.GetType().Name)
@@ -161,13 +148,12 @@ namespace SafeZoneVR.Editor
             TuneUrpAsset(k_PerformanceUrpPath, 2048, 12f);
             TuneUrpAsset(k_QualityUrpPath, 2048, 15f);
 
-            // Forward+ agrupa as luzes por tile: as luzes da casa acendem sem o limite por objeto do Forward.
             var renderer = AssetDatabase.LoadAssetAtPath<UniversalRendererData>(k_AndroidRendererPath);
             if (renderer != null)
             {
                 var so = new SerializedObject(renderer);
                 SetInt(so, "m_RenderingMode", 2);
-                SetInt(so, "m_IntermediateTextureMode", 0);   // Auto: evita uma cópia de tela por quadro
+                SetInt(so, "m_IntermediateTextureMode", 0);
                 so.ApplyModifiedPropertiesWithoutUndo();
                 EditorUtility.SetDirty(renderer);
             }
@@ -185,13 +171,13 @@ namespace SafeZoneVR.Editor
             SetInt(so, "m_MainLightShadowmapResolution", shadowRes);
             var dist = so.FindProperty("m_ShadowDistance");
             if (dist != null) dist.floatValue = shadowDistance;
-            SetBool(so, "m_SupportsHDR", false);                  // HDR custa banda e não muda nada aqui
-            SetInt(so, "m_MSAA", 4);                              // MSAA 4x é o antialiasing barato do Quest
+            SetBool(so, "m_SupportsHDR", false);
+            SetInt(so, "m_MSAA", 4);
             SetInt(so, "m_ShadowCascadeCount", 1);
             SetBool(so, "m_RequireDepthTexture", false);
             SetBool(so, "m_RequireOpaqueTexture", false);
             SetBool(so, "m_UseSRPBatcher", true);
-            // PerPixel (1) — as luminárias da casa precisam iluminar de verdade.
+
             SetInt(so, "m_AdditionalLightsRenderingMode", 1);
             SetInt(so, "m_AdditionalLightsPerObjectLimit", k_AdditionalLightsPerObject);
             SetBool(so, "m_AdditionalLightShadowsSupported", false);
@@ -199,7 +185,6 @@ namespace SafeZoneVR.Editor
             EditorUtility.SetDirty(asset);
         }
 
-        /// <summary>Nível de qualidade que o Android usa por padrão (o do Performance URP Config).</summary>
         static void SetAndroidQualityLevel()
         {
             var index = System.Array.IndexOf(QualitySettings.names, k_AndroidQualityLevel);
@@ -237,7 +222,6 @@ namespace SafeZoneVR.Editor
             EditorBuildSettings.scenes = scenes.ToArray();
         }
 
-        /// <summary>Texto com o estado das configurações que importam para o APK do Quest.</summary>
         public static string Validate()
         {
             var sb = new StringBuilder();

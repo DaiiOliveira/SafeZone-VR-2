@@ -7,10 +7,6 @@ using UnityEngine.Events;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Troca o estado do ambiente quando todos os passos de gatilho de uma fase estiverem concluídos.
-    /// Com fadeSeconds > 0 usa o ScreenFader (escurece, legenda, troca, clareia). Nunca move o jogador.
-    /// </summary>
     public class ScenarioPhaseSwitcher : MonoBehaviour
     {
         [Serializable]
@@ -19,8 +15,8 @@ namespace SafeZoneVR
             public string name;
             public List<MissionStepSO> triggerSteps = new List<MissionStepSO>();
             public float fadeSeconds;
-            [TextArea] public string caption;    // texto no escuro do fade
-            [TextArea] public string info;       // mensagem no relógio ao entrar
+            [TextArea] public string caption;
+            [TextArea] public string info;
             public List<GameObject> activate = new List<GameObject>();
             public List<GameObject> deactivate = new List<GameObject>();
             public UnityEvent onEnter = new UnityEvent();
@@ -28,7 +24,7 @@ namespace SafeZoneVR
         }
 
         [SerializeField] List<Phase> m_Phases = new List<Phase>();
-        [SerializeField] TextMeshProUGUI m_Caption;            // canvas preso à câmera, desligado por padrão
+        [SerializeField] TextMeshProUGUI m_Caption;
         ScenarioManager m_Manager;
 
         public List<Phase> phases => m_Phases;
@@ -62,7 +58,7 @@ namespace SafeZoneVR
             if (useFade)
             {
                 fader.FadeTo(1f);
-                yield return new WaitForSeconds(0.55f);                      // duração padrão do ScreenFader
+                yield return new WaitForSeconds(0.55f);
                 if (m_Caption != null && !string.IsNullOrEmpty(p.caption)) { m_Caption.text = p.caption; SetCaptionVisible(true); }
             }
             foreach (var go in p.deactivate) if (go != null) go.SetActive(false);
@@ -80,7 +76,7 @@ namespace SafeZoneVR
         void SetCaptionVisible(bool visible)
         {
             if (m_Caption == null) return;
-            // O canvas da legenda é o pai do texto (CreatePhaseCaption).
+
             m_Caption.transform.parent.gameObject.SetActive(visible);
         }
     }

@@ -3,10 +3,6 @@ using UnityEngine;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Luzes internas da casa. Ficam acesas o tempo todo (sem depender de bake de iluminação) e só apagam
-    /// quando o quadro de energia é desligado — ligado ao <see cref="BreakerLever"/> pelo builder da fase.
-    /// </summary>
     public class HouseLights : MonoBehaviour
     {
         [SerializeField]
@@ -24,7 +20,6 @@ namespace SafeZoneVR
             Apply();
         }
 
-        /// <summary>Liga/desliga todas as luzes de uma vez (alavanca do quadro de energia).</summary>
         public void SetPowered(bool on)
         {
             m_Powered = on;

@@ -2,7 +2,6 @@ using UnityEngine;
 
 namespace SafeZoneVR
 {
-    /// <summary>Zona que registra um erro quando o jogador entra nela (ex.: área de água profunda).</summary>
     [RequireComponent(typeof(Collider))]
     public class WrongActionZone : MonoBehaviour
     {

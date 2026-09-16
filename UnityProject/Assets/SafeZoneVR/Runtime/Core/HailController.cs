@@ -3,22 +3,18 @@ using UnityEngine;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Fonte única da intensidade do granizo (0..1): emissão das partículas (emissor segue a cabeça), gelo acumulando
-    /// no chão, som nos telhados e parada automática nos últimos segundos da missão de espera.
-    /// </summary>
     public class HailController : MonoBehaviour
     {
         static readonly int k_BaseColor = Shader.PropertyToID("_BaseColor");
 
-        [SerializeField] ParticleSystem m_Hail;                      // Simulation Space = World; Collision World/Low/HailBlockers
+        [SerializeField] ParticleSystem m_Hail;
         [SerializeField] float m_MaxEmission = 260f;
         [SerializeField] float m_EmitterHeight = 6f;
         [SerializeField] List<Renderer> m_IceLayers = new List<Renderer>();
         [SerializeField] float m_AccumulateSeconds = 40f;
         [SerializeField] float m_MaxIceAlpha = 0.6f;
         [SerializeField] List<AudioSource> m_RoofSounds = new List<AudioSource>();
-        [SerializeField] MissionStepSO m_StopStep;                   // gran_04_aguardar
+        [SerializeField] MissionStepSO m_StopStep;
         [SerializeField] float m_StopWhenSecondsLeft = 8f;
         [SerializeField] float m_UpdateInterval = 0.1f;
         float m_Intensity, m_Target, m_Rate, m_Ice, m_NextUpdate;
@@ -47,13 +43,11 @@ namespace SafeZoneVR
             if (m != null) { m.onStepProgress.RemoveListener(OnProgress); m.onStepCompleted.RemoveListener(OnStepCompleted); }
         }
 
-        // O progresso chega a cada 5 s; ao concluir a espera, garante que o granizo pare em poucos segundos.
         void OnStepCompleted(MissionStepSO step)
         {
             if (step == m_StopStep && m_Target > 0f) RampTo(0f, 2f);
         }
 
-        /// <summary>Leva a intensidade até <paramref name="target"/> em <paramref name="seconds"/> segundos.</summary>
         public void RampTo(float target, float seconds)
         {
             m_Target = Mathf.Clamp01(target);
@@ -62,7 +56,6 @@ namespace SafeZoneVR
             foreach (var s in m_RoofSounds) if (s != null && m_Target > 0f && !s.isPlaying) s.Play();
         }
 
-        /// <summary>Atalho para UnityEvents sem parâmetro: 0,3 → 1,0 em 15 s.</summary>
         public void StartHail() { m_Intensity = Mathf.Max(m_Intensity, 0.3f); RampTo(1f, 15f); }
 
         void OnProgress(MissionStepSO step, int done, int total)

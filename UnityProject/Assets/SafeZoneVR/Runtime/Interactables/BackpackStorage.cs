@@ -5,10 +5,6 @@ using UnityEngine.XR.Interaction.Toolkit.Interactors;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Vários sockets compartilham uma área de captura do tamanho da mochila e apenas o primeiro espaço
-    /// vazio fica ativo: o item é guardado ao ser solto perto da mochila e só um "fantasma" aparece por vez.
-    /// </summary>
     public class BackpackStorage : MonoBehaviour
     {
         [SerializeField]
@@ -31,7 +27,6 @@ namespace SafeZoneVR
                 Refresh();
         }
 
-        // Primeira atualização só depois do Awake de todos os sockets da cena.
         void Start()
         {
             m_Started = true;
@@ -54,7 +49,6 @@ namespace SafeZoneVR
             Refresh();
         }
 
-        /// <summary>Espaços ocupados continuam ativos (seguram o item); dos vazios, só o primeiro aceita itens.</summary>
         public void Refresh()
         {
             var emptyActivated = false;

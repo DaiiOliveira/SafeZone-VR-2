@@ -2,14 +2,10 @@ using UnityEngine;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Camada de fumaça que desce do teto (sala + corredor). Com a cabeça acima da base e dentro da zona, liga a névoa
-    /// do URP (visão cinza); abaixado, a visão limpa. Modo sentado: a base para mais alto, sem erro e com dica.
-    /// </summary>
     public class SmokeLayer : MonoBehaviour
     {
-        [SerializeField] BoxCollider m_Zone;                    // sala + corredor, trigger; bounds.min.y = piso
-        [SerializeField] Transform m_LayerVisual;               // raiz dos quads; começa desligada
+        [SerializeField] BoxCollider m_Zone;
+        [SerializeField] Transform m_LayerVisual;
         [SerializeField] float m_StartBottom = 2.0f, m_EndBottom = 1.15f, m_SeatedBottom = 1.6f, m_DescendSeconds = 40f;
         [SerializeField] Color m_FogColor = new Color(0.36f, 0.36f, 0.38f);
         [SerializeField] float m_FogDensity = 0.35f;
@@ -26,7 +22,7 @@ namespace SafeZoneVR
         public bool fogOn => m_FogOn;
         public float currentBottom { get; private set; }
 
-        public void Begin()                                     // ligado ao onEnter da fase Rack
+        public void Begin()
         {
             if (m_Active) return;
             m_Active = true;

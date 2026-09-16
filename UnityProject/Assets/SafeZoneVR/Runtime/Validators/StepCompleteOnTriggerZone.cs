@@ -2,11 +2,6 @@ using UnityEngine;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Conclui o passo quando o jogador entra na zona (ex.: ponto de encontro).
-    /// Além do OnTriggerEnter, verifica periodicamente a posição da câmera/pés dentro do collider,
-    /// porque o teleporte não dispara eventos de trigger de forma confiável.
-    /// </summary>
     [RequireComponent(typeof(Collider))]
     public class StepCompleteOnTriggerZone : StepValidatorBase
     {

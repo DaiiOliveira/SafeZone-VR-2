@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace SafeZoneVR
 {
-    /// <summary>Lista de cenários exibida no menu principal (RF01).</summary>
     [CreateAssetMenu(fileName = "ScenarioCatalog", menuName = "SafeZone VR/Scenario Catalog", order = 1)]
     public class ScenarioCatalogSO : ScriptableObject
     {
@@ -16,7 +15,6 @@ namespace SafeZoneVR
         public string menuSceneName => m_MenuSceneName;
         public IReadOnlyList<ScenarioSO> scenarios => m_Scenarios;
 
-        /// <summary>Catálogo carregado de Resources para que qualquer cena consiga voltar ao menu.</summary>
         public static ScenarioCatalogSO Load()
         {
             return Resources.Load<ScenarioCatalogSO>("ScenarioCatalog");

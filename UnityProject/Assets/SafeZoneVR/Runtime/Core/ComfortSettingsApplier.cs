@@ -7,10 +7,6 @@ using UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Aplica <see cref="ComfortSettings"/> ao XR Origin dos Starter Assets:
-    /// teleporte x movimento contínuo, giro em passos x suave, vinheta de túnel e modo sentado.
-    /// </summary>
     public class ComfortSettingsApplier : MonoBehaviour
     {
         [SerializeField]
@@ -100,7 +96,6 @@ namespace SafeZoneVR
             }
         }
 
-        /// <summary>Recentra a visão (útil para quem joga sentado).</summary>
         public static void Recenter()
         {
             var subsystems = new List<XRInputSubsystem>();

@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace SafeZoneVR
 {
-    /// <summary>Move um objeto em linha reta até um alvo, sem física (ex.: carro indo para a vaga segura).</summary>
     public class SimpleMover : MonoBehaviour
     {
         [SerializeField] Transform m_Target;

@@ -3,16 +3,12 @@ using UnityEngine;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Liga ou desliga objetos quando um passo é concluído. Não pode estar dentro de um objeto que ele mesmo desliga:
-    /// coloque todos sob SafeZone_Gameplay/Phases.
-    /// </summary>
     public class ActivateOnStepCompleted : MonoBehaviour
     {
         [SerializeField] MissionStepSO m_Step;
         [SerializeField] List<GameObject> m_Activate = new List<GameObject>();
         [SerializeField] List<GameObject> m_Deactivate = new List<GameObject>();
-        [SerializeField] bool m_ApplyInitialState = true;   // começa com "Activate" desligado e "Deactivate" ligado
+        [SerializeField] bool m_ApplyInitialState = true;
 
         public MissionStepSO step { get => m_Step; set => m_Step = value; }
         public List<GameObject> activate => m_Activate;

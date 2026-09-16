@@ -3,9 +3,6 @@ using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Na jarra de água: se o fogo estiver aceso, dá o "puff" (o erro é registrado pelo WrongActionInteractable).
-    /// </summary>
     [RequireComponent(typeof(XRSimpleInteractable))]
     public class FlareOnSelect : MonoBehaviour
     {

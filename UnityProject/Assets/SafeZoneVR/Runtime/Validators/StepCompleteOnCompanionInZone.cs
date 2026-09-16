@@ -2,7 +2,6 @@ using UnityEngine;
 
 namespace SafeZoneVR
 {
-    /// <summary>Conclui quando jogador (cabeça) e companheiro (NPC) estão dentro da zona.</summary>
     [RequireComponent(typeof(Collider))]
     public class StepCompleteOnCompanionInZone : StepValidatorBase
     {

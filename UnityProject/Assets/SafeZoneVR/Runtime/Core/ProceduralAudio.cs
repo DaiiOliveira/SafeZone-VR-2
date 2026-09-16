@@ -2,15 +2,10 @@ using UnityEngine;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Gera clipes de áudio simples em tempo de execução (sem depender de assets):
-    /// sinos de acerto, aviso e chuva ambiente. Mono, 22 kHz.
-    /// </summary>
     public static class ProceduralAudio
     {
         const int k_SampleRate = 22050;
 
-        /// <summary>Sequência de notas com decaimento (ex.: acerto = 3 notas ascendentes).</summary>
         public static AudioClip CreateChime(string name, float[] frequencies, float noteDuration = 0.16f, float volume = 0.5f)
         {
             var noteSamples = Mathf.RoundToInt(noteDuration * k_SampleRate);
@@ -34,7 +29,6 @@ namespace SafeZoneVR
             return Build(name, data);
         }
 
-        /// <summary>Aviso curto e grave.</summary>
         public static AudioClip CreateSoftWarning(string name, float volume = 0.35f)
         {
             var duration = 0.45f;
@@ -50,7 +44,6 @@ namespace SafeZoneVR
             return Build(name, data);
         }
 
-        /// <summary>Loop de chuva: ruído filtrado com leve variação.</summary>
         public static AudioClip CreateRainLoop(string name, float seconds = 4f, float volume = 0.25f)
         {
             var total = Mathf.RoundToInt(seconds * k_SampleRate);
@@ -65,7 +58,7 @@ namespace SafeZoneVR
                 var swell = 0.85f + 0.15f * Mathf.Sin(t * 0.7f);
                 data[i] = low * swell * volume;
             }
-            // Fade nas pontas para o loop não estalar.
+
             var fade = Mathf.RoundToInt(0.1f * k_SampleRate);
             for (var i = 0; i < fade; i++)
             {
@@ -76,7 +69,6 @@ namespace SafeZoneVR
             return Build(name, data);
         }
 
-        /// <summary>Granizo: loop de "tics" curtos e agudos.</summary>
         public static AudioClip CreateHailLoop(string name, float seconds = 3f, float hitsPerSecond = 90f, float volume = 0.35f)
         {
             var n = Mathf.CeilToInt(seconds * k_SampleRate);
@@ -86,12 +78,12 @@ namespace SafeZoneVR
             for (var h = 0; h < hits; h++)
             {
                 var start = rng.Next(n);
-                var len = 220 + rng.Next(440);                                   // 10–30 ms
+                var len = 220 + rng.Next(440);
                 var amp = (float)(0.3 + rng.NextDouble() * 0.7) * volume;
                 var freq = 1800f + (float)rng.NextDouble() * 2500f;
                 for (var i = 0; i < len; i++)
                 {
-                    var idx = (start + i) % n;                                   // dá a volta: loop sem emenda
+                    var idx = (start + i) % n;
                     data[idx] += Mathf.Sin(2f * Mathf.PI * freq * i / k_SampleRate) * Mathf.Exp(-i / (len * 0.25f)) * amp;
                 }
             }
@@ -99,7 +91,6 @@ namespace SafeZoneVR
             return Build(name, data);
         }
 
-        /// <summary>Crepitar do fogo: ruído grave + estalinhos esparsos. Loop.</summary>
         public static AudioClip CreateCrackleLoop(string name, float seconds = 3f, float volume = 0.3f)
         {
             var n = Mathf.CeilToInt(seconds * k_SampleRate);
@@ -124,7 +115,6 @@ namespace SafeZoneVR
             return Build(name, data);
         }
 
-        /// <summary>Detector de fumaça: três bipes de 1,8 kHz e uma pausa. Loop de 2 s.</summary>
         public static AudioClip CreateSmokeAlarmLoop(string name, float volume = 0.18f)
         {
             var n = k_SampleRate * 2;
@@ -142,7 +132,6 @@ namespace SafeZoneVR
             return Build(name, data);
         }
 
-        /// <summary>Sirene ao longe: dois tons alternados (650/900 Hz) a cada 0,6 s, abafados. Loop de 2,4 s.</summary>
         public static AudioClip CreateDistantSirenLoop(string name, float volume = 0.25f)
         {
             var n = (int)(2.4f * k_SampleRate);

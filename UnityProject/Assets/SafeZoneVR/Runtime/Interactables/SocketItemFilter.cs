@@ -6,10 +6,6 @@ using UnityEngine.XR.Interaction.Toolkit.Interactors;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Faz um socket aceitar apenas itens com determinados <see cref="ObjectiveItemId"/>.
-    /// Evita, por exemplo, guardar a garrafa de água no lugar dos documentos.
-    /// </summary>
     [RequireComponent(typeof(XRSocketInteractor))]
     public class SocketItemFilter : MonoBehaviour, IXRSelectFilter, IXRHoverFilter
     {

@@ -10,29 +10,24 @@ using UnityEngine.XR.Interaction.Toolkit.Interactors;
 
 namespace SafeZoneVR.Editor
 {
-    /// <summary>
-    /// Monta (idempotente) a fase Incêndio em Casa sobre a casa DC_Casa: panela em chamas, gás, tampa,
-    /// janela, benjamim/rack, fumaça, quadro de energia, porta operável, vizinho, Bombeiros, validadores e UI.
-    /// </summary>
     public static class IncendioGameplayBuilder
     {
         const string k_ScenePath = "Assets/Scenes/Fases/Incendio_EmCasa.unity";
 
-        // Posições na casa DC_Casa (metros, mundo). Cozinha a oeste (−X) da sala, corredor ao fundo, frente para +Z.
-        static readonly Vector3 k_PlayerStart = new Vector3(-2.8f, 0f, -2.6f);              // sala
-        static readonly Quaternion k_PlayerRot = Quaternion.Euler(0f, -90f, 0f);            // olhando para a cozinha (−X)
-        static readonly Vector2 k_PanXZ = new Vector2(-9.36f, -0.62f);                     // boca da frente do fogão
-        static readonly Vector3 k_GasCylinder = new Vector3(-8.45f, 0.28f, -0.45f);         // no chão, ao lado do fogão
-        static readonly Vector2 k_LidXZ = new Vector2(-10.36f, -3.05f);                    // bancada
-        static readonly Vector2 k_JugXZ = new Vector2(-8.35f, -2.75f);                     // mesa da cozinha
-        static readonly Vector3 k_PowerStrip = new Vector3(-5.05f, 0.03f, -1.05f);          // chão, ponta do rack da TV
+        static readonly Vector3 k_PlayerStart = new Vector3(-2.8f, 0f, -2.6f);
+        static readonly Quaternion k_PlayerRot = Quaternion.Euler(0f, -90f, 0f);
+        static readonly Vector2 k_PanXZ = new Vector2(-9.36f, -0.62f);
+        static readonly Vector3 k_GasCylinder = new Vector3(-8.45f, 0.28f, -0.45f);
+        static readonly Vector2 k_LidXZ = new Vector2(-10.36f, -3.05f);
+        static readonly Vector2 k_JugXZ = new Vector2(-8.35f, -2.75f);
+        static readonly Vector3 k_PowerStrip = new Vector3(-5.05f, 0.03f, -1.05f);
         static readonly Vector3 k_RackFire = new Vector3(-5.15f, 0.55f, -1.40f);
-        static readonly Vector2 k_NotebookXZ = new Vector2(-0.85f, -1.70f);                // sofá
+        static readonly Vector2 k_NotebookXZ = new Vector2(-0.85f, -1.70f);
         static readonly Vector2 k_BlanketXZ = new Vector2(-0.85f, -2.45f);
-        static readonly Vector3 k_FrontYardCenter = new Vector3(-4.5f, 1.2f, 1.3f);         // varanda e caminho de pedras
+        static readonly Vector3 k_FrontYardCenter = new Vector3(-4.5f, 1.2f, 1.3f);
         static readonly Vector3 k_FrontYardSize = new Vector3(3.0f, 2.4f, 3.6f);
-        static readonly Vector3 k_MeetingSign = new Vector3(-9.0f, 0f, 6.3f);               // calçada
-        static readonly Vector3 k_Truck = new Vector3(-13.0f, -0.06f, 9.7f);                // rua
+        static readonly Vector3 k_MeetingSign = new Vector3(-9.0f, 0f, 6.3f);
+        static readonly Vector3 k_Truck = new Vector3(-13.0f, -0.06f, 9.7f);
 
         const string k_IntroText =
             "Fim de tarde. Você esquentou óleo para fritar e foi até a sala por um instante. Ao voltar, a panela <b>pegou fogo</b>. " +
@@ -58,7 +53,7 @@ namespace SafeZoneVR.Editor
 
             var house = ScenarioSceneKit.EnsureHouseInstance(scene);
             var frontDoorPivot = ScenarioSceneKit.OpenHouseDoors(house, false);
-            ScenarioSceneKit.HidePart(house, "DC_CASA_PanelaChaleira");      // a panela da gameplay ocupa o fogão
+            ScenarioSceneKit.HidePart(house, "DC_CASA_PanelaChaleira");
             ScenarioSceneKit.SetupModelPhysics(house);
             var origin = ScenarioSceneKit.SetupXROrigin(scene, k_PlayerStart, k_PlayerRot);
             var camera = origin.Camera.transform;
@@ -79,7 +74,7 @@ namespace SafeZoneVR.Editor
 
             var kitchen = UIBuilderUtil.Child(root.transform, "Cozinha");
             var stove = ScenarioSceneKit.PartBounds(ScenarioSceneKit.ModelPart(house, "DC_CASA_Fogao"));
-            // Raycast abaixo da coifa, direto na chapa do fogão.
+
             var panPos = ScenarioSceneKit.OnSurface(k_PanXZ.x, k_PanXZ.y, 1.5f, 0.03f);
             var stoveKnobPos = new Vector3(stove.center.x + 0.2f, stove.max.y - 0.12f, stove.min.z - 0.01f);
             var pan = UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "Panela", kitchen.transform, panPos, Vector3.zero, new Vector3(0.28f, 0.06f, 0.28f), matPan);
@@ -236,7 +231,6 @@ namespace SafeZoneVR.Editor
             foreach (var go in activate) if (go != null) go.SetActive(false);
         }
 
-        /// <summary>Foco de fogo: partículas de chama e fumaça (URP Unlit aditivas), luz pontual e crepitar 3D.</summary>
         public static FireController CreateFire(Transform parent, string name, Vector3 pos, FireController.Size start, float[] growSteps, bool sparks, float residualSmoke)
         {
             var go = UIBuilderUtil.Child(parent, name);
@@ -316,7 +310,6 @@ namespace SafeZoneVR.Editor
             return ps;
         }
 
-        /// <summary>Vidro da janela da cozinha (sobre a bancada) vira folha que abre para fora com um toque.</summary>
         static ToggleOpening CreateWindow(GameObject house, Transform parent, MissionStepSO step)
         {
             var glass = ScenarioSceneKit.ModelPart(house, "DC_CASA_Janela_Direita0_Vidro");
@@ -335,12 +328,12 @@ namespace SafeZoneVR.Editor
             var toggle = hinge.gameObject.AddComponent<ToggleOpening>();
             toggle.hinge = hinge;
             toggle.axis = Vector3.up;
-            toggle.openAngle = ScenarioSceneKit.SwingAngle(hinge, Vector3.left, 80f);   // abre para fora (−X), sem bater na bancada
+            toggle.openAngle = ScenarioSceneKit.SwingAngle(hinge, Vector3.left, 80f);
             toggle.startsOpen = false;
 
             var target = hinge.gameObject.AddComponent<ObjectiveTarget>();
             target.step = step; target.markerHeightOffset = 0.3f;
-            // Legível de dentro da cozinha (lado +X).
+
             UIBuilderUtil.WorldText(parent, "Janela_Label", "JANELA\n<size=70%>aponte e aperte para abrir</size>", 0.5f, Color.white,
                 new Vector3(gb.center.x + 0.15f, gb.max.y + 0.2f, gb.center.z), new Vector3(0f, -90f, 0f), new Vector2(0.9f, 0.2f));
             return toggle;
@@ -390,7 +383,7 @@ namespace SafeZoneVR.Editor
                 var r = q.GetComponent<MeshRenderer>();
                 r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
                 r.receiveShadows = false;
-                // Segunda face para quem está dentro/acima da camada.
+
                 var q2 = UIBuilderUtil.Primitive(PrimitiveType.Quad, "Camada" + i + "_b", visual.transform, visual.transform.position + new Vector3(0f, 0.3f * i + 0.001f, 0f),
                     new Vector3(-90f, 0f, 0f), new Vector3(5.2f, 4.6f, 1f), ScenarioSceneKit.MatSmoke, false);
                 q2.GetComponent<MeshRenderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
@@ -403,7 +396,6 @@ namespace SafeZoneVR.Editor
             return smoke;
         }
 
-        /// <summary>Alarme no detector de fumaça do modelo (teto do corredor); cria um simples se o modelo não tiver.</summary>
         static SimpleLoopSound CreateDetector(GameObject house, Transform parent)
         {
             var model = ScenarioSceneKit.ModelPart(house, "DC_CASA_DetectorFumaca");
@@ -417,7 +409,6 @@ namespace SafeZoneVR.Editor
             return loop;
         }
 
-        /// <summary>Porta da frente do modelo operável (abre para dentro, −Z) com a chave "trancar" do lado de dentro.</summary>
         static ToggleOpening SetupFrontDoor(Transform hinge, Transform labelParent)
         {
             if (hinge == null)
@@ -429,14 +420,13 @@ namespace SafeZoneVR.Editor
                 leafCollider = leaf.gameObject.AddComponent<BoxCollider>();
 
             var doorInteractable = hinge.gameObject.AddComponent<XRSimpleInteractable>();
-            doorInteractable.colliders.Add(leafCollider);   // explícito: a chave (filha) tem o próprio interagível
+            doorInteractable.colliders.Add(leafCollider);
             var toggle = hinge.gameObject.AddComponent<ToggleOpening>();
             toggle.hinge = hinge;
             toggle.axis = Vector3.up;
             toggle.openAngle = ScenarioSceneKit.SwingAngle(hinge, Vector3.back, 95f);
             toggle.startsOpen = false;
 
-            // Chave na fechadura, face interna (−Z), do lado da maçaneta: decisão insegura "trancar a porta".
             var lb = ScenarioSceneKit.PartBounds(leaf);
             var keyPos = new Vector3(lb.min.x + 0.12f, 0.88f, lb.min.z - 0.03f);
             var key = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Chave", hinge, keyPos, Vector3.zero, new Vector3(0.02f, 0.05f, 0.04f), ScenarioSceneKit.MatMarker);
@@ -446,9 +436,8 @@ namespace SafeZoneVR.Editor
             wrong.message = "Não tranque a porta: os Bombeiros e outras pessoas podem precisar passar.";
             UIBuilderUtil.WorldText(key.transform, "Label", "Trancar?", 0.5f, new Color(1f, 0.75f, 0.35f),
                 keyPos + new Vector3(0f, -0.16f, -0.06f), Vector3.zero, new Vector2(0.6f, 0.15f)).gameObject.AddComponent<FacePlayer>().yawOnly = true;
-            key.transform.GetChild(0).localScale = new Vector3(50f, 20f, 25f);   // etiqueta não herda a escala da chave
+            key.transform.GetChild(0).localScale = new Vector3(50f, 20f, 25f);
 
-            // Legível de fora (+Z), de onde o jogador fecha a porta.
             UIBuilderUtil.WorldText(labelParent, "PortaFrente_Label", "PORTA DA FRENTE\n<size=70%>aponte e aperte para abrir/fechar</size>", 0.5f, Color.white,
                 new Vector3(lb.center.x, 2.25f, -0.45f), new Vector3(0f, 180f, 0f), new Vector2(1.2f, 0.2f));
             return toggle;

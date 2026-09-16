@@ -3,10 +3,6 @@ using UnityEngine;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Conclui quando todas as aberturas chegam ao estado-alvo. Só avalia quando uma abertura muda de estado,
-    /// então uma porta que começa fechada não conclui "fechar a porta" logo no início.
-    /// </summary>
     public class StepCompleteOnOpenings : StepValidatorBase
     {
         [SerializeField] List<ToggleOpening> m_Openings = new List<ToggleOpening>();

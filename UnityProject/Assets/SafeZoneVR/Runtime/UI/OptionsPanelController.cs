@@ -4,10 +4,6 @@ using UnityEngine.UI;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Painel de conforto e acessibilidade (RNF04): locomoção, giro, vinheta, modo sentado, recentrar,
-    /// reiniciar fase e voltar ao menu. Usado na fase (via botão do pulso) e no menu principal.
-    /// </summary>
     public class OptionsPanelController : MonoBehaviour
     {
         [SerializeField]

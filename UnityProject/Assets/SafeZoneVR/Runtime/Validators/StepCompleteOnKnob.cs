@@ -3,10 +3,6 @@ using UnityEngine;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Conclui o passo quando um <see cref="XRKnob"/> (registro de água, válvula de gás) é girado
-    /// além de um limiar, em qualquer direção, a partir do valor inicial.
-    /// </summary>
     public class StepCompleteOnKnob : StepValidatorBase
     {
         [SerializeField]

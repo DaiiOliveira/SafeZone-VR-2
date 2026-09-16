@@ -3,12 +3,10 @@ using UnityEngine.SceneManagement;
 
 namespace SafeZoneVR
 {
-    /// <summary>Navegação entre cenas com fade (conforto em VR).</summary>
     public static class SceneFlow
     {
         public const string k_DefaultMenuScene = "MainMenu";
 
-        // Uma troca de cena por vez: dois cliques seguidos encadeariam dois carregamentos.
         static bool s_Loading;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]

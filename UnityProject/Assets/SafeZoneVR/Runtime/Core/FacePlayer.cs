@@ -2,7 +2,6 @@ using UnityEngine;
 
 namespace SafeZoneVR
 {
-    /// <summary>Faz o objeto olhar para a câmera do jogador (UI de pulso, etiquetas, marcadores).</summary>
     public class FacePlayer : MonoBehaviour
     {
         [SerializeField]

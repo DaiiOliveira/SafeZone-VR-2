@@ -6,7 +6,6 @@ using UnityEngine.XR.Interaction.Toolkit.Interactors;
 
 namespace SafeZoneVR
 {
-    /// <summary>Conclui quando N interagíveis diferentes da lista forem selecionados (gatilho/grip), sem contar sockets.</summary>
     public class StepCompleteOnInteractCount : StepValidatorBase
     {
         [SerializeField] List<XRBaseInteractable> m_Interactables = new List<XRBaseInteractable>();

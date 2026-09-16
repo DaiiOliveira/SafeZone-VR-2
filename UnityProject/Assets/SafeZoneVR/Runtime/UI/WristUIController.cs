@@ -5,10 +5,6 @@ using UnityEngine.UI;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// "Relógio" no pulso esquerdo (RF04): passo atual, instrução, progresso, tempo, nível da água,
-    /// avisos e uma bússola que aponta para o objetivo. Botão "Opções" abre o painel de conforto.
-    /// </summary>
     public class WristUIController : MonoBehaviour
     {
         [SerializeField]
@@ -124,7 +120,6 @@ namespace SafeZoneVR
 
             if (m_ScenarioManager != null)
             {
-                // Antes do início da fase o relógio cobriria o painel de briefing.
                 m_ScenarioManager.onScenarioStarted.AddListener(ShowPanel);
                 SetPanelVisible(m_ScenarioManager.hasStarted);
                 m_ScenarioManager.onStepChanged.AddListener(OnStepChanged);
@@ -276,7 +271,7 @@ namespace SafeZoneVR
 
         void OnInfo(string message)
         {
-            ShowWarning(message, new Color(0.6f, 0.85f, 1f));   // azul-claro = informação
+            ShowWarning(message, new Color(0.6f, 0.85f, 1f));
         }
 
         void OnScenarioComplete()
@@ -284,7 +279,6 @@ namespace SafeZoneVR
             SetText(m_ProgressText, "Concluído");
             OnStepChanged(null);
 
-            // Relógio, bússola e opções saem de cena enquanto o relatório final está aberto.
             if (m_OptionsPanel != null)
                 m_OptionsPanel.Hide();
             if (m_CompassArrow != null)

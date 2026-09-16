@@ -4,18 +4,14 @@ using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Objeto que o jogador "observa" apontando e apertando o gatilho (ex.: forro cedendo). Mostra uma etiqueta
-    /// explicativa por alguns segundos e destaca o objeto via MaterialPropertyBlock.
-    /// </summary>
     [RequireComponent(typeof(XRSimpleInteractable))]
     public class InspectableSign : MonoBehaviour
     {
         static readonly int k_BaseColor = Shader.PropertyToID("_BaseColor");
 
-        [SerializeField] TextMeshPro m_Label;               // começa desativado
+        [SerializeField] TextMeshPro m_Label;
         [SerializeField, TextArea] string m_Explanation;
-        [SerializeField] Renderer m_Highlight;              // opcional
+        [SerializeField] Renderer m_Highlight;
         [SerializeField] float m_LabelSeconds = 6f;
 
         public bool inspected { get; private set; }

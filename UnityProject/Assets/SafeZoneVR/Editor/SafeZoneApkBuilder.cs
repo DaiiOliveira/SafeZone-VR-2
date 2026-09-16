@@ -8,11 +8,6 @@ using UnityEngine;
 
 namespace SafeZoneVR.Editor
 {
-    /// <summary>
-    /// Gera o APK do Quest. Aplica as configurações do <see cref="QuestProjectConfigurator"/> antes de compilar,
-    /// então o APK sai sempre com Vulkan, OpenXR, IL2CPP/ARM64 e as quatro cenas na ordem certa.
-    /// Também dá para chamar pela linha de comando (ver <see cref="BuildFromCommandLine"/>).
-    /// </summary>
     public static class SafeZoneApkBuilder
     {
         const string k_OutputFolder = "Builds";
@@ -33,7 +28,6 @@ namespace SafeZoneVR.Editor
                 EditorUtility.DisplayDialog("SafeZone VR", "APK de desenvolvimento gerado em:\n" + apk, "OK");
         }
 
-        /// <summary>Compila o APK e devolve o caminho; null se o build falhar.</summary>
         public static string Build(bool development)
         {
             QuestProjectConfigurator.Apply();
@@ -74,10 +68,6 @@ namespace SafeZoneVR.Editor
             return apk;
         }
 
-        /// <summary>
-        /// Entrada para build automatizado:
-        /// Unity.exe -quit -batchmode -projectPath UnityProject -executeMethod SafeZoneVR.Editor.SafeZoneApkBuilder.BuildFromCommandLine
-        /// </summary>
         public static void BuildFromCommandLine()
         {
             var development = Environment.GetCommandLineArgs().Contains("-development");

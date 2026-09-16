@@ -14,11 +14,6 @@ namespace SafeZoneVR
     [Serializable]
     public class StringEvent : UnityEvent<string> { }
 
-    /// <summary>
-    /// Estado da fase (RF02): mantém o passo atual, registra conclusões, erros e tempo, e dispara
-    /// eventos consumidos pela UI de pulso, pelos guias visuais e pelo relatório final.
-    /// Passos fora de ordem são aceitos, mas marcados como tal.
-    /// </summary>
     public class ScenarioManager : MonoBehaviour
     {
         [SerializeField]
@@ -62,7 +57,6 @@ namespace SafeZoneVR
 
         static ScenarioManager s_Instance;
 
-        /// <summary>Instância da cena atual (busca uma vez se ainda não registrada, ex.: após recarga de domínio).</summary>
         public static ScenarioManager instance
         {
             get
@@ -143,7 +137,6 @@ namespace SafeZoneVR
                 return;
             }
 
-            // O passo atual já é conhecido antes do início, para a UI mostrar o que vem pela frente.
             currentStep = m_Scenario.steps[0];
             m_OnStepChanged.Invoke(currentStep);
 
@@ -151,7 +144,6 @@ namespace SafeZoneVR
                 StartScenario();
         }
 
-        /// <summary>Inicia o cronômetro. Chamado pelo painel de briefing ou automaticamente.</summary>
         public void StartScenario()
         {
             if (hasStarted || m_Scenario == null)
@@ -172,7 +164,6 @@ namespace SafeZoneVR
             return step != null && currentStep == step;
         }
 
-        /// <summary>Progresso parcial de um passo (ex.: 2 de 3 itens do kit) para feedback imediato.</summary>
         public void ReportStepProgress(MissionStepSO step, int done, int total)
         {
             if (step == null || isComplete)
@@ -221,7 +212,6 @@ namespace SafeZoneVR
             }
         }
 
-        /// <summary>Em ordem = todos os passos anteriores já feitos, exceto os do mesmo grupo de ordem (≠ 0).</summary>
         bool IsInOrder(IReadOnlyList<MissionStepSO> steps, int index)
         {
             var group = steps[index].orderGroup;
@@ -235,17 +225,12 @@ namespace SafeZoneVR
             return true;
         }
 
-        /// <summary>Mensagem informativa (alerta oficial, fala de NPC). Aparece no relógio e não conta como erro.</summary>
         public void ShowInfo(string message)
         {
             if (!string.IsNullOrEmpty(message))
                 m_OnInfo.Invoke(message);
         }
 
-        /// <summary>
-        /// Registra uma decisão insegura (ex.: tentar sair de carro). Não encerra a fase.
-        /// O mesmo id só conta uma vez a cada <paramref name="cooldownSeconds"/>.
-        /// </summary>
         public void RegisterMistake(string mistakeId, string message, float cooldownSeconds = 10f)
         {
             if (isComplete)
@@ -265,13 +250,12 @@ namespace SafeZoneVR
             m_OnMistake.Invoke(message);
         }
 
-        /// <summary>Observação livre incluída no relatório (ex.: nível da água ao concluir).</summary>
         public void AddResultNote(string note)
         {
             if (string.IsNullOrEmpty(note))
                 return;
             m_Notes.Add(note);
-            // Ouvintes de onScenarioComplete podem adicionar notas depois que o resultado foi montado.
+
             if (m_Result != null)
                 m_Result.notes.Add(note);
         }

@@ -18,10 +18,6 @@ using UnityEngine.XR.Interaction.Toolkit.Locomotion.Turning;
 
 namespace SafeZoneVR.Editor
 {
-    /// <summary>
-    /// Helpers compartilhados pelos builders de fase (Alagamento, Incêndio, Granizo): XR Origin, materiais,
-    /// casa reaproveitada (prefab), teleporte, colisores, interagíveis genéricos, UI de pulso, painéis e NPCs.
-    /// </summary>
     public static class ScenarioSceneKit
     {
         public const string k_RootName = "SafeZone_Gameplay";
@@ -89,17 +85,12 @@ namespace SafeZoneVR.Editor
             light.transform.rotation = Quaternion.Euler(euler);
         }
 
-        // Os FBX exportados do Blender chegam deitados (altura no eixo Z). Girando a raiz, casa e praça ficam de pé
-        // e continuam no mesmo referencial: as duas na origem já se encaixam (praça do outro lado da rua).
         public static readonly Quaternion k_ModelUpright = Quaternion.Euler(-90f, 0f, 0f);
 
-        // Raízes da casa antiga (prefab Casa_SafeZone e sobras da cena original do Alagamento).
         static readonly string[] k_LegacyHouseRoots = { "Casa_SafeZone", "Disjuntor_PowerOff", "Fase_AlagamentoEmCasa" };
 
-        /// <summary>Casa DC_Casa recriada do zero na cena (desempacotada, para os builders mexerem em portas e peças).</summary>
         public static GameObject EnsureHouseInstance(Scene scene)
         {
-            // Comparação por prefixo: sem o prefab, o nome vem com sufixo "(Missing Prefab with guid: ...)".
             foreach (var rootGo in scene.GetRootGameObjects())
             {
                 if (rootGo == null) continue;
@@ -115,7 +106,6 @@ namespace SafeZoneVR.Editor
             return house;
         }
 
-        /// <summary>Praça DC_Praca recriada do zero na cena, no mesmo referencial da casa.</summary>
         public static GameObject EnsurePracaInstance(Scene scene)
         {
             return InstantiateModel(scene, k_PracaModelPath, k_PracaRootName);
@@ -128,17 +118,15 @@ namespace SafeZoneVR.Editor
             if (model == null)
                 throw new System.Exception($"Modelo não encontrado em {path}.");
             var instance = (GameObject)PrefabUtility.InstantiatePrefab(model, scene);
-            // Desempacotado: portas ganham pivôs de dobradiça e peças são escondidas; a cena é regerada a cada build.
+
             PrefabUtility.UnpackPrefabInstance(instance, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
             instance.name = rootName;
             instance.transform.SetPositionAndRotation(Vector3.zero, k_ModelUpright);
             return instance;
         }
 
-        // O importador da casa acende qualquer material com "Luz" no nome; o quadro de energia não é luminária.
         static readonly string[] k_NotEmissive = { "QuadroLuz" };
 
-        /// <summary>Apaga a emissão indevida de algumas peças, sem mexer nos materiais do FBX (property block por renderer).</summary>
         static void DimFalseEmission(GameObject model)
         {
             var block = new MaterialPropertyBlock();
@@ -154,13 +142,11 @@ namespace SafeZoneVR.Editor
             }
         }
 
-        /// <summary>Peça do modelo pelo nome (null se não existir).</summary>
         public static Transform ModelPart(GameObject model, string name)
         {
             return model != null ? FindChildRecursive(model.transform, name) : null;
         }
 
-        /// <summary>Bounds de mundo de uma peça do modelo (todas as malhas dela e das filhas).</summary>
         public static Bounds PartBounds(Transform part)
         {
             var renderers = part.GetComponentsInChildren<Renderer>(true);
@@ -172,7 +158,6 @@ namespace SafeZoneVR.Editor
             return b;
         }
 
-        /// <summary>Desliga o visual e os colisores de uma peça (ex.: panela do modelo, trocada pela da gameplay).</summary>
         public static void HidePart(GameObject model, string name)
         {
             var part = ModelPart(model, name);
@@ -226,7 +211,6 @@ namespace SafeZoneVR.Editor
             return origin;
         }
 
-        /// <summary>Remove a "Main Camera" padrão de cena nova (fora do XR Origin): 2 AudioListeners e Camera.main errado.</summary>
         static void RemoveStrayCameras(Scene scene, XROrigin origin)
         {
             foreach (var rootGo in scene.GetRootGameObjects())
@@ -253,7 +237,6 @@ namespace SafeZoneVR.Editor
                 go.AddComponent<UnityEngine.XR.Interaction.Toolkit.UI.XRUIInputModule>();
             }
 
-            // Mouse e toque para o simulador do editor; no headset não há nenhum dos dois.
             var inputModule = Object.FindAnyObjectByType<UnityEngine.XR.Interaction.Toolkit.UI.XRUIInputModule>();
             if (inputModule != null)
             {
@@ -287,7 +270,6 @@ namespace SafeZoneVR.Editor
             return spawn.AddComponent<PlayerSpawnPoint>();
         }
 
-        /// <summary>ScenarioManager (autoStart = false), FeedbackPlayer, ComfortSettingsApplier e ObjectiveBeaconSystem.</summary>
         public static ScenarioManager CreateCore(Transform root, XROrigin origin, ScenarioSO scenario, bool rainAmbience, out FeedbackPlayer feedback)
         {
             var managerGo = UIBuilderUtil.Child(root, "ScenarioManager");
@@ -332,7 +314,6 @@ namespace SafeZoneVR.Editor
             if (MatLever == null)
                 MatLever = UIBuilderUtil.GetOrCreateMaterial("Mat_Alavanca", new Color(0.85f, 0.1f, 0.1f), false, false, 0.5f);
 
-            // Compartilhados pelas fases novas (NPCs, cenário urbano, granizo, fogo).
             MatSkin = UIBuilderUtil.GetOrCreateMaterial("Mat_Pele", new Color(0.86f, 0.66f, 0.52f), false, false, 0.2f);
             MatCloth = UIBuilderUtil.GetOrCreateMaterial("Mat_Roupa", new Color(0.25f, 0.35f, 0.6f), false, false, 0.1f);
             MatMetal = UIBuilderUtil.GetOrCreateMaterial("Mat_Metal", new Color(0.6f, 0.62f, 0.66f), false, false, 0.75f);
@@ -357,17 +338,12 @@ namespace SafeZoneVR.Editor
             return area;
         }
 
-        // Peças sem colisor: céu e entorno distante, fiação, plantas miúdas e o que fica acima da cabeça.
         static readonly string[] k_NoColliderKeys =
         {
             "Montanha", "Nuvem", "PosteRede", "Fio", "FloresJardim", "Plantas", "Arbusto", "CercaViva", "Forro", "Telhado",
             "Oitao", "Tabeira", "Calha", "Luminaria", "Plafon", "Pendente", "Cortina", "Varal", "LedAereo",
         };
 
-        /// <summary>
-        /// Física do modelo (casa ou praça): pisos, tapetes, calçadas, rua e gramas viram MeshCollider + área de teleporte;
-        /// paredes, móveis e estruturas ganham colisor estático; árvores só no tronco. Nada disso vem do importador.
-        /// </summary>
         public static void SetupModelPhysics(GameObject model)
         {
             foreach (var mf in model.GetComponentsInChildren<MeshFilter>(true))
@@ -401,7 +377,6 @@ namespace SafeZoneVR.Editor
             Physics.SyncTransforms();
         }
 
-        /// <summary>Superfície baixa e fina (piso, tapete, soleira, calçada, rua, grama, degrau): dá para teleportar em cima.</summary>
         static bool IsFloorLike(Bounds b)
         {
             return b.size.y <= 0.35f && b.max.y <= 0.25f && b.size.x * b.size.z >= 0.2f;
@@ -417,10 +392,6 @@ namespace SafeZoneVR.Editor
             capsule.height = 2.4f;
         }
 
-        /// <summary>
-        /// Peças leves (ou grandes, como paredes com vão de porta) usam MeshCollider; peças pequenas e pesadas, como o
-        /// carro, usam caixa.
-        /// </summary>
         static void AddPieceCollider(MeshFilter mf, Bounds worldBounds)
         {
             var mesh = mf.sharedMesh;
@@ -456,7 +427,6 @@ namespace SafeZoneVR.Editor
             return false;
         }
 
-        /// <summary>Ponto da superfície embaixo de (x, z), por raycast nos colisores já criados. Sem acerto: y = 0.</summary>
         public static Vector3 OnSurface(float x, float z, float fromY = 2.5f, float lift = 0f)
         {
             Physics.SyncTransforms();
@@ -465,10 +435,6 @@ namespace SafeZoneVR.Editor
             return new Vector3(x, lift, z);
         }
 
-        /// <summary>
-        /// Coloca uma folha (porta, janela, portão) sob um pivô na dobradiça, com rotação de mundo zero:
-        /// o eixo Y local do pivô é o vertical do mundo, como o <see cref="ToggleOpening"/> espera.
-        /// </summary>
         public static Transform HingePivot(Transform leaf, Vector3 hinge)
         {
             var pivot = new GameObject(leaf.name + "_Dobradica").transform;
@@ -480,7 +446,6 @@ namespace SafeZoneVR.Editor
             return pivot;
         }
 
-        /// <summary>Ângulo (±graus em Y) que leva o centro da folha para o lado <paramref name="towards"/>.</summary>
         public static float SwingAngle(Transform pivot, Vector3 towards, float degrees)
         {
             var offset = PartBounds(pivot).center - pivot.position;
@@ -489,7 +454,6 @@ namespace SafeZoneVR.Editor
             return Vector3.Dot(plus, towards) >= 0f ? degrees : -degrees;
         }
 
-        /// <summary>Folha de porta do modelo (origem já na dobradiça) aberta para o lado indicado. Devolve o pivô.</summary>
         public static Transform OpenModelDoor(GameObject model, string leafName, Vector3 towards, float degrees = 95f)
         {
             var leaf = ModelPart(model, leafName);
@@ -503,18 +467,14 @@ namespace SafeZoneVR.Editor
             return pivot;
         }
 
-        /// <summary>
-        /// Portas internas abertas (cômodos acessíveis) e portão de pedestres aberto para dentro do lote. A porta da frente
-        /// ganha pivô na dobradiça e só abre se <paramref name="openFrontDoor"/>; o pivô é devolvido para quem precisar dela.
-        /// </summary>
         public static Transform OpenHouseDoors(GameObject house, bool openFrontDoor)
         {
-            OpenModelDoor(house, "DC_CASA_Porta_FrenteCorredor0", Vector3.forward);   // corredor → sala
-            OpenModelDoor(house, "DC_CASA_Porta_FrenteCorredor1", Vector3.forward);   // corredor → cozinha
-            OpenModelDoor(house, "DC_CASA_Porta_CorredorFundo0", Vector3.back);       // quarto de casal
-            OpenModelDoor(house, "DC_CASA_Porta_CorredorFundo1", Vector3.back);       // quarto 2
-            OpenModelDoor(house, "DC_CASA_Porta_CorredorFundo2", Vector3.back);       // banheiro
-            OpenModelDoor(house, "DC_CASA_Porta_Direita1", Vector3.left);             // cozinha → quintal
+            OpenModelDoor(house, "DC_CASA_Porta_FrenteCorredor0", Vector3.forward);
+            OpenModelDoor(house, "DC_CASA_Porta_FrenteCorredor1", Vector3.forward);
+            OpenModelDoor(house, "DC_CASA_Porta_CorredorFundo0", Vector3.back);
+            OpenModelDoor(house, "DC_CASA_Porta_CorredorFundo1", Vector3.back);
+            OpenModelDoor(house, "DC_CASA_Porta_CorredorFundo2", Vector3.back);
+            OpenModelDoor(house, "DC_CASA_Porta_Direita1", Vector3.left);
 
             var gate = ModelPart(house, "DC_CASA_PortaoPedestre");
             if (gate != null)
@@ -569,7 +529,6 @@ namespace SafeZoneVR.Editor
             return wrong;
         }
 
-        /// <summary>Cria (ou reaproveita) uma layer no TagManager.</summary>
         public static int EnsureLayer(string name)
         {
             var tagManager = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset")[0]);
@@ -587,10 +546,6 @@ namespace SafeZoneVR.Editor
             throw new System.Exception("Sem layer livre para " + name);
         }
 
-        /// <summary>
-        /// Alavanca do quadro de energia na face frontal <paramref name="frontCenter"/>; <paramref name="facing"/> aponta
-        /// para fora da parede (+Z local). Com <paramref name="withBox"/> falso, aproveita a caixa do modelo.
-        /// </summary>
         public static BreakerLever SetupBreaker(Transform parent, MissionStepSO step, Vector3 frontCenter, Quaternion facing, bool withBox)
         {
             var box = UIBuilderUtil.Child(parent, "Disjuntor_PowerOff");
@@ -630,7 +585,6 @@ namespace SafeZoneVR.Editor
             lever.startsOn = true;
             lever.indicatorRenderer = indicator.GetComponent<Renderer>();
 
-            // Legível para quem está de frente para o quadro (lado +Z local).
             UIBuilderUtil.WorldText(box.transform, "Label", "QUADRO DE ENERGIA", 0.35f, Color.white,
                 frontCenter + facing * new Vector3(0f, 0.36f, 0.03f), (facing * Quaternion.Euler(0f, 180f, 0f)).eulerAngles, new Vector2(0.7f, 0.16f));
 
@@ -640,10 +594,6 @@ namespace SafeZoneVR.Editor
             return lever;
         }
 
-        /// <summary>
-        /// Luzes da casa acesas sem bake: os marcadores DC_LUZ_* do modelo viram luzes Realtime sem sombra, num
-        /// <see cref="HouseLights"/> que a alavanca do quadro de energia apaga.
-        /// </summary>
         public static HouseLights SetupHouseLights(GameObject house, Transform parent, BreakerLever breaker)
         {
             var go = UIBuilderUtil.Child(parent, "LuzesDaCasa");
@@ -653,7 +603,7 @@ namespace SafeZoneVR.Editor
                 if (light.type == LightType.Directional)
                     continue;
                 light.lightmapBakeType = LightmapBakeType.Realtime;
-                light.shadows = LightShadows.None;   // 20+ luzes em tempo real: sombra sai caro no Quest
+                light.shadows = LightShadows.None;
                 light.enabled = true;
                 control.lights.Add(light);
             }
@@ -663,17 +613,15 @@ namespace SafeZoneVR.Editor
             return control;
         }
 
-        /// <summary>Alavanca sobre o quadro de energia da casa DC_Casa (corredor), no lugar do disjuntor geral do FBX.</summary>
         public static BreakerLever SetupHouseBreaker(GameObject house, Transform parent, MissionStepSO step)
         {
             HidePart(house, "DC_CASA_QDL_DisjuntorGeral");
             var panel = PartBounds(ModelPart(house, "DC_CASA_QuadroLuz"));
-            // O quadro fica na parede do corredor e olha para −Z.
+
             var front = new Vector3(panel.center.x, panel.center.y, panel.min.z);
             return SetupBreaker(parent, step, front, Quaternion.Euler(0f, 180f, 0f), false);
         }
 
-        /// <summary>Registro/botão giratório genérico (XRKnob) com volante cilíndrico e etiqueta.</summary>
         public static XRKnob CreateKnob(Transform parent, string name, Vector3 center, Quaternion rotation, float radius, float thickness,
             Material mat, string label, Vector3 labelOffset, Vector3 labelEuler, MissionStepSO step)
         {
@@ -718,7 +666,6 @@ namespace SafeZoneVR.Editor
             var go = UIBuilderUtil.Primitive(type, name, parent, pos, euler, scale, mat);
             if (type == PrimitiveType.Cylinder)
             {
-                // Cápsula/mesh do cilindro: troca por BoxCollider para física estável e barata.
                 var c = go.GetComponent<Collider>();
                 if (c != null) Object.DestroyImmediate(c);
                 var box = go.AddComponent<BoxCollider>();
@@ -749,7 +696,7 @@ namespace SafeZoneVR.Editor
             var label = UIBuilderUtil.WorldText(go.transform, "Label", displayName, 0.5f, Color.white, pos + Vector3.up * 0.12f, Vector3.zero, new Vector2(0.6f, 0.12f));
             var face = label.gameObject.AddComponent<FacePlayer>();
             face.yawOnly = true;
-            // Etiqueta não deve herdar a escala do primitivo.
+
             label.transform.localScale = new Vector3(1f / Mathf.Max(scale.x, 0.001f), 1f / Mathf.Max(scale.y, 0.001f), 1f / Mathf.Max(scale.z, 0.001f));
             return go;
         }
@@ -812,7 +759,6 @@ namespace SafeZoneVR.Editor
             return template;
         }
 
-        /// <summary>Setas verdes no chão (rota segura) ao longo de pontos; o grupo começa desligado.</summary>
         public static void CreateRouteChevrons(Transform parent, Vector3[] points)
         {
             for (var i = 0; i < points.Length; i++)
@@ -830,7 +776,6 @@ namespace SafeZoneVR.Editor
             parent.gameObject.SetActive(false);
         }
 
-        /// <summary>NPC low-poly: corpo (cápsula), cabeça, opcionalmente andador. Collider na layer Ignore Raycast + XRSimpleInteractable.</summary>
         public static XRSimpleInteractable CreateNpc(Transform parent, string name, Vector3 feetPos, float yaw, Color clothColor, bool walker,
             string speech, out TextMeshPro speechBubble)
         {
@@ -881,7 +826,6 @@ namespace SafeZoneVR.Editor
             return list;
         }
 
-        /// <summary>Relógio de pulso. Com <paramref name="withCallButton"/>, a faixa inferior vira Opções + Ligar e o botão "Ligar" é retornado.</summary>
         public static WristUIController CreateWristUI(Transform hand, ScenarioManager manager, FloodWaterController water, OptionsPanelController options,
             bool withCallButton, out Button callButton)
         {
@@ -918,7 +862,6 @@ namespace SafeZoneVR.Editor
             ctrl.waterText = UIBuilderUtil.TopText(panel, "Water", "", 12f, new Color(0.55f, 0.8f, 1f), TextAlignmentOptions.Left, 182f, 18f, 10f);
             ctrl.warningText = UIBuilderUtil.TopText(panel, "Warning", "", 12f, new Color(1f, 0.8f, 0.4f), TextAlignmentOptions.TopLeft, 200f, 22f, 10f);
 
-            // Botão largo (~2,3 cm de altura): fácil de acertar com o raio ou com o dedo (poke).
             callButton = null;
             if (withCallButton)
             {
@@ -931,7 +874,6 @@ namespace SafeZoneVR.Editor
                     8f, 52f, 0f, 1f, 8f, out _);
             }
 
-            // Bússola: seta 3D acima do painel apontando para o objetivo atual.
             var compass = UIBuilderUtil.Child(wrist.transform, "Compass");
             compass.transform.localPosition = new Vector3(0f, 0.075f, 0f);
             UIBuilderUtil.Primitive(PrimitiveType.Cube, "Body", compass.transform, Vector3.zero, Vector3.zero, new Vector3(0.012f, 0.004f, 0.035f), MatMarker, false);
@@ -995,7 +937,7 @@ namespace SafeZoneVR.Editor
         {
             var go = UIBuilderUtil.Child(parent, "EndReportPanel");
             UIBuilderUtil.AddLazyFollow(go, camera, new Vector3(0f, 0.02f, 1.95f), 3f);
-            // 0,0016 m por pixel: o painel fica com 1,38 m x 1,22 m, bem mais legível no headset.
+
             var canvas = UIBuilderUtil.CreateWorldCanvas("Canvas", go.transform, new Vector2(860f, 760f), 0.0016f);
             var panel = canvas.transform;
             UIBuilderUtil.FullPanel(panel, "Background", UIBuilderUtil.PanelColor);
@@ -1033,7 +975,6 @@ namespace SafeZoneVR.Editor
             return ctrl;
         }
 
-        /// <summary>Painel de ligação de emergência (199/193/190/192) aberto pelo botão "Ligar" do relógio.</summary>
         public static EmergencyCallPanel CreateCallPanel(Transform parent, Transform camera, Button openButton,
             string reply199, string reply193, string reply190, string reply192, params string[] acceptedNumbers)
         {
@@ -1075,7 +1016,6 @@ namespace SafeZoneVR.Editor
             return ctrl;
         }
 
-        /// <summary>Legenda de fase presa à câmera (a 0,6 m), renderizada na frente do FadeQuad. Começa desligada.</summary>
         public static TextMeshProUGUI CreatePhaseCaption(Transform camera)
         {
             var existing = camera.Find("PhaseCaption");
@@ -1094,7 +1034,6 @@ namespace SafeZoneVR.Editor
             var text = UIBuilderUtil.Text(go.transform, "Caption", "", 40f, Color.white, TextAlignmentOptions.Center,
                 Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, FontStyles.Italic);
 
-            // Material do TMP na frente do fade (renderQueue 4001).
             var font = UIBuilderUtil.Font;
             if (font != null && font.material != null)
             {

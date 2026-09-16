@@ -4,11 +4,6 @@ using UnityEngine.UI;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Menu principal (RF01) no hub da Defesa Civil: liga cada totem a um cenário do catálogo,
-    /// abre o painel de conforto e encerra o jogo. A escolha da fase acontece no próprio totem
-    /// (<see cref="HubKiosk"/>).
-    /// </summary>
     public class MainMenuController : MonoBehaviour
     {
         [SerializeField]
@@ -46,7 +41,6 @@ namespace SafeZoneVR
                 m_QuitButton.onClick.AddListener(Quit);
         }
 
-        /// <summary>Totens sem cenário definido recebem os do catálogo, na ordem; todos são reescritos.</summary>
         void BindKiosks()
         {
             var scenarios = m_Catalog != null ? m_Catalog.scenarios : null;

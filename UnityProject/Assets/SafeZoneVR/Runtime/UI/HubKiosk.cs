@@ -4,10 +4,6 @@ using UnityEngine.UI;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Um totem do hub (RF01): mostra um cenário do catálogo no painel do pedestal — nome, resumo,
-    /// melhor pontuação — e carrega a fase quando o jogador aperta "Jogar".
-    /// </summary>
     public class HubKiosk : MonoBehaviour
     {
         [SerializeField]
@@ -61,7 +57,6 @@ namespace SafeZoneVR
             Refresh();
         }
 
-        /// <summary>Reescreve os textos do totem a partir do cenário (a melhor pontuação muda entre partidas).</summary>
         public void Refresh()
         {
             var available = m_Scenario != null && m_Scenario.isAvailable;

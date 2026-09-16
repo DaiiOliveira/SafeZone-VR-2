@@ -37,7 +37,8 @@ Os dois buracos reais são de estrutura (sem `.asmdef`, sem teste), não de escr
 (as regras `UNT****`). Ele **já vem** no projeto através de `com.unity.feature.development`
 (pacotes `ide.visualstudio` e `ide.rider`) — só faltava dizer o que é erro e o que é aviso.
 
-Foi criado um `.editorconfig` na raiz do repositório com as severidades. O critério:
+Foi criado um `.editorconfig` na raiz do repositório com as severidades. Ele não tem
+comentários, como o resto do código; o critério está aqui:
 
 - **Erro** para regras que quebram comportamento: assinatura errada de mensagem da Unity
   (`UNT0006`), `??`/`?.`/`??=` em `UnityEngine.Object` (`UNT0007/8/23` — o operador ignora a

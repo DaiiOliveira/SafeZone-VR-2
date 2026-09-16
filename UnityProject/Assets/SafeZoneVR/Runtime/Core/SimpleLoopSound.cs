@@ -2,7 +2,6 @@ using UnityEngine;
 
 namespace SafeZoneVR
 {
-    /// <summary>Fonte de áudio simples (detector de fumaça, sirene) com métodos públicos para listeners persistentes.</summary>
     public class SimpleLoopSound : MonoBehaviour
     {
         public enum ClipKind { SmokeAlarm, DistantSiren, Crackle, Hail, Rain }

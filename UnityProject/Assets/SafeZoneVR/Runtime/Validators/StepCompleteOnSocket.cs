@@ -5,12 +5,6 @@ using UnityEngine.XR.Interaction.Toolkit.Interactors;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Conclui o passo quando todos os itens exigidos (por <see cref="ObjectiveItemId"/>) estiverem
-    /// encaixados em qualquer um dos sockets listados. Ex.: kit = água + remédios + lanterna na mochila;
-    /// objetos de valor = documentos + porta-retrato no alto do armário.
-    /// Reporta progresso parcial (2 de 3) para feedback imediato.
-    /// </summary>
     public class StepCompleteOnSocket : StepValidatorBase
     {
         [SerializeField]
@@ -103,7 +97,6 @@ namespace SafeZoneVR
             if (socket == null || !m_Placed.Remove(socket))
                 return;
 
-            // Saída cancelada = socket/item desativado ou cena descarregando: não é ação do jogador.
             if (args.isCanceled || !isActiveAndEnabled)
                 return;
 

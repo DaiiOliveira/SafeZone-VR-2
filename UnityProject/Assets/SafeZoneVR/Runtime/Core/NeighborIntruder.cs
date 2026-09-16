@@ -6,10 +6,6 @@ using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Vizinho que chega pela calçada querendo entrar na casa em chamas. Ao ser selecionado (impedido), desiste e
-    /// vai para o ponto de encontro. O objeto começa desligado e é ligado por ActivateOnStepCompleted.
-    /// </summary>
     public class NeighborIntruder : MonoBehaviour
     {
         [SerializeField] CompanionFollower m_Follower;

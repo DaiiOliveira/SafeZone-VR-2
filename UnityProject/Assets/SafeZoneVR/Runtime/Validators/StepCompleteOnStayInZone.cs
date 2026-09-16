@@ -2,10 +2,6 @@ using UnityEngine;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Conclui depois de o jogador acumular X segundos com a cabeça dentro da zona. Sair pausa o contador, sem zerar.
-    /// Verificação a cada 0,2 s; progresso para o relógio a cada 5 s.
-    /// </summary>
     [RequireComponent(typeof(Collider))]
     public class StepCompleteOnStayInZone : StepValidatorBase
     {

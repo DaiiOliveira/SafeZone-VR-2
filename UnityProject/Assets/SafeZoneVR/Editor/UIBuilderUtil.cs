@@ -8,7 +8,6 @@ using UnityEngine.XR.Interaction.Toolkit.UI;
 
 namespace SafeZoneVR.Editor
 {
-    /// <summary>Helpers para montar UI world-space (uGUI + TMP) e materiais URP a partir de scripts de Editor.</summary>
     public static class UIBuilderUtil
     {
         public const string k_GeneratedMaterialsFolder = "Assets/SafeZoneVR/Materials/Generated";
@@ -150,7 +149,7 @@ namespace SafeZoneVR.Editor
             var scaler = go.AddComponent<CanvasScaler>();
             scaler.dynamicPixelsPerUnit = 2f;
             go.AddComponent<TrackedDeviceGraphicRaycaster>();
-            // Mouse / "apontar e clicar" do simulador (o raycaster acima só atende controles rastreados).
+
             go.AddComponent<ScreenPointGraphicRaycaster>();
             go.AddComponent<CanvasCameraBinder>();
             return canvas;
@@ -204,7 +203,6 @@ namespace SafeZoneVR.Editor
             return tmp;
         }
 
-        /// <summary>Texto ancorado no topo com altura fixa (layout "de cima para baixo").</summary>
         public static TextMeshProUGUI TopText(Transform parent, string name, string text, float fontSize, Color color, TextAlignmentOptions align,
             float top, float height, float sideMargin = 24f, FontStyles style = FontStyles.Normal)
         {
@@ -238,7 +236,6 @@ namespace SafeZoneVR.Editor
             return button;
         }
 
-        /// <summary>Botão ancorado no topo (layout de cima para baixo).</summary>
         public static Button TopButton(Transform parent, string name, string label, float fontSize, Color background,
             float top, float height, float sideMargin, out TextMeshProUGUI labelText)
         {

@@ -5,10 +5,6 @@ using UnityEngine.XR.Interaction.Toolkit.Interactors;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// No socket da tampa: tampar apaga a panela. Tirar a tampa antes do tempo de esfriar reacende um fogo pequeno
-    /// e registra o erro. Tampar de novo apaga outra vez.
-    /// </summary>
     public class LidCooldown : MonoBehaviour
     {
         [SerializeField] XRSocketInteractor m_LidSocket;
@@ -39,7 +35,7 @@ namespace SafeZoneVR
 
         void OnLidRemoved(SelectExitEventArgs args)
         {
-            if (args.isCanceled || m_CoveredAt < 0f) return;              // cena descarregando: não é ação do jogador
+            if (args.isCanceled || m_CoveredAt < 0f) return;
             if (Time.time - m_CoveredAt < m_CoolSeconds)
             {
                 if (m_PanFire != null) m_PanFire.Ignite(FireController.Size.Small);

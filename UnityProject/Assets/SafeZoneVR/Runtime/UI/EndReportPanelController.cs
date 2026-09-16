@@ -6,10 +6,6 @@ using UnityEngine.UI;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Relatório de fim de fase (RF03): estrelas, tempo, acertos, erros, melhor resultado e cards educativos
-    /// com as orientações da Defesa Civil. Aparece em frente ao jogador ao concluir o cenário.
-    /// </summary>
     public class EndReportPanelController : MonoBehaviour
     {
         [SerializeField]

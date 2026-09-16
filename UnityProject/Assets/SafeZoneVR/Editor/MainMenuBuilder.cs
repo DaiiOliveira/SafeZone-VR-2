@@ -11,11 +11,6 @@ using UnityEngine.XR.Interaction.Toolkit.Locomotion.Comfort;
 
 namespace SafeZoneVR.Editor
 {
-    /// <summary>
-    /// Gera a cena MainMenu (RF01) em cima do hub da Defesa Civil (modelo DC_Hub): três totens de cenário,
-    /// botões de chão para configurações e sair, XR Origin, teleporte e limites do terraço.
-    /// Sobrescreve a cena existente.
-    /// </summary>
     public static class MainMenuBuilder
     {
         const string k_ScenePath = "Assets/Scenes/MainMenu.unity";
@@ -23,18 +18,13 @@ namespace SafeZoneVR.Editor
         const string k_HubRootName = "DC_Hub";
         const string k_CatalogPath = SafeZoneDataBuilder.k_ResourcesFolder + "/ScenarioCatalog.asset";
 
-        // O jogador entra pelos fundos do terraço (lado aberto do guarda-corpo), de frente para os totens.
         static readonly Vector3 k_SpawnPosition = new Vector3(0f, 0f, 5.9f);
         const float k_SpawnYaw = 180f;
 
-        // Calibrado para a placa 3D ficar do tamanho do texto gravado nos outros dois totens.
         const float k_BoardFontSize = 1.05f;
 
-        // Os painéis do modelo ficam de costas para a entrada quando criados sem giro: a UI world-space
-        // só é legível pelo lado -Z do próprio canvas.
         static readonly Quaternion k_FacingEntrance = Quaternion.Euler(0f, 180f, 0f);
 
-        /// <summary>Ligação entre um totem do modelo e a posição do cenário no catálogo.</summary>
         struct KioskMap
         {
             public string objectName;
@@ -48,8 +38,7 @@ namespace SafeZoneVR.Editor
         {
             new KioskMap { objectName = "DC_PANEL_Rain", catalogIndex = 0, accent = new Color(0.24f, 0.55f, 0.84f) },
             new KioskMap { objectName = "DC_PANEL_Fire", catalogIndex = 1, accent = new Color(0.88f, 0.57f, 0.2f) },
-            // O modelo grava "TERREMOTOS" no totem verde, mas o terceiro cenário do jogo é o Granizo:
-            // o texto gravado é escondido e substituído por uma placa 3D com o nome certo.
+
             new KioskMap
             {
                 objectName = "DC_PANEL_Quake", catalogIndex = 2, accent = new Color(0.13f, 0.62f, 0.32f),
@@ -57,7 +46,6 @@ namespace SafeZoneVR.Editor
             },
         };
 
-        /// <summary>Peças decorativas ou distantes cujo colisor atrapalharia o teleporte e o caminhar.</summary>
         static readonly string[] k_NoColliderParts =
         {
             "DC_ENV_Backdrop", "DC_ENV_GroundFar", "DC_ENV_Mountains_Far", "DC_ENV_Mountains_Mid", "DC_ENV_Mountains_Near",
@@ -103,7 +91,6 @@ namespace SafeZoneVR.Editor
 
             var options = ScenarioSceneKit.CreateOptionsPanel(root.transform, cam.transform, false);
 
-            // Carregado só agora: gravar assets no meio do build (materiais, reimport do modelo) invalida a referência.
             var catalog = AssetDatabase.LoadAssetAtPath<ScenarioCatalogSO>(k_CatalogPath);
             if (catalog == null)
                 throw new System.Exception($"Catálogo não encontrado em {k_CatalogPath}. Rode SafeZoneDataBuilder.Build() primeiro.");
@@ -122,7 +109,6 @@ namespace SafeZoneVR.Editor
             Debug.Log("[SafeZone VR] Cena MainMenu (hub DC_Hub) gerada em " + k_ScenePath);
         }
 
-        /// <summary>Colisores vêm do importador (o hub é feito de peças leves), sem câmeras/luzes/animação do FBX.</summary>
         static void ConfigureHubImporter()
         {
             var importer = AssetImporter.GetAtPath(k_HubModelPath) as ModelImporter;
@@ -163,10 +149,6 @@ namespace SafeZoneVR.Editor
             }
         }
 
-        /// <summary>
-        /// Piso de teleporte invisível sobre o terraço. Fica 2 cm acima do chão do modelo para ser o primeiro
-        /// alvo do raio e cobre só a área dentro do guarda-corpo — a borda externa do piso não é destino válido.
-        /// </summary>
         static void CreateTeleportArea(Scene scene)
         {
             var area = GameObject.CreatePrimitive(PrimitiveType.Plane);
@@ -178,7 +160,6 @@ namespace SafeZoneVR.Editor
             ScenarioSceneKit.AddTeleportArea(area);
         }
 
-        /// <summary>Paredes invisíveis na linha do guarda-corpo e na entrada: sem elas o jogador anda para fora do terraço.</summary>
         static void CreateBounds(Scene scene)
         {
             var root = new GameObject("Limites");
@@ -233,7 +214,6 @@ namespace SafeZoneVR.Editor
                 if (!string.IsNullOrEmpty(map.boardTitle))
                     CreateBoardLabel(kiosk, go.transform, panel, map, hidden);
 
-                // Deixa a cena já com os textos do catálogo, sem depender de entrar em Play.
                 kiosk.Refresh();
                 kiosks.Add(kiosk);
             }
@@ -241,7 +221,6 @@ namespace SafeZoneVR.Editor
             return kiosks;
         }
 
-        /// <summary>Painel do cenário rente à arte do totem (o quadro colorido de 2,2 m x 1,86 m).</summary>
         static void CreateKioskCanvas(HubKiosk kiosk, Transform parent, GameObject hub, KioskMap map, Transform panel)
         {
             var art = ScenarioSceneKit.FindChildRecursive(hub.transform, map.objectName + "_Art");
@@ -261,10 +240,6 @@ namespace SafeZoneVR.Editor
             kiosk.playLabel = playLabel;
         }
 
-        /// <summary>
-        /// Esconde o texto gravado na base do totem (submalha DC_M_White) e escreve o nome do cenário no
-        /// mesmo lugar, para o totem não anunciar um desastre diferente do que a fase ensina.
-        /// </summary>
         static void CreateBoardLabel(HubKiosk kiosk, Transform parent, Transform panel, KioskMap map, Material hidden)
         {
             var renderer = panel.GetComponent<MeshRenderer>();
@@ -285,7 +260,6 @@ namespace SafeZoneVR.Editor
                     Debug.LogWarning($"[SafeZone VR] Texto gravado do totem {map.objectName} não encontrado (submalha DC_M_White).");
             }
 
-            // O texto gravado do modelo ocupa a faixa em y = 0,83 m, 10 cm à frente do centro do pedestal.
             var label = UIBuilderUtil.WorldText(parent, "Placa", map.boardTitle, k_BoardFontSize, new Color(0.93f, 0.91f, 0.87f),
                 panel.position + new Vector3(0f, 0.84f, 0.13f), new Vector3(0f, 180f, 0f), new Vector2(1.7f, 0.5f));
             label.fontStyle = FontStyles.Bold;
@@ -295,10 +269,6 @@ namespace SafeZoneVR.Editor
             kiosk.boardSubtitle = map.boardSubtitle;
         }
 
-        /// <summary>
-        /// Alvo clicável transparente rente ao disco do modelo: o desenho e o rótulo já estão no 3D,
-        /// aqui entra só a área de toque, que clareia quando o raio passa por cima.
-        /// </summary>
         static Button CreateDiscButton(Transform parent, GameObject hub, string objectName, string name)
         {
             var disc = ScenarioSceneKit.FindChildRecursive(hub.transform, objectName);
@@ -317,7 +287,6 @@ namespace SafeZoneVR.Editor
                 Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, out var label);
             label.gameObject.SetActive(false);
 
-            // Sprite redondo embutido do Unity: o alvo acompanha o disco do modelo em vez de virar um quadrado claro.
             var image = button.targetGraphic as Image;
             if (image != null)
                 image.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");

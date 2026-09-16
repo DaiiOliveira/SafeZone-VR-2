@@ -5,10 +5,6 @@ using UnityEngine.XR.Interaction.Toolkit.Inputs.Haptics;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Retorno imediato (RF03): som + vibração ao concluir passo, ao errar e ao terminar a fase,
-    /// mais a chuva ambiente da cena.
-    /// </summary>
     [RequireComponent(typeof(AudioSource))]
     public class FeedbackPlayer : MonoBehaviour
     {
@@ -94,7 +90,6 @@ namespace SafeZoneVR
             PlaySfx(m_ProgressClip, 0.5f);
         }
 
-        /// <summary>Ajusta o volume da chuva ambiente (ex.: aumenta no granizo, reduz depois).</summary>
         public void SetRainVolume(float volume)
         {
             m_RainVolume = Mathf.Clamp01(volume);
@@ -147,7 +142,6 @@ namespace SafeZoneVR
             }
         }
 
-        // Eventos podem chegar durante o descarregamento da cena (sockets soltando itens no OnDisable).
         void PlaySfx(AudioClip clip, float volume = 1f)
         {
             if (clip != null && m_Sfx != null && m_Sfx.isActiveAndEnabled)

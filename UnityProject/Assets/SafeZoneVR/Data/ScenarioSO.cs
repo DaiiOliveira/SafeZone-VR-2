@@ -3,10 +3,6 @@ using UnityEngine;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Um cenário de desastre: qual cena carregar, quais passos existem, quais cards mostrar no fim
-    /// e quais metas de tempo definem a pontuação em estrelas.
-    /// </summary>
     [CreateAssetMenu(fileName = "Scenario", menuName = "SafeZone VR/Scenario", order = 0)]
     public class ScenarioSO : ScriptableObject
     {

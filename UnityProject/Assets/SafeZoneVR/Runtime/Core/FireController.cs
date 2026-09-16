@@ -4,24 +4,20 @@ using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Foco de fogo com quatro tamanhos (apagado, pequeno, médio, grande): partículas, luz com cintilação,
-    /// crescimento automático, faíscas antes de acender e "puff" ao errar. O raio do foco não chega ao jogador.
-    /// </summary>
     public class FireController : MonoBehaviour
     {
         public enum Size { Out = 0, Small = 1, Medium = 2, Large = 3 }
 
         [SerializeField] ParticleSystem m_Flames;
         [SerializeField] ParticleSystem m_Smoke;
-        [SerializeField] ParticleSystem m_Sparks;                        // opcional (benjamim)
-        [SerializeField] Light m_Light;                                  // pontual, sem sombra
-        [SerializeField] AudioSource m_Crackle;                          // loop CreateCrackleLoop, 3D
+        [SerializeField] ParticleSystem m_Sparks;
+        [SerializeField] Light m_Light;
+        [SerializeField] AudioSource m_Crackle;
         [SerializeField] float[] m_FlameRate = { 0f, 12f, 30f, 60f };
         [SerializeField] float[] m_FlameScale = { 0f, 0.35f, 0.8f, 1.4f };
         [SerializeField] float[] m_LightIntensity = { 0f, 0.8f, 1.6f, 2.6f };
         [SerializeField] Size m_StartSize = Size.Small;
-        [SerializeField] float[] m_GrowSteps = new float[0];             // Rack: { 20, 25 } segundos por degrau
+        [SerializeField] float[] m_GrowSteps = new float[0];
         [SerializeField] float m_ResidualSmokeSeconds = 20f;
         Size m_Size; int m_GrowIndex; float m_NextGrow = -1f, m_NextFlicker; bool m_Flaring;
 
@@ -44,7 +40,6 @@ namespace SafeZoneVR
 
         public void IgniteSmall() => Ignite(Size.Small);
 
-        /// <summary>Faíscas por 2 s e depois fogo pequeno que cresce sozinho (benjamim atrás da TV).</summary>
         public void SparkThenIgnite() => StartCoroutine(SparkRoutine());
 
         public void Extinguish()
@@ -54,7 +49,6 @@ namespace SafeZoneVR
             if (m_Smoke != null) { m_Smoke.Play(); CancelInvoke(nameof(StopSmoke)); Invoke(nameof(StopSmoke), m_ResidualSmokeSeconds); }
         }
 
-        /// <summary>"Puff" rápido e controlado (água no óleo). Volta ao tamanho anterior em 0,6 s.</summary>
         public void Flare()
         {
             if (!isBurning || m_Flaring) return;

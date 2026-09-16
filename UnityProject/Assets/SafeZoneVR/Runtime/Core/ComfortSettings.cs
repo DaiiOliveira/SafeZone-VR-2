@@ -15,10 +15,6 @@ namespace SafeZoneVR
         Smooth = 1
     }
 
-    /// <summary>
-    /// Preferências de conforto (RNF04) persistidas em PlayerPrefs e aplicadas por <see cref="ComfortSettingsApplier"/>.
-    /// Padrão: teleporte + giro em passos + vinheta ligada (menor risco de enjoo).
-    /// </summary>
     public static class ComfortSettings
     {
         const string k_Locomotion = "safezone.comfort.locomotion";

@@ -2,10 +2,6 @@ using UnityEngine;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Conclui o passo quando um Transform gira mais que um ângulo em relação à rotação inicial.
-    /// Útil para objetos girados por física (HingeJoint) ou animação. Para XRKnob, prefira <see cref="StepCompleteOnKnob"/>.
-    /// </summary>
     public class StepCompleteOnKnobThreshold : StepValidatorBase
     {
         [SerializeField]

@@ -5,7 +5,6 @@ using UnityEngine.XR.Interaction.Toolkit.Interactors;
 
 namespace SafeZoneVR
 {
-    /// <summary>Conclui quando todas as condições (alavancas desligadas, registros girados, sockets vazios) forem atendidas, com progresso "x de y".</summary>
     public class StepCompleteOnAllConditions : StepValidatorBase
     {
         [SerializeField] List<BreakerLever> m_LeversOff = new List<BreakerLever>();
@@ -34,7 +33,7 @@ namespace SafeZoneVR
             foreach (var l in m_LeversOff) if (l != null && !l.isOn) done++;
             foreach (var k in m_KnobsTurned) if (k != null && Mathf.Abs(k.value - m_KnobStart[k]) >= m_RequiredDelta) done++;
             foreach (var s in m_SocketsEmpty) if (s != null && !s.hasSelection) done++;
-            if (done != m_LastDone) { m_LastDone = done; ReportProgress(done, total); }   // XRKnob dispara a cada grau
+            if (done != m_LastDone) { m_LastDone = done; ReportProgress(done, total); }
             if (done >= total) Complete();
         }
     }

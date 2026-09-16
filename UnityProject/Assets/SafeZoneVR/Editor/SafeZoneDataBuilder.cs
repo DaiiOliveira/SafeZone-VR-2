@@ -5,11 +5,6 @@ using UnityEngine;
 
 namespace SafeZoneVR.Editor
 {
-    /// <summary>
-    /// Cria/atualiza os ScriptableObjects do jogo: passos e cards do Alagamento (conteúdo baseado nas
-    /// cartilhas "Como agir? Alagamentos/Inundações" do MDR/Defesa Civil), cenários futuros (bloqueados)
-    /// e o catálogo usado pelo menu.
-    /// </summary>
     public static class SafeZoneDataBuilder
     {
         public const string k_DataFolder = "Assets/SafeZoneVR/Data";
@@ -43,7 +38,6 @@ namespace SafeZoneVR.Editor
             UIBuilderUtil.EnsureFolder(k_CardsFolder);
             UIBuilderUtil.EnsureFolder(k_ResourcesFolder);
 
-            // Nomes de passo já fora de uso; os validadores são recriados pelo builder da cena.
             foreach (var old in new[] { "Step_01_SafeArea", "Step_02_PowerOff", "Step_03_WaterValve", "Step_04_EmergencyKit", "Step_05_Evacuate" })
             {
                 var p = $"{k_AlagamentoFolder}/{old}.asset";
@@ -112,7 +106,6 @@ namespace SafeZoneVR.Editor
                 cards);
             EditorUtility.SetDirty(data.scenario);
 
-            // Cenários fora do catálogo atual (Alagamento, Incêndio, Granizo).
             foreach (var old in new[] { "Scenario_Deslizamento", "Scenario_Enxurrada", "Scenario_Vendaval" })
             {
                 var p = $"{k_DataFolder}/{old}.asset";
@@ -216,7 +209,7 @@ namespace SafeZoneVR.Editor
                 "Portão da frente",
                 "Nenhum objeto vale o risco. Não permita que ninguém entre em um local em chamas: espere os Bombeiros.");
 
-            d.gas.EditorSetOrderGroup(1);        // missões 1 e 2 em qualquer ordem
+            d.gas.EditorSetOrderGroup(1);
             d.tampa.EditorSetOrderGroup(1);
 
             var cards = new List<EducationCardSO>
@@ -291,7 +284,7 @@ namespace SafeZoneVR.Editor
                 "Relógio de pulso",
                 "Avisar as autoridades permite vistoriar o telhado e evitar acidentes.");
 
-            d.vaga.EditorSetOrderGroup(1);       // missões 1 e 2 em qualquer ordem
+            d.vaga.EditorSetOrderGroup(1);
             d.joaquim.EditorSetOrderGroup(1);
 
             var src = k_FonteGranizo;

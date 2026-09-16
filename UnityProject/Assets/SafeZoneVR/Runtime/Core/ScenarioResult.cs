@@ -2,7 +2,6 @@ using System.Collections.Generic;
 
 namespace SafeZoneVR
 {
-    /// <summary>Resumo de desempenho de uma partida (RF03).</summary>
     public class ScenarioResult
     {
         public float elapsedSeconds;
