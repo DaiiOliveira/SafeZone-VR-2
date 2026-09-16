@@ -66,13 +66,10 @@ namespace SafeZoneVR.Editor
             var root = new GameObject(k_RootName);
             SceneManager.MoveGameObjectToScene(root, scene);
 
-            // Ponto de início: alinha a cabeça do jogador aqui ao carregar e o devolve se cair para fora do mundo.
             ScenarioSceneKit.CreatePlayerSpawn(root.transform, k_PlayerStart, k_PlayerRot);
 
-            // ---- Núcleo
             var manager = ScenarioSceneKit.CreateCore(root.transform, origin, data.scenario, true, out _);
 
-            // ---- Ambiente extra: água, rua, ponto de encontro, rota
             var env = UIBuilderUtil.Child(root.transform, "Environment");
             ScenarioSceneKit.OpenHouseDoors(house, true);
             ScenarioSceneKit.SetupModelPhysics(house);
@@ -80,7 +77,6 @@ namespace SafeZoneVR.Editor
             var evacZone = CreateMeetingPoint(env.transform, out var routeGroup);
             CreateRouteChevrons(routeGroup.transform);
 
-            // ---- Interagíveis
             var interactables = UIBuilderUtil.Child(root.transform, "Interactables");
             var lever = ScenarioSceneKit.SetupHouseBreaker(house, interactables.transform, data.stepPower);
             var knob = SetupValve(interactables.transform, data.stepWater);
@@ -141,7 +137,6 @@ namespace SafeZoneVR.Editor
 
             CreateCarWrongAction(interactables.transform);
 
-            // ---- Validadores
             var validators = UIBuilderUtil.Child(root.transform, "Validators");
 
             var vValuables = UIBuilderUtil.Child(validators.transform, "Validator_01_Valores").AddComponent<StepCompleteOnSocket>();
@@ -176,7 +171,6 @@ namespace SafeZoneVR.Editor
             evacTarget.markerHeightOffset = 0.6f;
             evacTarget.showWhileActive.Add(routeGroup);
 
-            // ---- UI
             var ui = UIBuilderUtil.Child(root.transform, "UI");
             var options = ScenarioSceneKit.CreateOptionsPanel(ui.transform, camera, true);
             ScenarioSceneKit.CreateWristUI(leftHand != null ? leftHand : camera, manager, water, options, false, out _);
@@ -188,8 +182,6 @@ namespace SafeZoneVR.Editor
             QuestProjectConfigurator.RegisterScenes();
             Debug.Log("[SafeZone VR] Gameplay do Alagamento montado e cena salva.");
         }
-
-        // ------------------------------------------------------------------ Scene / cleanup
 
         static void CleanupLegacy(Scene scene)
         {
@@ -223,8 +215,6 @@ namespace SafeZoneVR.Editor
                 }
             }
         }
-
-        // ------------------------------------------------------------------ Environment
 
         static Vector3 OnSurface(Vector2 xz, float lift, float fromY = 2.5f)
         {
@@ -292,8 +282,6 @@ namespace SafeZoneVR.Editor
                 points[i] = OnSurface(path[i], 0.03f, 0.3f);
             ScenarioSceneKit.CreateRouteChevrons(parent, points);
         }
-
-        // ------------------------------------------------------------------ Interactables
 
         static XRKnob SetupValve(Transform parent, MissionStepSO step)
         {

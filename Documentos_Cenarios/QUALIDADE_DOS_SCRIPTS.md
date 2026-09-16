@@ -1,8 +1,5 @@
 # Como medir a qualidade dos scripts
 
-Resposta a "como podemos avaliar a qualidade dos scripts? Tem alguma ferramenta sugerida pra
-gente ver as boas práticas do Unity e tirar essas métricas?".
-
 Resumo: **três camadas** — analisador no editor (já ligado), auditoria do projeto (um comando),
 e medição em runtime no headset (a única que diz se o jogo roda bem). Ferramenta de análise
 genérica de C# (SonarQube e afins) é a de menor retorno aqui e fica por último.
@@ -127,6 +124,6 @@ métricas formais (aí sim ele gera os gráficos de dívida técnica que bancas 
 | 1 | `.editorconfig` com os UNT | **feito** | alto |
 | 2 | Instalar Project Auditor e rodar uma vez | 10 min | alto |
 | 3 | Criar os dois `.asmdef` | 30 min | alto (compilação + destrava testes) |
-| 4 | APK dev + OVR Metrics Tool no headset | 20 min | alto (é o que o usuário sente) |
+| 4 | APK dev + OVR Metrics Tool no headset | 20 min | alto (é o que o jogador sente) |
 | 5 | Suíte de EditMode tests + Code Coverage | 2–3 h | médio-alto |
 | 6 | SonarCloud | 1–2 h + conta | baixo |

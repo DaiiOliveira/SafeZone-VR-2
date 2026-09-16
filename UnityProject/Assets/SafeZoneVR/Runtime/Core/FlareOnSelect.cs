@@ -5,7 +5,6 @@ namespace SafeZoneVR
 {
     /// <summary>
     /// Na jarra de água: se o fogo estiver aceso, dá o "puff" (o erro é registrado pelo WrongActionInteractable).
-    /// Precisa ficar em arquivo com o mesmo nome da classe, senão o Unity não consegue serializar o componente.
     /// </summary>
     [RequireComponent(typeof(XRSimpleInteractable))]
     public class FlareOnSelect : MonoBehaviour

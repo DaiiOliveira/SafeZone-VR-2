@@ -6,9 +6,8 @@ using UnityEngine.XR.Interaction.Toolkit.Interactors;
 namespace SafeZoneVR
 {
     /// <summary>
-    /// Mochila fácil de encher: vários sockets compartilham uma área de captura grande (a mochila inteira
-    /// com folga) e apenas o primeiro espaço vazio fica ativo. Assim basta soltar ou jogar o item perto da
-    /// mochila para ele ser guardado, sem mirar em um encaixe pequeno, e só aparece um "fantasma" por vez.
+    /// Vários sockets compartilham uma área de captura do tamanho da mochila e apenas o primeiro espaço
+    /// vazio fica ativo: o item é guardado ao ser solto perto da mochila e só um "fantasma" aparece por vez.
     /// </summary>
     public class BackpackStorage : MonoBehaviour
     {

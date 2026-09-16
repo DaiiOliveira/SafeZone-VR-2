@@ -84,7 +84,6 @@ namespace SafeZoneVR.Editor
             ScenarioSceneKit.CreatePlayerSpawn(root.transform, k_PlayerStart, Quaternion.identity);
             var manager = ScenarioSceneKit.CreateCore(root.transform, origin, data.scenario, true, out var feedback);
 
-            // ---- Ambiente
             var env = UIBuilderUtil.Child(root.transform, "Environment");
             var iceLayers = CreateIce(env.transform);
             var ubsZoneBounds = CreateUbs(env.transform, out var ubsRoof);
@@ -97,7 +96,6 @@ namespace SafeZoneVR.Editor
             // Sem quadro de energia nesta fase: as luzes da casa ficam acesas.
             ScenarioSceneKit.SetupHouseLights(house, root.transform, null);
 
-            // ---- NPCs e carro
             var actors = UIBuilderUtil.Child(root.transform, "Atores");
             var joaquim = CreateJoaquim(actors.transform, data.joaquim, out var joaquimInteractable);
             var car = CreateCar(actors.transform, house);
@@ -109,7 +107,6 @@ namespace SafeZoneVR.Editor
             ScenarioSceneKit.CreateNpc(actors.transform, "Carlos", k_Carlos, 180f, new Color(0.2f, 0.45f, 0.3f), false, "Onde eu deixo o carro?", out var carlosSpeech);
             carlosSpeech.gameObject.SetActive(true);
 
-            // ---- Vagas (missão 1)
             var spots = UIBuilderUtil.Child(root.transform, "Vagas");
             var optA = CreateSpot(spots.transform, "Vaga_A_Placa", k_SpotA, false, "vaga_placa",
                 "Não estacione perto de placas de propaganda: elas podem cair com o vento e o granizo.", data.vaga);
@@ -117,7 +114,6 @@ namespace SafeZoneVR.Editor
                 "Não estacione perto de torres de transmissão: há risco de queda e de danos à rede elétrica.", data.vaga);
             var optC = CreateSpot(spots.transform, "Vaga_C_Rua", k_SpotC, true, "", "Carlos: boa! Longe da placa e da torre.", data.vaga);
 
-            // ---- Zonas de abrigo errado (fase Granizo) e praça aberta
             var wrongShelters = UIBuilderUtil.Child(root.transform, "ZonasAbrigoErrado");
             CreateTreeZones(wrongShelters.transform, praca);
             var pergola = ScenarioSceneKit.ModelPart(praca, "DC_PRACA_PergoladoMadeira");
@@ -138,7 +134,6 @@ namespace SafeZoneVR.Editor
                 "sair_durante_granizo", "Espere o granizo passar dentro do abrigo.");
             openPlaza.gameObject.SetActive(false);
 
-            // ---- Fase Depois (casa)
             var after = UIBuilderUtil.Child(root.transform, "Depois");
             CreateDamagedCeiling(after.transform, data.forro, out var ceilingInteractable);
             CreateLadder(after.transform);
@@ -152,14 +147,12 @@ namespace SafeZoneVR.Editor
                 "voltar_ao_quarto", "Não volte ao cômodo com risco de desabamento até a vistoria das autoridades.");
             bedroomZone.gameObject.SetActive(false);
 
-            // ---- Rota segura (missão 5): porta da UBS → calçada da praça → faixa → portão de casa.
             var gateZone = ScenarioSceneKit.CreateTriggerZone(env.transform, "Zona_Portao", k_GateZone, new Vector3(1.8f, 2.4f, 1.4f));
             var routeGroup = UIBuilderUtil.Child(env.transform, "RotaSegura");
             ScenarioSceneKit.CreateRouteChevrons(routeGroup.transform, Snap(0.03f,
                 new Vector2(9.5f, 16f), new Vector2(7f, 15.2f), new Vector2(6.6f, 13f), new Vector2(3.5f, 12.5f), new Vector2(0f, 12.5f),
                 new Vector2(-3.2f, 12.5f), new Vector2(-4.9f, 11.4f), new Vector2(-4.9f, 9.6f), new Vector2(-4.9f, 7.8f), new Vector2(-4.9f, 6f)));
 
-            // ---- Validadores
             var validators = UIBuilderUtil.Child(root.transform, "Validators");
 
             var v1 = UIBuilderUtil.Child(validators.transform, "Validator_01_Vaga").AddComponent<StepCompleteOnChoice>();
@@ -201,7 +194,6 @@ namespace SafeZoneVR.Editor
             var v8 = UIBuilderUtil.Child(validators.transform, "Validator_08_Comunicar").AddComponent<StepCompleteOnButtonPress>();
             v8.scenarioManager = manager; v8.step = data.comunicar;
 
-            // ---- Fases
             var phases = UIBuilderUtil.Child(root.transform, "Phases");
             var caption = ScenarioSceneKit.CreatePhaseCaption(camera);
             var switcher = phases.AddComponent<ScenarioPhaseSwitcher>();
@@ -228,7 +220,6 @@ namespace SafeZoneVR.Editor
             AddActivate(phases.transform, "Ativar_ZonaSala", data.forro, livingZone);
             AddActivate(phases.transform, "Ativar_ZonaQuarto", data.sair, bedroomZone.gameObject);
 
-            // ---- UI
             var ui = UIBuilderUtil.Child(root.transform, "UI");
             var options = ScenarioSceneKit.CreateOptionsPanel(ui.transform, camera, true);
             ScenarioSceneKit.CreateWristUI(leftHand != null ? leftHand : camera, manager, null, options, true, out var callButton);
@@ -247,8 +238,6 @@ namespace SafeZoneVR.Editor
             QuestProjectConfigurator.RegisterScenes();
             Debug.Log("[SafeZone VR] Gameplay do Granizo montado e cena salva.");
         }
-
-        // ------------------------------------------------------------------ Helpers
 
         /// <summary>Céu fechado de tempestade: sem sol no horizonte, ambiente cinza e névoa curta.</summary>
         static void SetupStormSky()
@@ -506,7 +495,6 @@ namespace SafeZoneVR.Editor
         {
             interactable = ScenarioSceneKit.CreateNpc(parent, "SeuJoaquim", k_JoaquimBench, 180f, new Color(0.45f, 0.4f, 0.35f), true, "Obrigado, meu filho! Vamos.", out var speech);
             var npc = interactable.gameObject;
-            // Boina.
             var cap = UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "Boina", npc.transform, Vector3.zero, Vector3.zero, new Vector3(0.28f, 0.02f, 0.28f), ScenarioSceneKit.MatFlashlight, false);
             cap.transform.localPosition = new Vector3(0f, 1.71f, 0f);
             var follower = npc.AddComponent<CompanionFollower>();
@@ -595,7 +583,6 @@ namespace SafeZoneVR.Editor
             var target = sag.AddComponent<ObjectiveTarget>();
             target.step = step; target.markerHeightOffset = -0.6f;
 
-            // Goteira (partículas) + poça.
             var dripGo = UIBuilderUtil.Child(g.transform, "Goteira");
             dripGo.transform.position = k_Ceiling + new Vector3(0.3f, -0.12f, 0f);
             var ps = dripGo.AddComponent<ParticleSystem>();

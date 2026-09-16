@@ -6,7 +6,7 @@ namespace SafeZoneVR
 {
     /// <summary>
     /// Foco de fogo com quatro tamanhos (apagado, pequeno, médio, grande): partículas, luz com cintilação,
-    /// crescimento automático, faíscas antes de acender e "puff" controlado ao errar. Nunca alcança o jogador.
+    /// crescimento automático, faíscas antes de acender e "puff" ao errar. O raio do foco não chega ao jogador.
     /// </summary>
     public class FireController : MonoBehaviour
     {

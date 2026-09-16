@@ -3,8 +3,8 @@ using UnityEngine;
 namespace SafeZoneVR
 {
     /// <summary>
-    /// Água que sobe lentamente enquanto a fase corre. Cria urgência pedagógica, nunca perigo:
-    /// o nível máximo é baixo (tornozelo/canela) e nada acontece de ruim com o jogador.
+    /// Água que sobe lentamente enquanto a fase corre. O nível máximo fica na altura da canela
+    /// e não tem efeito sobre o jogador.
     /// </summary>
     public class FloodWaterController : MonoBehaviour
     {
@@ -78,7 +78,7 @@ namespace SafeZoneVR
             {
                 m_Elapsed += Time.deltaTime;
                 var k = m_RiseDuration <= 0f ? 1f : Mathf.Clamp01(m_Elapsed / m_RiseDuration);
-                // Sobe mais rápido no início e desacelera: dá tempo de concluir sem pressa excessiva.
+                // Sobe mais rápido no início e desacelera perto do nível máximo.
                 k = 1f - (1f - k) * (1f - k);
                 currentLevel = Mathf.Lerp(m_StartLevel, m_MaxLevel, k);
             }

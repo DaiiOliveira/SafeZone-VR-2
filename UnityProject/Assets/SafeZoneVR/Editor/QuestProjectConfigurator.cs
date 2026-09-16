@@ -56,8 +56,6 @@ namespace SafeZoneVR.Editor
             Debug.Log("[SafeZone VR] Configurações do projeto aplicadas.\n" + Validate());
         }
 
-        // ------------------------------------------------------------------ Identidade
-
         static void ApplyIdentity()
         {
             PlayerSettings.productName = "SafeZone VR";
@@ -70,8 +68,6 @@ namespace SafeZoneVR.Editor
             PlayerSettings.SplashScreen.show = false;
             PlayerSettings.SplashScreen.showUnityLogo = false;
         }
-
-        // ------------------------------------------------------------------ Android / Player
 
         static void ApplyAndroidPlayer()
         {
@@ -106,8 +102,6 @@ namespace SafeZoneVR.Editor
             // Colisores de malha "cozidos" no build: carrega mais rápido e não exige Read/Write nas malhas.
             PlayerSettings.bakeCollisionMeshes = true;
         }
-
-        // ------------------------------------------------------------------ OpenXR
 
         static void ApplyOpenXr()
         {
@@ -161,8 +155,6 @@ namespace SafeZoneVR.Editor
             var p = so.FindProperty(path);
             if (p != null) p.boolValue = value;
         }
-
-        // ------------------------------------------------------------------ URP e qualidade
 
         static void ApplyRendering()
         {
@@ -234,8 +226,6 @@ namespace SafeZoneVR.Editor
             }
         }
 
-        // ------------------------------------------------------------------ Cenas
-
         public static void RegisterScenes()
         {
             var scenes = new List<EditorBuildSettingsScene>();
@@ -246,8 +236,6 @@ namespace SafeZoneVR.Editor
                     scenes.Add(new EditorBuildSettingsScene(path, true));
             EditorBuildSettings.scenes = scenes.ToArray();
         }
-
-        // ------------------------------------------------------------------ Relatório
 
         /// <summary>Texto com o estado das configurações que importam para o APK do Quest.</summary>
         public static string Validate()

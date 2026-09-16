@@ -4,7 +4,6 @@ namespace SafeZoneVR
 {
     /// <summary>
     /// Converte tempo e erros em estrelas/pontuação e guarda o melhor resultado por cenário (PlayerPrefs).
-    /// Regra simples e transparente para o jogador:
     ///  3 estrelas = concluiu dentro do tempo-alvo sem erros;
     ///  2 estrelas = concluiu dentro do tempo "bom" com até 2 erros;
     ///  1 estrela  = concluiu.

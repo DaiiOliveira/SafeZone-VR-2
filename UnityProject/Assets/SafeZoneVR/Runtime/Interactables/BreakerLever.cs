@@ -11,7 +11,7 @@ namespace SafeZoneVR
 
     /// <summary>
     /// Alavanca do quadro geral de energia: um toque/seleção alterna ligado/desligado com animação curta.
-    /// Simples e robusto para VR (sem física de dobradiça).
+    /// Sem física de dobradiça.
     /// </summary>
     [RequireComponent(typeof(XRSimpleInteractable))]
     public class BreakerLever : MonoBehaviour

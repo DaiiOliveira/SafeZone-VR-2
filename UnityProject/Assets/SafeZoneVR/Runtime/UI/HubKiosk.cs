@@ -6,8 +6,7 @@ namespace SafeZoneVR
 {
     /// <summary>
     /// Um totem do hub (RF01): mostra um cenário do catálogo no painel do pedestal — nome, resumo,
-    /// melhor pontuação — e carrega a fase quando o jogador aperta "Jogar". Substitui a lista de
-    /// botões do menu antigo, que era um painel único flutuando na frente do jogador.
+    /// melhor pontuação — e carrega a fase quando o jogador aperta "Jogar".
     /// </summary>
     public class HubKiosk : MonoBehaviour
     {

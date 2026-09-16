@@ -7,7 +7,7 @@ namespace SafeZoneVR
     /// <summary>
     /// Menu principal (RF01) no hub da Defesa Civil: liga cada totem a um cenário do catálogo,
     /// abre o painel de conforto e encerra o jogo. A escolha da fase acontece no próprio totem
-    /// (<see cref="HubKiosk"/>), não em uma lista de botões.
+    /// (<see cref="HubKiosk"/>).
     /// </summary>
     public class MainMenuController : MonoBehaviour
     {

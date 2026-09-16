@@ -68,7 +68,6 @@ namespace SafeZoneVR.Editor
             ScenarioSceneKit.CreatePlayerSpawn(root.transform, k_PlayerStart, k_PlayerRot);
             var manager = ScenarioSceneKit.CreateCore(root.transform, origin, data.scenario, false, out _);
 
-            // ---- Ambiente
             var env = UIBuilderUtil.Child(root.transform, "Environment");
             var frontYard = ScenarioSceneKit.CreateTriggerZone(env.transform, "Zona_QuintalFrente", k_FrontYardCenter, k_FrontYardSize);
             CreateMeetingSign(env.transform);
@@ -78,7 +77,6 @@ namespace SafeZoneVR.Editor
             var matGas = UIBuilderUtil.GetOrCreateMaterial("Mat_Botijao", new Color(0.93f, 0.93f, 0.9f), false, false, 0.5f);
             var matPan = ScenarioSceneKit.MatMetal;
 
-            // ---- Cozinha
             var kitchen = UIBuilderUtil.Child(root.transform, "Cozinha");
             var stove = ScenarioSceneKit.PartBounds(ScenarioSceneKit.ModelPart(house, "DC_CASA_Fogao"));
             // Raycast abaixo da coifa, direto na chapa do fogão.
@@ -117,7 +115,6 @@ namespace SafeZoneVR.Editor
 
             var window = CreateWindow(house, kitchen.transform, data.ventilar);
 
-            // ---- Sala
             var living = UIBuilderUtil.Child(root.transform, "Sala");
             CreatePowerStrip(living.transform);
             var rackFire = CreateFire(living.transform, "Fogo_Rack", k_RackFire, FireController.Size.Out, new[] { 20f, 25f }, true, 0f);
@@ -133,25 +130,20 @@ namespace SafeZoneVR.Editor
             var smoke = CreateSmokeLayer(living.transform);
             var detector = CreateDetector(house, living.transform);
 
-            // ---- Quarto
             var hall = UIBuilderUtil.Child(root.transform, "Corredor");
             var lever = ScenarioSceneKit.SetupHouseBreaker(house, hall.transform, data.energia);
 
             ScenarioSceneKit.SetupHouseLights(house, root.transform, lever);
 
-            // ---- Porta da frente operável + chave
             var door = SetupFrontDoor(frontDoorPivot, root.transform);
 
-            // ---- Exterior: vizinho
             var outside = UIBuilderUtil.Child(root.transform, "Exterior");
             var neighbor = CreateNeighbor(outside.transform, data.vizinho, out var neighborInteractable);
 
-            // ---- Zona "voltar para dentro"
             var insideZone = ScenarioSceneKit.CreateWrongZone(outside.transform, "Zona_VoltarParaDentro", new Vector3(-5.5f, 1.2f, -5.3f), new Vector3(10.6f, 2.4f, 10.0f),
                 "voltar_para_dentro", "Não volte para dentro de uma casa em chamas. Espere os Bombeiros.");
             insideZone.gameObject.SetActive(false);
 
-            // ---- Validadores
             var validators = UIBuilderUtil.Child(root.transform, "Validators");
 
             var v1 = UIBuilderUtil.Child(validators.transform, "Validator_01_Gas").AddComponent<StepCompleteOnAllConditions>();
@@ -188,7 +180,6 @@ namespace SafeZoneVR.Editor
             v8.scenarioManager = manager; v8.step = data.vizinho;
             v8.interactables.Add(neighborInteractable); v8.requiredCount = 1;
 
-            // ---- Fases
             var phases = UIBuilderUtil.Child(root.transform, "Phases");
             var caption = ScenarioSceneKit.CreatePhaseCaption(camera);
             var switcher = phases.AddComponent<ScenarioPhaseSwitcher>();
@@ -218,7 +209,6 @@ namespace SafeZoneVR.Editor
 
             UnityEventTools.AddFloatPersistentListener(lidCooldown.onCovered, detector.StopAfter, 20f);
 
-            // ---- UI
             var ui = UIBuilderUtil.Child(root.transform, "UI");
             var options = ScenarioSceneKit.CreateOptionsPanel(ui.transform, camera, true);
             ScenarioSceneKit.CreateWristUI(leftHand != null ? leftHand : camera, manager, null, options, true, out var callButton);
@@ -237,8 +227,6 @@ namespace SafeZoneVR.Editor
             QuestProjectConfigurator.RegisterScenes();
             Debug.Log("[SafeZone VR] Gameplay do Incêndio montado e cena salva.");
         }
-
-        // ------------------------------------------------------------------ Helpers
 
         static void AddActivate(Transform parent, string name, MissionStepSO step, params GameObject[] activate)
         {

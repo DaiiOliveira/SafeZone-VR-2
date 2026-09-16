@@ -21,7 +21,6 @@ namespace SafeZoneVR.Editor
     /// <summary>
     /// Helpers compartilhados pelos builders de fase (Alagamento, Incêndio, Granizo): XR Origin, materiais,
     /// casa reaproveitada (prefab), teleporte, colisores, interagíveis genéricos, UI de pulso, painéis e NPCs.
-    /// Comportamento idêntico ao que vivia no AlagamentoGameplayBuilder.
     /// </summary>
     public static class ScenarioSceneKit
     {
@@ -38,8 +37,6 @@ namespace SafeZoneVR.Editor
         public static Material MatWater, MatMarker, MatSocket, MatFade, MatChevron, MatStreet, MatPlatform,
             MatSign, MatDocs, MatPhoto, MatBottle, MatMeds, MatFlashlight, MatBackpack, MatIndicator, MatHint, MatLever,
             MatSkin, MatCloth, MatMetal, MatWood, MatConcrete, MatIce, MatFlame, MatSmoke, MatGlass, MatFire;
-
-        // ------------------------------------------------------------------ Scene
 
         public static Scene OpenOrCreateScene(string scenePath)
         {
@@ -92,8 +89,6 @@ namespace SafeZoneVR.Editor
             light.transform.rotation = Quaternion.Euler(euler);
         }
 
-        // ------------------------------------------------------------------ Modelos (casa e praça)
-
         // Os FBX exportados do Blender chegam deitados (altura no eixo Z). Girando a raiz, casa e praça ficam de pé
         // e continuam no mesmo referencial: as duas na origem já se encaixam (praça do outro lado da rua).
         public static readonly Quaternion k_ModelUpright = Quaternion.Euler(-90f, 0f, 0f);
@@ -104,7 +99,7 @@ namespace SafeZoneVR.Editor
         /// <summary>Casa DC_Casa recriada do zero na cena (desempacotada, para os builders mexerem em portas e peças).</summary>
         public static GameObject EnsureHouseInstance(Scene scene)
         {
-            // O nome pode vir com sufixo ("Casa_SafeZone (Missing Prefab with guid: ...)") quando o prefab antigo já não existe.
+            // Comparação por prefixo: sem o prefab, o nome vem com sufixo "(Missing Prefab with guid: ...)".
             foreach (var rootGo in scene.GetRootGameObjects())
             {
                 if (rootGo == null) continue;
@@ -187,8 +182,6 @@ namespace SafeZoneVR.Editor
             foreach (var c in part.GetComponentsInChildren<Collider>(true)) c.enabled = false;
         }
 
-        // ------------------------------------------------------------------ XR Origin
-
         public static XROrigin SetupXROrigin(Scene scene, Vector3 startPosition, Quaternion startRotation)
         {
             var origin = Object.FindAnyObjectByType<XROrigin>();
@@ -260,8 +253,7 @@ namespace SafeZoneVR.Editor
                 go.AddComponent<UnityEngine.XR.Interaction.Toolkit.UI.XRUIInputModule>();
             }
 
-            // O XRUIInputModule nasce com mouse e toque desligados: no XR Interaction Simulator o clique
-            // do mouse não chegava na UI e nenhum botão respondia. No headset não muda nada (não há mouse).
+            // Mouse e toque para o simulador do editor; no headset não há nenhum dos dois.
             var inputModule = Object.FindAnyObjectByType<UnityEngine.XR.Interaction.Toolkit.UI.XRUIInputModule>();
             if (inputModule != null)
             {
@@ -318,8 +310,6 @@ namespace SafeZoneVR.Editor
             return manager;
         }
 
-        // ------------------------------------------------------------------ Materials
-
         public static void CreateMaterials()
         {
             MatWater = UIBuilderUtil.GetOrCreateMaterial("Mat_Agua", new Color(0.18f, 0.42f, 0.62f, 0.55f), true, false, 0.9f);
@@ -355,8 +345,6 @@ namespace SafeZoneVR.Editor
             MatFire = UIBuilderUtil.GetOrCreateMaterial("Mat_Fogo", new Color(1f, 0.35f, 0.05f, 0.9f), true, true);
             AssetDatabase.SaveAssets();
         }
-
-        // ------------------------------------------------------------------ Environment
 
         public static TeleportationArea AddTeleportArea(GameObject go)
         {
@@ -476,8 +464,6 @@ namespace SafeZoneVR.Editor
                 return hit.point + Vector3.up * lift;
             return new Vector3(x, lift, z);
         }
-
-        // ------------------------------------------------------------------ Portas do modelo
 
         /// <summary>
         /// Coloca uma folha (porta, janela, portão) sob um pivô na dobradiça, com rotação de mundo zero:
@@ -600,8 +586,6 @@ namespace SafeZoneVR.Editor
             }
             throw new System.Exception("Sem layer livre para " + name);
         }
-
-        // ------------------------------------------------------------------ Interactables
 
         /// <summary>
         /// Alavanca do quadro de energia na face frontal <paramref name="frontCenter"/>; <paramref name="facing"/> aponta
@@ -846,8 +830,6 @@ namespace SafeZoneVR.Editor
             parent.gameObject.SetActive(false);
         }
 
-        // ------------------------------------------------------------------ NPCs
-
         /// <summary>NPC low-poly: corpo (cápsula), cabeça, opcionalmente andador. Collider na layer Ignore Raycast + XRSimpleInteractable.</summary>
         public static XRSimpleInteractable CreateNpc(Transform parent, string name, Vector3 feetPos, float yaw, Color clothColor, bool walker,
             string speech, out TextMeshPro speechBubble)
@@ -898,8 +880,6 @@ namespace SafeZoneVR.Editor
             }
             return list;
         }
-
-        // ------------------------------------------------------------------ UI
 
         /// <summary>Relógio de pulso. Com <paramref name="withCallButton"/>, a faixa inferior vira Opções + Ligar e o botão "Ligar" é retornado.</summary>
         public static WristUIController CreateWristUI(Transform hand, ScenarioManager manager, FloodWaterController water, OptionsPanelController options,

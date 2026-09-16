@@ -4,7 +4,7 @@ namespace SafeZoneVR
 {
     /// <summary>
     /// Gera clipes de áudio simples em tempo de execução (sem depender de assets):
-    /// sinos de acerto, aviso suave e chuva ambiente. Leve para Quest (mono, 22 kHz).
+    /// sinos de acerto, aviso e chuva ambiente. Mono, 22 kHz.
     /// </summary>
     public static class ProceduralAudio
     {
@@ -34,7 +34,7 @@ namespace SafeZoneVR
             return Build(name, data);
         }
 
-        /// <summary>Aviso curto e grave, sem agressividade.</summary>
+        /// <summary>Aviso curto e grave.</summary>
         public static AudioClip CreateSoftWarning(string name, float volume = 0.35f)
         {
             var duration = 0.45f;
@@ -76,7 +76,7 @@ namespace SafeZoneVR
             return Build(name, data);
         }
 
-        /// <summary>Granizo: loop de "tics" curtos e agudos, sem estalos altos.</summary>
+        /// <summary>Granizo: loop de "tics" curtos e agudos.</summary>
         public static AudioClip CreateHailLoop(string name, float seconds = 3f, float hitsPerSecond = 90f, float volume = 0.35f)
         {
             var n = Mathf.CeilToInt(seconds * k_SampleRate);
@@ -124,7 +124,7 @@ namespace SafeZoneVR
             return Build(name, data);
         }
 
-        /// <summary>Detector de fumaça "suave": três bipes de 1,8 kHz e uma pausa. Loop de 2 s.</summary>
+        /// <summary>Detector de fumaça: três bipes de 1,8 kHz e uma pausa. Loop de 2 s.</summary>
         public static AudioClip CreateSmokeAlarmLoop(string name, float volume = 0.18f)
         {
             var n = k_SampleRate * 2;

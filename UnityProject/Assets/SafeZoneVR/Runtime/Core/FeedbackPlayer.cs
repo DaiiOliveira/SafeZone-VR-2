@@ -6,8 +6,8 @@ using UnityEngine.XR.Interaction.Toolkit.Inputs.Haptics;
 namespace SafeZoneVR
 {
     /// <summary>
-    /// Feedback positivo imediato (RF03): som + vibração ao concluir passo, ao errar e ao terminar a fase,
-    /// além de chuva ambiente para contextualizar a urgência sem assustar.
+    /// Retorno imediato (RF03): som + vibração ao concluir passo, ao errar e ao terminar a fase,
+    /// mais a chuva ambiente da cena.
     /// </summary>
     [RequireComponent(typeof(AudioSource))]
     public class FeedbackPlayer : MonoBehaviour

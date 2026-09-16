@@ -103,8 +103,7 @@ namespace SafeZoneVR.Editor
 
             var options = ScenarioSceneKit.CreateOptionsPanel(root.transform, cam.transform, false);
 
-            // O catálogo é lido aqui, e não junto com o SafeZoneDataBuilder: cada gravação de asset
-            // feita no meio do build (materiais, reimportação do modelo) invalida a referência carregada antes.
+            // Carregado só agora: gravar assets no meio do build (materiais, reimport do modelo) invalida a referência.
             var catalog = AssetDatabase.LoadAssetAtPath<ScenarioCatalogSO>(k_CatalogPath);
             if (catalog == null)
                 throw new System.Exception($"Catálogo não encontrado em {k_CatalogPath}. Rode SafeZoneDataBuilder.Build() primeiro.");
@@ -122,8 +121,6 @@ namespace SafeZoneVR.Editor
             QuestProjectConfigurator.RegisterScenes();
             Debug.Log("[SafeZone VR] Cena MainMenu (hub DC_Hub) gerada em " + k_ScenePath);
         }
-
-        // ------------------------------------------------------------------ Modelo do hub
 
         /// <summary>Colisores vêm do importador (o hub é feito de peças leves), sem câmeras/luzes/animação do FBX.</summary>
         static void ConfigureHubImporter()
@@ -209,8 +206,6 @@ namespace SafeZoneVR.Editor
             RenderSettings.ambientIntensity = 1f;
             DynamicGI.UpdateEnvironment();
         }
-
-        // ------------------------------------------------------------------ Totens
 
         static List<HubKiosk> CreateKiosks(Transform parent, GameObject hub, ScenarioCatalogSO catalog)
         {
@@ -299,8 +294,6 @@ namespace SafeZoneVR.Editor
             kiosk.boardTitle = map.boardTitle;
             kiosk.boardSubtitle = map.boardSubtitle;
         }
-
-        // ------------------------------------------------------------------ Botões de chão (configurações / sair)
 
         /// <summary>
         /// Alvo clicável transparente rente ao disco do modelo: o desenho e o rótulo já estão no 3D,

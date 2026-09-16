@@ -31,8 +31,6 @@ namespace SafeZoneVR.Editor
             }
         }
 
-        // ---------------------------------------------------------------- Materials
-
         public static Material GetOrCreateMaterial(string name, Color color, bool transparent = false, bool unlit = false, float smoothness = 0.35f, int renderQueue = -1)
         {
             EnsureFolder(k_GeneratedMaterialsFolder);
@@ -99,8 +97,6 @@ namespace SafeZoneVR.Editor
             AssetDatabase.CreateFolder(parent, leaf);
         }
 
-        // ---------------------------------------------------------------- Scene objects
-
         public static GameObject Child(Transform parent, string name)
         {
             var go = new GameObject(name);
@@ -141,8 +137,6 @@ namespace SafeZoneVR.Editor
             tmp.rectTransform.sizeDelta = size;
             return tmp;
         }
-
-        // ---------------------------------------------------------------- Canvas
 
         public static Canvas CreateWorldCanvas(string name, Transform parent, Vector2 sizePx, float metersPerPixel)
         {

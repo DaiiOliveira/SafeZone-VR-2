@@ -31,7 +31,7 @@ Legenda de prioridade:
 
 | Objeto | Fase | Hoje | Tamanho alvo (m) | Observações |
 |---|---|---|---|---|
-| `Panela` | Incêndio | cilindro achatado + cubo de cabo | Ø 0,28 × 0,12 | **O caso citado pelo usuário.** Precisa de corpo com parede e fundo, cabo de baquelite e borda onde a tampa encaixa. Fica em cima do fogão e o fogo sai de dentro dela — deixar o interior vazado. |
+| `Panela` | Incêndio | cilindro achatado + cubo de cabo | Ø 0,28 × 0,12 | **Prioridade máxima.** Precisa de corpo com parede e fundo, cabo de baquelite e borda onde a tampa encaixa. Fica em cima do fogão e o fogo sai de dentro dela — deixar o interior vazado. |
 | `Item_Tampa` | Incêndio | disco de Ø 0,30 | Ø 0,30 × 0,04 | Tampa da panela, com puxador central. É o item correto para abafar o fogo, então o jogador olha para ela de perto. Modelar junto com a panela, mesmo atlas. |
 | `Jarra_Agua` | Incêndio | cilindro Ø 0,12 | Ø 0,14 × 0,22 | Jarra de água (ação **errada** de propósito: espalha o fogo). Vidro/plástico translúcido, com alça e água dentro. |
 | `Item_Documentos` | Alagamento | cubo | 0,22 × 0,03 × 0,30 | Pasta/envelope de documentos, de preferência com RG e certidão visíveis na capa. |

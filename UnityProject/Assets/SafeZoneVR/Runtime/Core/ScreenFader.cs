@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 namespace SafeZoneVR
 {
     /// <summary>
-    /// Fade para preto na frente da câmera (quad). Evita cortes bruscos ao trocar de cena, que causam desconforto.
+    /// Fade para preto na frente da câmera (quad), no lugar do corte seco ao trocar de cena.
     /// Deve ficar como filho da câmera principal.
     /// </summary>
     public class ScreenFader : MonoBehaviour

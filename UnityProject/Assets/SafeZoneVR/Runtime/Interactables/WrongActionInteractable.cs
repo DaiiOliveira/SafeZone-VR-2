@@ -6,7 +6,7 @@ namespace SafeZoneVR
 {
     /// <summary>
     /// Objeto que representa uma decisão insegura (ex.: porta do carro durante alagamento).
-    /// Ao ser selecionado, registra o erro com uma explicação da Defesa Civil. Não pune: ensina.
+    /// Ao ser selecionado, registra o erro com a explicação correspondente. Não interrompe a fase.
     /// </summary>
     [RequireComponent(typeof(XRSimpleInteractable))]
     public class WrongActionInteractable : MonoBehaviour

@@ -3,8 +3,8 @@ using UnityEngine;
 namespace SafeZoneVR
 {
     /// <summary>
-    /// Um passo (missão) dentro de um cenário. Conteúdo puro: o que o jogador deve fazer e por quê,
-    /// segundo as orientações da Defesa Civil. A validação fica nos componentes de cena (Validators).
+    /// Um passo (missão) dentro de um cenário: o que o jogador deve fazer e por quê, segundo as
+    /// orientações da Defesa Civil. A validação fica nos componentes de cena (Validators).
     /// </summary>
     [CreateAssetMenu(fileName = "MissionStep", menuName = "SafeZone VR/Mission Step", order = 10)]
     public class MissionStepSO : ScriptableObject

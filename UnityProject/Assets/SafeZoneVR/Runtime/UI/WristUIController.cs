@@ -124,8 +124,7 @@ namespace SafeZoneVR
 
             if (m_ScenarioManager != null)
             {
-                // O relógio só aparece quando a fase começa: antes disso ele fica na frente do briefing,
-                // bem em cima do botão "Começar".
+                // Antes do início da fase o relógio cobriria o painel de briefing.
                 m_ScenarioManager.onScenarioStarted.AddListener(ShowPanel);
                 SetPanelVisible(m_ScenarioManager.hasStarted);
                 m_ScenarioManager.onStepChanged.AddListener(OnStepChanged);
@@ -285,7 +284,7 @@ namespace SafeZoneVR
             SetText(m_ProgressText, "Concluído");
             OnStepChanged(null);
 
-            // O relatório final assume a tela: relógio, bússola e opções saem da frente para não cobri-lo.
+            // Relógio, bússola e opções saem de cena enquanto o relatório final está aberto.
             if (m_OptionsPanel != null)
                 m_OptionsPanel.Hide();
             if (m_CompassArrow != null)

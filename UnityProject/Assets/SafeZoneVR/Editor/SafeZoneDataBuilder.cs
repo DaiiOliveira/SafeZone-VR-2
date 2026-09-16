@@ -43,7 +43,7 @@ namespace SafeZoneVR.Editor
             UIBuilderUtil.EnsureFolder(k_CardsFolder);
             UIBuilderUtil.EnsureFolder(k_ResourcesFolder);
 
-            // Passos antigos (nomes/ordem obsoletos) são removidos; os validadores são recriados pelo builder da cena.
+            // Nomes de passo já fora de uso; os validadores são recriados pelo builder da cena.
             foreach (var old in new[] { "Step_01_SafeArea", "Step_02_PowerOff", "Step_03_WaterValve", "Step_04_EmergencyKit", "Step_05_Evacuate" })
             {
                 var p = $"{k_AlagamentoFolder}/{old}.asset";
@@ -112,7 +112,7 @@ namespace SafeZoneVR.Editor
                 cards);
             EditorUtility.SetDirty(data.scenario);
 
-            // Cenários "Em breve" antigos saem do plano: o catálogo passa a ser Alagamento, Incêndio e Granizo.
+            // Cenários fora do catálogo atual (Alagamento, Incêndio, Granizo).
             foreach (var old in new[] { "Scenario_Deslizamento", "Scenario_Enxurrada", "Scenario_Vendaval" })
             {
                 var p = $"{k_DataFolder}/{old}.asset";
@@ -163,8 +163,6 @@ namespace SafeZoneVR.Editor
             EditorUtility.SetDirty(card);
             return card;
         }
-
-        // ------------------------------------------------------------------ Incêndio em Casa
 
         public const string k_IncendioFolder = "Assets/SafeZoneVR/Data/Incendio";
         public const string k_IncendioSceneName = "Incendio_EmCasa";
@@ -243,8 +241,6 @@ namespace SafeZoneVR.Editor
             EditorUtility.SetDirty(d.scenario);
             return d;
         }
-
-        // ------------------------------------------------------------------ Granizo
 
         public const string k_GranizoFolder = "Assets/SafeZoneVR/Data/Granizo";
         public const string k_GranizoSceneName = "Granizo_Praca";

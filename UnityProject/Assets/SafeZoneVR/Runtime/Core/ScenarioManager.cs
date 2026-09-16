@@ -15,9 +15,9 @@ namespace SafeZoneVR
     public class StringEvent : UnityEvent<string> { }
 
     /// <summary>
-    /// Coração da fase (RF02): mantém o passo atual, registra conclusões, erros e tempo, e dispara
+    /// Estado da fase (RF02): mantém o passo atual, registra conclusões, erros e tempo, e dispara
     /// eventos consumidos pela UI de pulso, pelos guias visuais e pelo relatório final.
-    /// Passos fora de ordem são aceitos (o jogador aprende fazendo), mas contam como "fora de ordem".
+    /// Passos fora de ordem são aceitos, mas marcados como tal.
     /// </summary>
     public class ScenarioManager : MonoBehaviour
     {
@@ -243,8 +243,8 @@ namespace SafeZoneVR
         }
 
         /// <summary>
-        /// Registra uma decisão insegura (ex.: tentar sair de carro). Não encerra a fase: o jogo ensina,
-        /// não pune. O mesmo id só conta uma vez a cada <paramref name="cooldownSeconds"/>.
+        /// Registra uma decisão insegura (ex.: tentar sair de carro). Não encerra a fase.
+        /// O mesmo id só conta uma vez a cada <paramref name="cooldownSeconds"/>.
         /// </summary>
         public void RegisterMistake(string mistakeId, string message, float cooldownSeconds = 10f)
         {

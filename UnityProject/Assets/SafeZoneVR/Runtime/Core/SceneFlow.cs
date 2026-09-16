@@ -8,8 +8,7 @@ namespace SafeZoneVR
     {
         public const string k_DefaultMenuScene = "MainMenu";
 
-        // Uma troca de cena de cada vez: dois cliques seguidos (ou em totens diferentes) carregavam
-        // duas cenas em sequência e a fase que abria não era a escolhida.
+        // Uma troca de cena por vez: dois cliques seguidos encadeariam dois carregamentos.
         static bool s_Loading;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
