@@ -16,8 +16,8 @@ MonoBehaviour:
   m_OrderIndex: 2
   m_Title: "Feche o registro de entrada de \xE1gua"
   m_InstructionText: "Saia pela porta da frente, v\xE1 at\xE9 a garagem e gire o
-    registro geral at\xE9 fechar."
-  m_LocationHint: "Garagem (junto \xE0 parede da casa)"
+    registro geral, na parede da casa ao lado do carro, at\xE9 fechar."
+  m_LocationHint: Garagem (parede da casa, ao lado do carro)
   m_WhyItMatters: "Fechar o registro impede que a \xE1gua contaminada do alagamento
     entre na rede interna da casa."
   m_OrderGroup: 0

@@ -13,7 +13,7 @@ namespace SafeZoneVR.Editor
 {
     /// <summary>
     /// Monta (e remonta, de forma idempotente) toda a camada de gameplay da cena Alagamento_EmCasa
-    /// sobre a casa modelada: XR Origin, teleporte, vinheta, disjuntor, registro, itens, sockets,
+    /// sobre a casa DC_Casa: XR Origin, teleporte, vinheta, disjuntor, registro, itens, sockets,
     /// validadores, UI de pulso, briefing, relatório, água, rota de fuga e ponto de encontro.
     /// Tudo que é gerado fica sob o objeto raiz "SafeZone_Gameplay" (exceto ajustes na casa).
     /// </summary>
@@ -22,28 +22,26 @@ namespace SafeZoneVR.Editor
         const string k_ScenePath = "Assets/Scenes/Fases/Alagamento_EmCasa.unity";
         const string k_RootName = "SafeZone_Gameplay";
 
-        // Posições medidas na casa modelada (metros, espaço de mundo).
-        static readonly Vector3 k_PlayerStart = new Vector3(-33.2f, 0f, 11.2f);
-        static readonly Vector3 k_BreakerBox = new Vector3(-29.68f, 1.50f, 6.22f);
-        static readonly Vector3 k_ValveCenter = new Vector3(-28.80f, 0.30f, 14.68f);
-        static readonly Vector3 k_SofaDocs = new Vector3(-31.57f, 0.93f, 11.55f);
-        static readonly Vector3 k_SofaPhoto = new Vector3(-31.57f, 0.92f, 12.45f);
-        static readonly Vector3 k_ShelfSocketA = new Vector3(-32.2f, 1.92f, 6.47f);
-        static readonly Vector3 k_ShelfSocketB = new Vector3(-31.0f, 1.92f, 6.47f);
-        static readonly Vector3 k_KitchenWater = new Vector3(-35.45f, 1.02f, 10.2f);
-        // Tampa da caixa acoplada do vaso (plana, y 0.98): a pia é de coluna, sem bancada, e o item caía na cuba.
-        static readonly Vector3 k_BathroomMeds = new Vector3(-35.70f, 1.03f, 6.60f);
-        static readonly Vector3 k_BedFlashlight = new Vector3(-29.6f, 0.86f, 8.9f);
-        // Mochila sobre um banco perto da porta: na altura da mão (conforto sentado/em pé) e acima da água.
-        static readonly Vector3 k_BackpackBench = new Vector3(-34.3f, 0.225f, 14.35f);
-        static readonly Vector3 k_Backpack = new Vector3(-34.3f, 0.67f, 14.35f);
-        static readonly Vector3 k_MeetingPoint = new Vector3(-33.0f, 0.15f, 23.0f);
+        // Posições na casa DC_Casa (metros, mundo; frente da casa para +Z, rua e calçada em z 5..12).
+        static readonly Vector3 k_PlayerStart = new Vector3(-2.6f, 0f, -2.4f);                 // sala
+        static readonly Quaternion k_PlayerRot = Quaternion.Euler(0f, 90f, 0f);                // de frente para o sofá
+        static readonly Vector2 k_SofaDocs = new Vector2(-0.80f, -1.60f);                      // assento do sofá (x, z)
+        static readonly Vector2 k_SofaPhoto = new Vector2(-0.80f, -2.40f);
+        static readonly Vector2 k_KitchenWater = new Vector2(-10.40f, -3.05f);                 // bancada da cozinha
+        static readonly Vector2 k_BathroomMeds = new Vector2(-10.55f, -6.95f);                 // bancada do banheiro, ao lado da cuba
+        static readonly Vector2 k_BedFlashlight = new Vector2(-1.50f, -8.40f);                 // cama de casal
+        // Registro na parede externa da casa, do lado da garagem, entre a parede e o carro.
+        static readonly Vector3 k_ValveCenter = new Vector3(0.07f, 0.35f, -0.45f);
+        // Mochila sobre um banco na sala, perto da porta do corredor: na altura da mão e acima da água.
+        static readonly Vector3 k_BackpackBench = new Vector3(-4.0f, 0.225f, -4.30f);
+        static readonly Vector3 k_Backpack = new Vector3(-4.0f, 0.67f, -4.30f);
+        // Ponto de encontro elevado na calçada, à esquerda do portão de pedestres.
+        static readonly Vector3 k_MeetingPoint = new Vector3(-9.5f, 0.2f, 6.2f);
+        static readonly Vector3 k_CarDoor = new Vector3(0.42f, 1.0f, -2.3f);                   // porta do motorista do carro da garagem
         const string k_IntroText = "<b>Alerta da Defesa Civil:</b> chuva muito forte na sua região e a água já começou a subir na rua.\n" +
             "Você está em casa e tem alguns minutos para agir com calma e segurança.\n\n" +
             "Use o relógio no seu pulso esquerdo para ver a missão atual. Aponte para o chão e aperte o gatilho para se teleportar. " +
             "Para ajustar o conforto, aperte \"Opções\" no relógio ou o botão Menu do controle esquerdo.";
-
-        static readonly Vector3 k_KombiDoor = new Vector3(-26.8f, 1.0f, 15.75f);
 
         [MenuItem("SafeZone VR/Build/2. Fase Alagamento (montar gameplay na casa)")]
         public static void BuildMenu()
@@ -60,8 +58,8 @@ namespace SafeZoneVR.Editor
 
             CleanupLegacy(scene);
 
-            ScenarioSceneKit.EnsureHouseInstance(scene);
-            var origin = ScenarioSceneKit.SetupXROrigin(scene, k_PlayerStart, Quaternion.identity);
+            var house = ScenarioSceneKit.EnsureHouseInstance(scene);
+            var origin = ScenarioSceneKit.SetupXROrigin(scene, k_PlayerStart, k_PlayerRot);
             var camera = origin.Camera.transform;
             var leftHand = ScenarioSceneKit.FindChildRecursive(origin.transform, "Left Controller");
 
@@ -69,47 +67,50 @@ namespace SafeZoneVR.Editor
             SceneManager.MoveGameObjectToScene(root, scene);
 
             // Ponto de início: alinha a cabeça do jogador aqui ao carregar e o devolve se cair para fora do mundo.
-            ScenarioSceneKit.CreatePlayerSpawn(root.transform, k_PlayerStart, Quaternion.identity);
+            ScenarioSceneKit.CreatePlayerSpawn(root.transform, k_PlayerStart, k_PlayerRot);
 
             // ---- Núcleo
             var manager = ScenarioSceneKit.CreateCore(root.transform, origin, data.scenario, true, out _);
 
             // ---- Ambiente extra: água, rua, ponto de encontro, rota
             var env = UIBuilderUtil.Child(root.transform, "Environment");
-            ScenarioSceneKit.SetupTeleportFloors();
-            ScenarioSceneKit.AddFurnitureColliders();
-            ScenarioSceneKit.MarkHouseStatic();
+            ScenarioSceneKit.OpenHouseDoors(house, true);
+            ScenarioSceneKit.SetupModelPhysics(house);
             var water = CreateWater(env.transform, manager);
-            ScenarioSceneKit.CreateStreet(env.transform);
             var evacZone = CreateMeetingPoint(env.transform, out var routeGroup);
             CreateRouteChevrons(routeGroup.transform);
 
             // ---- Interagíveis
             var interactables = UIBuilderUtil.Child(root.transform, "Interactables");
-            var lever = ScenarioSceneKit.SetupBreaker(interactables.transform, data.stepPower, k_BreakerBox);
+            var lever = ScenarioSceneKit.SetupHouseBreaker(house, interactables.transform, data.stepPower);
             var knob = SetupValve(interactables.transform, data.stepWater);
+            ScenarioSceneKit.SetupHouseLights(house, root.transform, lever);
 
-            var docs = ScenarioSceneKit.CreateItem(interactables.transform, "Item_Documentos", PrimitiveType.Cube, k_SofaDocs, new Vector3(0f, 90f, 0f),
+            var docs = ScenarioSceneKit.CreateItem(interactables.transform, "Item_Documentos", PrimitiveType.Cube, OnSurface(k_SofaDocs, 0.03f), new Vector3(0f, 90f, 0f),
                 new Vector3(0.24f, 0.03f, 0.32f), ScenarioSceneKit.MatDocs, "documentos", "Documentos", data.stepValuables);
-            var photo = ScenarioSceneKit.CreateItem(interactables.transform, "Item_PortaRetrato", PrimitiveType.Cube, k_SofaPhoto, new Vector3(0f, 90f, 0f),
+            var photo = ScenarioSceneKit.CreateItem(interactables.transform, "Item_PortaRetrato", PrimitiveType.Cube, OnSurface(k_SofaPhoto, 0.03f), new Vector3(0f, 90f, 0f),
                 new Vector3(0.16f, 0.02f, 0.20f), ScenarioSceneKit.MatPhoto, "porta_retrato", "Porta-retrato", data.stepValuables);
-            var bottle = ScenarioSceneKit.CreateItem(interactables.transform, "Item_Agua", PrimitiveType.Cylinder, k_KitchenWater, Vector3.zero,
+            var bottle = ScenarioSceneKit.CreateItem(interactables.transform, "Item_Agua", PrimitiveType.Cylinder, OnSurface(k_KitchenWater, 0.12f), Vector3.zero,
                 new Vector3(0.07f, 0.11f, 0.07f), ScenarioSceneKit.MatBottle, "agua", "Água potável", data.stepKit);
-            var meds = ScenarioSceneKit.CreateItem(interactables.transform, "Item_Remedios", PrimitiveType.Cube, k_BathroomMeds, Vector3.zero,
+            var meds = ScenarioSceneKit.CreateItem(interactables.transform, "Item_Remedios", PrimitiveType.Cube, OnSurface(k_BathroomMeds, 0.04f), Vector3.zero,
                 new Vector3(0.10f, 0.05f, 0.06f), ScenarioSceneKit.MatMeds, "remedios", "Remédios", data.stepKit);
-            var flashlight = ScenarioSceneKit.CreateItem(interactables.transform, "Item_Lanterna", PrimitiveType.Cylinder, k_BedFlashlight, new Vector3(0f, 0f, 90f),
+            var flashlight = ScenarioSceneKit.CreateItem(interactables.transform, "Item_Lanterna", PrimitiveType.Cylinder, OnSurface(k_BedFlashlight, 0.06f, 2.0f), new Vector3(0f, 0f, 90f),
                 new Vector3(0.045f, 0.09f, 0.045f), ScenarioSceneKit.MatFlashlight, "lanterna", "Lanterna", data.stepKit);
 
+            // Local alto: topo do guarda-roupa do quarto de casal.
+            var wardrobe = ScenarioSceneKit.PartBounds(ScenarioSceneKit.ModelPart(house, "DC_CASA_GuardaRoupa1"));
+            var shelfPosA = new Vector3(wardrobe.center.x, wardrobe.max.y + 0.05f, wardrobe.center.z + 0.45f);
+            var shelfPosB = new Vector3(wardrobe.center.x, wardrobe.max.y + 0.05f, wardrobe.center.z - 0.45f);
             var shelfTop = UIBuilderUtil.Child(interactables.transform, "ArmarioTopo");
-            shelfTop.transform.position = (k_ShelfSocketA + k_ShelfSocketB) * 0.5f;
+            shelfTop.transform.position = (shelfPosA + shelfPosB) * 0.5f;
             var shelfTarget = shelfTop.AddComponent<ObjectiveTarget>();
             shelfTarget.step = data.stepValuables;
             shelfTarget.markerHeightOffset = 0.3f;
             UIBuilderUtil.WorldText(shelfTop.transform, "Label", "LOCAL ALTO E SEGURO", 0.9f, UIBuilderUtil.AccentGreen,
-                shelfTop.transform.position + new Vector3(0f, 0.12f, 0.25f), new Vector3(0f, 180f, 0f), new Vector2(1.6f, 0.3f));
+                shelfTop.transform.position + new Vector3(0.35f, 0.15f, 0f), new Vector3(0f, -90f, 0f), new Vector2(1.6f, 0.3f));
             var valuableIds = new List<string> { "documentos", "porta_retrato" };
-            var shelfSocketA = ScenarioSceneKit.CreateSocket(shelfTop.transform, "Socket_Valores_A", k_ShelfSocketA, valuableIds, 0.16f);
-            var shelfSocketB = ScenarioSceneKit.CreateSocket(shelfTop.transform, "Socket_Valores_B", k_ShelfSocketB, valuableIds, 0.16f);
+            var shelfSocketA = ScenarioSceneKit.CreateSocket(shelfTop.transform, "Socket_Valores_A", shelfPosA, valuableIds, 0.16f);
+            var shelfSocketB = ScenarioSceneKit.CreateSocket(shelfTop.transform, "Socket_Valores_B", shelfPosB, valuableIds, 0.16f);
 
             var bench = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Banco_Mochila", interactables.transform, k_BackpackBench, Vector3.zero,
                 new Vector3(0.5f, 0.45f, 0.36f), ScenarioSceneKit.MatPhoto);
@@ -138,7 +139,7 @@ namespace SafeZoneVR.Editor
             };
             backpack.AddComponent<BackpackStorage>().slots.AddRange(kitSockets);
 
-            CreateKombiWrongAction(interactables.transform);
+            CreateCarWrongAction(interactables.transform);
 
             // ---- Validadores
             var validators = UIBuilderUtil.Child(root.transform, "Validators");
@@ -223,15 +224,19 @@ namespace SafeZoneVR.Editor
             }
         }
 
-        // ------------------------------------------------------------------ Materials
-
         // ------------------------------------------------------------------ Environment
+
+        static Vector3 OnSurface(Vector2 xz, float lift, float fromY = 2.5f)
+        {
+            return ScenarioSceneKit.OnSurface(xz.x, xz.y, fromY, lift);
+        }
 
         static FloodWaterController CreateWater(Transform parent, ScenarioManager manager)
         {
             var go = UIBuilderUtil.Child(parent, "Flood");
-            var surface = UIBuilderUtil.Primitive(PrimitiveType.Plane, "WaterSurface", go.transform, new Vector3(-31f, -0.04f, 14f), Vector3.zero,
-                new Vector3(1.5f, 1f, 2.6f), ScenarioSceneKit.MatWater, false);
+            // Cobre a casa, o lote, a calçada e a rua (40 × 30 m).
+            var surface = UIBuilderUtil.Primitive(PrimitiveType.Plane, "WaterSurface", go.transform, new Vector3(-5.4f, -0.04f, -3f), Vector3.zero,
+                new Vector3(4f, 1f, 3f), ScenarioSceneKit.MatWater, false);
             var r = surface.GetComponent<MeshRenderer>();
             r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             r.receiveShadows = false;
@@ -248,18 +253,18 @@ namespace SafeZoneVR.Editor
         static GameObject CreateMeetingPoint(Transform parent, out GameObject routeGroup)
         {
             var group = UIBuilderUtil.Child(parent, "PontoDeEncontro");
+            var size = new Vector3(3f, 0.44f, 1.8f);
 
-            var platform = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Plataforma", group.transform, k_MeetingPoint, Vector3.zero,
-                new Vector3(3f, 0.3f, 3f), ScenarioSceneKit.MatPlatform);
+            var platform = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Plataforma", group.transform, k_MeetingPoint, Vector3.zero, size, ScenarioSceneKit.MatPlatform);
             ScenarioSceneKit.AddTeleportArea(platform);
             UIBuilderUtil.MarkStatic(platform);
 
-            var signPos = k_MeetingPoint + new Vector3(1.8f, 0f, 0.4f);
+            var signPos = new Vector3(k_MeetingPoint.x - 1.8f, 0f, k_MeetingPoint.z);
             UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "Poste", group.transform, signPos + new Vector3(0f, 0.9f, 0f), Vector3.zero,
                 new Vector3(0.06f, 0.9f, 0.06f), ScenarioSceneKit.MatFlashlight);
             var board = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Placa", group.transform, signPos + new Vector3(0f, 1.95f, 0f), Vector3.zero,
                 new Vector3(1.1f, 0.55f, 0.04f), ScenarioSceneKit.MatSign);
-            // O jogador chega pelo sul (z menor) olhando para +Z: texto com rotação zero fica legível.
+            // O jogador chega do portão (z menor) olhando para +Z: texto com rotação zero fica legível.
             UIBuilderUtil.WorldText(board.transform, "Texto", "PONTO DE ENCONTRO\n<size=60%>local alto e seguro</size>", 1.6f, Color.white,
                 signPos + new Vector3(0f, 1.95f, -0.03f), Vector3.zero, new Vector2(1.05f, 0.5f));
 
@@ -267,80 +272,47 @@ namespace SafeZoneVR.Editor
             zone.transform.position = k_MeetingPoint + new Vector3(0f, 1.2f, 0f);
             var box = zone.AddComponent<BoxCollider>();
             box.isTrigger = true;
-            box.size = new Vector3(3f, 2.4f, 3f);
+            box.size = new Vector3(size.x, 2.4f, size.z);
 
             routeGroup = UIBuilderUtil.Child(group.transform, "RotaDeFuga");
             return zone;
         }
 
+        /// <summary>Setas da porta da frente pelo caminho de pedras e pelo portão até o ponto de encontro.</summary>
         static void CreateRouteChevrons(Transform parent)
         {
-            var points = new[]
+            var path = new[]
             {
-                new Vector3(-32.4f, 0.03f, 13.6f),
-                new Vector3(-32.4f, 0.03f, 15.7f),
-                new Vector3(-32.7f, 0.03f, 16.9f),
-                new Vector3(-33.0f, 0.03f, 18.7f),
-                new Vector3(-33.0f, 0.03f, 20.3f),
-                new Vector3(-33.0f, 0.03f, 21.4f),
+                new Vector2(-4.5f, 0.4f), new Vector2(-4.6f, 1.8f), new Vector2(-4.7f, 3.2f), new Vector2(-4.9f, 4.4f),
+                new Vector2(-4.9f, 6.0f), new Vector2(-6.6f, 6.2f), new Vector2(-7.7f, 6.2f),
             };
-            for (var i = 0; i < points.Length; i++)
-            {
-                var chevron = UIBuilderUtil.Child(parent, "Seta_" + (i + 1));
-                chevron.transform.position = points[i];
-                UIBuilderUtil.Primitive(PrimitiveType.Cube, "L", chevron.transform, points[i] + new Vector3(-0.12f, 0f, -0.1f), new Vector3(0f, -45f, 0f),
-                    new Vector3(0.06f, 0.01f, 0.36f), ScenarioSceneKit.MatChevron, false);
-                UIBuilderUtil.Primitive(PrimitiveType.Cube, "R", chevron.transform, points[i] + new Vector3(0.12f, 0f, -0.1f), new Vector3(0f, 45f, 0f),
-                    new Vector3(0.06f, 0.01f, 0.36f), ScenarioSceneKit.MatChevron, false);
-            }
-            parent.gameObject.SetActive(false);
+            var points = new Vector3[path.Length];
+            // Raycast baixo: começa abaixo do portão aberto e das plantas, só enxerga o chão.
+            for (var i = 0; i < path.Length; i++)
+                points[i] = OnSurface(path[i], 0.03f, 0.3f);
+            ScenarioSceneKit.CreateRouteChevrons(parent, points);
         }
 
         // ------------------------------------------------------------------ Interactables
 
         static XRKnob SetupValve(Transform parent, MissionStepSO step)
         {
-            var existing = GameObject.Find("Registro_Knob");
-            XRKnob knob;
-            if (existing != null)
-            {
-                knob = existing.GetComponent<XRKnob>();
-                if (existing.GetComponent<ObjectiveTarget>() == null)
-                {
-                    var t = existing.AddComponent<ObjectiveTarget>();
-                    t.step = step;
-                }
-                return knob;
-            }
-
             var knobGo = UIBuilderUtil.Child(parent, "Registro_Knob");
-            // Eixo Y local do knob = eixo X do mundo (o volante do registro é fino em X).
+            // Eixo Y local do knob = eixo X do mundo (volante encostado na parede, que é perpendicular a X).
             knobGo.transform.SetPositionAndRotation(k_ValveCenter, Quaternion.Euler(0f, 0f, -90f));
             var handle = UIBuilderUtil.Child(knobGo.transform, "Handle");
             handle.transform.localPosition = Vector3.zero;
             handle.transform.localRotation = Quaternion.identity;
 
-            var old = GameObject.Find("RegistroGeral");
-            if (old != null)
-            {
-                var oldKnob = old.GetComponent<XRKnob>();
-                if (oldKnob != null) Object.DestroyImmediate(oldKnob);
-                var children = new List<Transform>();
-                foreach (Transform c in old.transform) children.Add(c);
-                foreach (var c in children) c.SetParent(handle.transform, true);
-                if (old.transform.childCount == 0)
-                    Object.DestroyImmediate(old);
-            }
-            else
-            {
-                UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "Volante", handle.transform, k_ValveCenter, new Vector3(0f, 0f, 90f),
-                    new Vector3(0.2f, 0.02f, 0.2f), ScenarioSceneKit.MatLever);
-            }
+            UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "Cano", knobGo.transform, k_ValveCenter + new Vector3(-0.03f, 0f, 0f), new Vector3(0f, 0f, 90f),
+                new Vector3(0.05f, 0.05f, 0.05f), ScenarioSceneKit.MatMetal, false);
+            UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "Volante", handle.transform, k_ValveCenter, new Vector3(0f, 0f, 90f),
+                new Vector3(0.2f, 0.02f, 0.2f), ScenarioSceneKit.MatLever);
 
             var sphere = handle.AddComponent<SphereCollider>();
             sphere.radius = 0.14f;
 
-            knob = knobGo.AddComponent<XRKnob>();
+            var knob = knobGo.AddComponent<XRKnob>();
             knob.handle = handle.transform;
             knob.clampedMotion = true;
             knob.minAngle = -180f;
@@ -356,19 +328,17 @@ namespace SafeZoneVR.Editor
             return knob;
         }
 
-        static void CreateKombiWrongAction(Transform parent)
+        static void CreateCarWrongAction(Transform parent)
         {
-            var go = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Kombi_PortaTraseira", parent, k_KombiDoor, Vector3.zero,
-                new Vector3(0.5f, 0.6f, 0.1f), ScenarioSceneKit.MatHint);
+            var go = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Carro_PortaMotorista", parent, k_CarDoor, Vector3.zero,
+                new Vector3(0.1f, 0.6f, 0.5f), ScenarioSceneKit.MatHint);
             go.AddComponent<XRSimpleInteractable>();
             var wrong = go.AddComponent<WrongActionInteractable>();
             wrong.mistakeId = "sair_de_carro";
             wrong.message = "Nunca saia de carro em alagamento: a força da água arrasta veículos. Siga a pé até o local alto.";
-            UIBuilderUtil.WorldText(parent, "Kombi_Label", "Sair de carro?", 0.7f, new Color(1f, 0.75f, 0.35f),
-                k_KombiDoor + new Vector3(0f, 0.85f, 0.15f), Vector3.zero, new Vector2(1.2f, 0.2f)).gameObject.AddComponent<FacePlayer>().yawOnly = true;
+            UIBuilderUtil.WorldText(parent, "Carro_Label", "Sair de carro?", 0.7f, new Color(1f, 0.75f, 0.35f),
+                k_CarDoor + new Vector3(-0.1f, 0.85f, 0f), Vector3.zero, new Vector2(1.2f, 0.2f)).gameObject.AddComponent<FacePlayer>().yawOnly = true;
         }
-
-        // ------------------------------------------------------------------ UI
 
     }
 }

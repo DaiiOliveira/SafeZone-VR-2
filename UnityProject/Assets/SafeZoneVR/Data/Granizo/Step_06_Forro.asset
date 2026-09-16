@@ -15,9 +15,9 @@ MonoBehaviour:
   m_StepId: gran_06_forro
   m_OrderIndex: 5
   m_Title: Confira a casa por dentro
-  m_InstructionText: Entre em casa e olhe o teto do quarto. Aponte para o forro e
-    aperte o gatilho.
-  m_LocationHint: Quarto
+  m_InstructionText: Entre em casa e olhe o teto do quarto de casal. Aponte para
+    o forro e aperte o gatilho.
+  m_LocationHint: Quarto de casal
   m_WhyItMatters: "Telhas quebradas pelo granizo deixam a \xE1gua entrar e podem
     enfraquecer o telhado e o forro."
   m_OrderGroup: 0

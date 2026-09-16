@@ -15,9 +15,9 @@ MonoBehaviour:
   m_StepId: gran_05_voltar
   m_OrderIndex: 4
   m_Title: Volte para casa com cuidado
-  m_InstructionText: "O ch\xE3o est\xE1 coberto de gelo. Volte pela cal\xE7ada com
-    corrim\xE3o, n\xE3o pela rampa do atalho."
-  m_LocationHint: "Cal\xE7ada norte \u2192 port\xE3o de casa"
+  m_InstructionText: "O ch\xE3o est\xE1 coberto de gelo. Volte pela cal\xE7ada da
+    pra\xE7a e atravesse a rua na faixa de pedestres at\xE9 o port\xE3o de casa."
+  m_LocationHint: "Cal\xE7ada \u2192 faixa de pedestres \u2192 port\xE3o de casa"
   m_WhyItMatters: O granizo deixa o piso escorregadio. Prefira o caminho mais seguro,
     mesmo que seja mais longo.
   m_OrderGroup: 0

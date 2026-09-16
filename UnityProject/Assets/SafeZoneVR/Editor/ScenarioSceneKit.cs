@@ -28,8 +28,10 @@ namespace SafeZoneVR.Editor
         public const string k_RootName = "SafeZone_Gameplay";
         public const string k_XROriginPrefab = "Assets/Samples/XR Interaction Toolkit/3.5.1/Starter Assets/Prefabs/XR Origin (XR Rig).prefab";
         public const string k_VignettePrefab = "Assets/Samples/XR Interaction Toolkit/3.5.1/Starter Assets/TunnelingVignette/TunnelingVignette.prefab";
-        public const string k_HousePrefabPath = "Assets/SafeZoneVR/Prefabs/Casa_SafeZone.prefab";
-        public const string k_HouseRootName = "Casa_SafeZone";
+        public const string k_CasaModelPath = "Assets/Casa/DC_Casa.fbx";
+        public const string k_PracaModelPath = "Assets/Praca/DC_Praca.fbx";
+        public const string k_HouseRootName = "DC_Casa";
+        public const string k_PracaRootName = "DC_Praca";
         public const int k_TeleportLayerBit = 31;
         public const int k_MaxMeshColliderTris = 2000;
 
@@ -90,43 +92,99 @@ namespace SafeZoneVR.Editor
             light.transform.rotation = Quaternion.Euler(euler);
         }
 
-        // ------------------------------------------------------------------ House prefab
+        // ------------------------------------------------------------------ Modelos (casa e praça)
 
-        /// <summary>Instância da casa na cena (prefab Casa_SafeZone), criando-a se ainda não existir.</summary>
+        // Os FBX exportados do Blender chegam deitados (altura no eixo Z). Girando a raiz, casa e praça ficam de pé
+        // e continuam no mesmo referencial: as duas na origem já se encaixam (praça do outro lado da rua).
+        public static readonly Quaternion k_ModelUpright = Quaternion.Euler(-90f, 0f, 0f);
+
+        // Raízes da casa antiga (prefab Casa_SafeZone e sobras da cena original do Alagamento).
+        static readonly string[] k_LegacyHouseRoots = { "Casa_SafeZone", "Disjuntor_PowerOff", "Fase_AlagamentoEmCasa" };
+
+        /// <summary>Casa DC_Casa recriada do zero na cena (desempacotada, para os builders mexerem em portas e peças).</summary>
         public static GameObject EnsureHouseInstance(Scene scene)
         {
+            // O nome pode vir com sufixo ("Casa_SafeZone (Missing Prefab with guid: ...)") quando o prefab antigo já não existe.
             foreach (var rootGo in scene.GetRootGameObjects())
-                if (rootGo.name == k_HouseRootName)
-                    return rootGo;
+            {
+                if (rootGo == null) continue;
+                foreach (var legacy in k_LegacyHouseRoots)
+                {
+                    if (!rootGo.name.StartsWith(legacy)) continue;
+                    Object.DestroyImmediate(rootGo);
+                    break;
+                }
+            }
+            var house = InstantiateModel(scene, k_CasaModelPath, k_HouseRootName);
+            DimFalseEmission(house);
+            return house;
+        }
 
-            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(k_HousePrefabPath);
-            if (prefab == null)
-                throw new System.Exception($"Prefab da casa não encontrado em {k_HousePrefabPath}. Rode HousePrefabBuilder.Build() primeiro.");
-            var instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab, scene);
-            instance.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+        /// <summary>Praça DC_Praca recriada do zero na cena, no mesmo referencial da casa.</summary>
+        public static GameObject EnsurePracaInstance(Scene scene)
+        {
+            return InstantiateModel(scene, k_PracaModelPath, k_PracaRootName);
+        }
+
+        static GameObject InstantiateModel(Scene scene, string path, string rootName)
+        {
+            DestroyRoot(scene, rootName);
+            var model = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+            if (model == null)
+                throw new System.Exception($"Modelo não encontrado em {path}.");
+            var instance = (GameObject)PrefabUtility.InstantiatePrefab(model, scene);
+            // Desempacotado: portas ganham pivôs de dobradiça e peças são escondidas; a cena é regerada a cada build.
+            PrefabUtility.UnpackPrefabInstance(instance, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
+            instance.name = rootName;
+            instance.transform.SetPositionAndRotation(Vector3.zero, k_ModelUpright);
             return instance;
         }
 
-        /// <summary>Peças da casa: filhas de Casa_SafeZone (se existir) mais as raízes da cena.</summary>
-        public static List<Transform> HouseParts()
+        // O importador da casa acende qualquer material com "Luz" no nome; o quadro de energia não é luminária.
+        static readonly string[] k_NotEmissive = { "QuadroLuz" };
+
+        /// <summary>Apaga a emissão indevida de algumas peças, sem mexer nos materiais do FBX (property block por renderer).</summary>
+        static void DimFalseEmission(GameObject model)
         {
-            var list = new List<Transform>();
-            var scene = SceneManager.GetActiveScene();
-            foreach (var rootGo in scene.GetRootGameObjects())
+            var block = new MaterialPropertyBlock();
+            foreach (var r in model.GetComponentsInChildren<Renderer>(true))
             {
-                if (rootGo.name == k_HouseRootName)
-                    foreach (Transform c in rootGo.transform) list.Add(c);
-                else
-                    list.Add(rootGo.transform);
+                var wrong = false;
+                foreach (var m in r.sharedMaterials)
+                    if (m != null && ContainsAny(m.name, k_NotEmissive)) { wrong = true; break; }
+                if (!wrong) continue;
+                r.GetPropertyBlock(block);
+                block.SetColor("_EmissionColor", Color.black);
+                r.SetPropertyBlock(block);
             }
-            return list;
         }
 
-        public static Transform FindHousePart(string name)
+        /// <summary>Peça do modelo pelo nome (null se não existir).</summary>
+        public static Transform ModelPart(GameObject model, string name)
         {
-            foreach (var t in HouseParts())
-                if (t.name == name) return t;
-            return null;
+            return model != null ? FindChildRecursive(model.transform, name) : null;
+        }
+
+        /// <summary>Bounds de mundo de uma peça do modelo (todas as malhas dela e das filhas).</summary>
+        public static Bounds PartBounds(Transform part)
+        {
+            var renderers = part.GetComponentsInChildren<Renderer>(true);
+            if (renderers.Length == 0)
+                return new Bounds(part.position, Vector3.zero);
+            var b = renderers[0].bounds;
+            foreach (var r in renderers)
+                b.Encapsulate(r.bounds);
+            return b;
+        }
+
+        /// <summary>Desliga o visual e os colisores de uma peça (ex.: panela do modelo, trocada pela da gameplay).</summary>
+        public static void HidePart(GameObject model, string name)
+        {
+            var part = ModelPart(model, name);
+            if (part == null)
+                return;
+            foreach (var r in part.GetComponentsInChildren<Renderer>(true)) r.enabled = false;
+            foreach (var c in part.GetComponentsInChildren<Collider>(true)) c.enabled = false;
         }
 
         // ------------------------------------------------------------------ XR Origin
@@ -290,22 +348,6 @@ namespace SafeZoneVR.Editor
 
         // ------------------------------------------------------------------ Environment
 
-        public static void SetupTeleportFloors()
-        {
-            foreach (var t in HouseParts())
-            {
-                // Pisos da casa, garagem e gramados (os gramados ficam na mesma altura do terreno e
-                // bloqueariam o raio de teleporte se não fossem áreas válidas).
-                if (t.name == "ChaoCasa" || t.name == "Plane" || t.name.StartsWith("Grama") || t.name == "Terreno")
-                    AddTeleportArea(t.gameObject);
-                if (t.name == "Fase_AlagamentoEmCasa")
-                {
-                    var terreno = FindChildRecursive(t, "Terreno");
-                    if (terreno != null) AddTeleportArea(terreno.gameObject);
-                }
-            }
-        }
-
         public static TeleportationArea AddTeleportArea(GameObject go)
         {
             var area = go.GetComponent<TeleportationArea>();
@@ -317,81 +359,182 @@ namespace SafeZoneVR.Editor
             return area;
         }
 
-        /// <summary>
-        /// Colisor estático direto em cada peça de móvel, porta e acessório da casa (sem Rigidbody). Peças leves
-        /// usam MeshCollider; peças pesadas, como a Kombi, usam caixa.
-        /// </summary>
-        public static void AddFurnitureColliders()
+        // Peças sem colisor: céu e entorno distante, fiação, plantas miúdas e o que fica acima da cabeça.
+        static readonly string[] k_NoColliderKeys =
         {
-            var names = new HashSet<string>
+            "Montanha", "Nuvem", "PosteRede", "Fio", "FloresJardim", "Plantas", "Arbusto", "CercaViva", "Forro", "Telhado",
+            "Oitao", "Tabeira", "Calha", "Luminaria", "Plafon", "Pendente", "Cortina", "Varal", "LedAereo",
+        };
+
+        /// <summary>
+        /// Física do modelo (casa ou praça): pisos, tapetes, calçadas, rua e gramas viram MeshCollider + área de teleporte;
+        /// paredes, móveis e estruturas ganham colisor estático; árvores só no tronco. Nada disso vem do importador.
+        /// </summary>
+        public static void SetupModelPhysics(GameObject model)
+        {
+            foreach (var mf in model.GetComponentsInChildren<MeshFilter>(true))
             {
-                "Sofa", "Tapete", "Estante", "TV", "PS5", "AltoFalantes", "Livros", "Geladeira", "Balcao", "Fogao", "Microondas",
-                "LavaLoucas", "Chuveiro", "Pia", "Privada", "Toalheiro", "Papel", "Espelho", "Cama", "Armario",
-                "PortaQuarto", "PortaFrente", "PortaBanheiro", "Kombi"
-            };
-            foreach (var t in HouseParts())
-            {
-                if (!names.Contains(t.name)) continue;
-                foreach (var mf in t.GetComponentsInChildren<MeshFilter>(true))
+                if (mf.sharedMesh == null || mf.GetComponent<Collider>() != null)
+                    continue;
+                if (IsUnder(mf.transform, "DC_GRUPO_Luzes") || ContainsAny(mf.name, k_NoColliderKeys))
+                    continue;
+
+                var renderer = mf.GetComponent<Renderer>();
+                if (renderer == null)
+                    continue;
+                var b = renderer.bounds;
+
+                if (mf.name.Contains("Arvore"))
                 {
-                    if (mf.sharedMesh == null || mf.GetComponent<Collider>() != null) continue;
-                    AddPieceCollider(mf);
+                    AddTrunkCollider(mf.transform, b);
+                    continue;
                 }
 
-                // O tapete fica sobre o piso: sem isto o colisor dele bloquearia o teleporte na sala.
-                if (t.name == "Tapete")
-                    AddTeleportArea(t.gameObject);
+                if (IsFloorLike(b))
+                {
+                    var floor = mf.gameObject.AddComponent<MeshCollider>();
+                    floor.sharedMesh = mf.sharedMesh;
+                    AddTeleportArea(mf.gameObject);
+                    continue;
+                }
+
+                AddPieceCollider(mf, b);
             }
+            Physics.SyncTransforms();
         }
 
-        static void AddPieceCollider(MeshFilter mf)
+        /// <summary>Superfície baixa e fina (piso, tapete, soleira, calçada, rua, grama, degrau): dá para teleportar em cima.</summary>
+        static bool IsFloorLike(Bounds b)
+        {
+            return b.size.y <= 0.35f && b.max.y <= 0.25f && b.size.x * b.size.z >= 0.2f;
+        }
+
+        static void AddTrunkCollider(Transform tree, Bounds b)
+        {
+            var trunk = new GameObject("Tronco_Colisor");
+            trunk.transform.SetParent(tree, false);
+            trunk.transform.SetPositionAndRotation(new Vector3(b.center.x, b.min.y + 1.2f, b.center.z), Quaternion.identity);
+            var capsule = trunk.AddComponent<CapsuleCollider>();
+            capsule.radius = 0.22f;
+            capsule.height = 2.4f;
+        }
+
+        /// <summary>
+        /// Peças leves (ou grandes, como paredes com vão de porta) usam MeshCollider; peças pequenas e pesadas, como o
+        /// carro, usam caixa.
+        /// </summary>
+        static void AddPieceCollider(MeshFilter mf, Bounds worldBounds)
         {
             var mesh = mf.sharedMesh;
             var tris = 0L;
             for (var i = 0; i < mesh.subMeshCount; i++)
                 tris += mesh.GetIndexCount(i) / 3;
 
-            if (tris <= k_MaxMeshColliderTris)
+            var small = Mathf.Max(worldBounds.size.x, worldBounds.size.z) < 5f;
+            if (tris > k_MaxMeshColliderTris && small)
             {
-                var mc = mf.gameObject.AddComponent<MeshCollider>();
-                mc.sharedMesh = mesh;
-                mc.convex = false;
+                var box = mf.gameObject.AddComponent<BoxCollider>();
+                box.center = mesh.bounds.center;
+                box.size = mesh.bounds.size;
                 return;
             }
 
-            var box = mf.gameObject.AddComponent<BoxCollider>();
-            box.center = mesh.bounds.center;
-            box.size = mesh.bounds.size;
+            var mc = mf.gameObject.AddComponent<MeshCollider>();
+            mc.sharedMesh = mesh;
+            mc.convex = false;
         }
 
-        public static void MarkHouseStatic()
+        static bool ContainsAny(string name, string[] keys)
         {
-            var prefixes = new[] { "ParedeGaragem", "PilarMuro", "Grama", "Muro", "Telhado", "Teto", "ChaoCasa", "Plane", "Fase_AlagamentoEmCasa" };
-            foreach (var t in HouseParts())
+            foreach (var k in keys)
+                if (name.Contains(k)) return true;
+            return false;
+        }
+
+        static bool IsUnder(Transform t, string ancestorName)
+        {
+            for (var p = t; p != null; p = p.parent)
+                if (p.name == ancestorName) return true;
+            return false;
+        }
+
+        /// <summary>Ponto da superfície embaixo de (x, z), por raycast nos colisores já criados. Sem acerto: y = 0.</summary>
+        public static Vector3 OnSurface(float x, float z, float fromY = 2.5f, float lift = 0f)
+        {
+            Physics.SyncTransforms();
+            if (Physics.Raycast(new Vector3(x, fromY, z), Vector3.down, out var hit, fromY + 10f, ~0, QueryTriggerInteraction.Ignore))
+                return hit.point + Vector3.up * lift;
+            return new Vector3(x, lift, z);
+        }
+
+        // ------------------------------------------------------------------ Portas do modelo
+
+        /// <summary>
+        /// Coloca uma folha (porta, janela, portão) sob um pivô na dobradiça, com rotação de mundo zero:
+        /// o eixo Y local do pivô é o vertical do mundo, como o <see cref="ToggleOpening"/> espera.
+        /// </summary>
+        public static Transform HingePivot(Transform leaf, Vector3 hinge)
+        {
+            var pivot = new GameObject(leaf.name + "_Dobradica").transform;
+            pivot.SetParent(leaf.parent, false);
+            pivot.SetPositionAndRotation(hinge, Quaternion.identity);
+            leaf.SetParent(pivot, true);
+            foreach (var t in pivot.GetComponentsInChildren<Transform>(true))
+                GameObjectUtility.SetStaticEditorFlags(t.gameObject, 0);
+            return pivot;
+        }
+
+        /// <summary>Ângulo (±graus em Y) que leva o centro da folha para o lado <paramref name="towards"/>.</summary>
+        public static float SwingAngle(Transform pivot, Vector3 towards, float degrees)
+        {
+            var offset = PartBounds(pivot).center - pivot.position;
+            offset.y = 0f;
+            var plus = Quaternion.AngleAxis(degrees, Vector3.up) * offset;
+            return Vector3.Dot(plus, towards) >= 0f ? degrees : -degrees;
+        }
+
+        /// <summary>Folha de porta do modelo (origem já na dobradiça) aberta para o lado indicado. Devolve o pivô.</summary>
+        public static Transform OpenModelDoor(GameObject model, string leafName, Vector3 towards, float degrees = 95f)
+        {
+            var leaf = ModelPart(model, leafName);
+            if (leaf == null)
             {
-                foreach (var p in prefixes)
-                {
-                    if (t.name.StartsWith(p))
-                    {
-                        UIBuilderUtil.MarkStatic(t.gameObject);
-                        break;
-                    }
-                }
+                Debug.LogWarning($"[SafeZone VR] Porta {leafName} não existe no modelo.");
+                return null;
             }
+            var pivot = HingePivot(leaf, leaf.position);
+            pivot.rotation = Quaternion.AngleAxis(SwingAngle(pivot, towards, degrees), Vector3.up);
+            return pivot;
         }
 
-        /// <summary>Rua (plano) e calçada (cubo) ao norte do lote, com teleporte. Valores padrão = Alagamento.</summary>
-        public static void CreateStreet(Transform parent, float xCenter = -31f, float xLength = 16f)
+        /// <summary>
+        /// Portas internas abertas (cômodos acessíveis) e portão de pedestres aberto para dentro do lote. A porta da frente
+        /// ganha pivô na dobradiça e só abre se <paramref name="openFrontDoor"/>; o pivô é devolvido para quem precisar dela.
+        /// </summary>
+        public static Transform OpenHouseDoors(GameObject house, bool openFrontDoor)
         {
-            var street = UIBuilderUtil.Primitive(PrimitiveType.Plane, "Rua", parent, new Vector3(xCenter, -0.005f, 22.5f), Vector3.zero,
-                new Vector3(xLength / 10f, 1f, 0.9f), MatStreet);
-            AddTeleportArea(street);
-            UIBuilderUtil.MarkStatic(street);
+            OpenModelDoor(house, "DC_CASA_Porta_FrenteCorredor0", Vector3.forward);   // corredor → sala
+            OpenModelDoor(house, "DC_CASA_Porta_FrenteCorredor1", Vector3.forward);   // corredor → cozinha
+            OpenModelDoor(house, "DC_CASA_Porta_CorredorFundo0", Vector3.back);       // quarto de casal
+            OpenModelDoor(house, "DC_CASA_Porta_CorredorFundo1", Vector3.back);       // quarto 2
+            OpenModelDoor(house, "DC_CASA_Porta_CorredorFundo2", Vector3.back);       // banheiro
+            OpenModelDoor(house, "DC_CASA_Porta_Direita1", Vector3.left);             // cozinha → quintal
 
-            var curb = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Calcada", parent, new Vector3(xCenter, 0.04f, 18.6f), Vector3.zero,
-                new Vector3(xLength, 0.08f, 1.0f), MatStreet);
-            AddTeleportArea(curb);
-            UIBuilderUtil.MarkStatic(curb);
+            var gate = ModelPart(house, "DC_CASA_PortaoPedestre");
+            if (gate != null)
+            {
+                var gb = PartBounds(gate);
+                var pivot = HingePivot(gate, new Vector3(gb.min.x, 0f, gb.center.z));
+                pivot.rotation = Quaternion.AngleAxis(SwingAngle(pivot, Vector3.back, 100f), Vector3.up);
+            }
+
+            var front = ModelPart(house, "DC_CASA_Porta_NichoFundo0");
+            if (front == null)
+                return null;
+            var frontPivot = HingePivot(front, front.position);
+            if (openFrontDoor)
+                frontPivot.rotation = Quaternion.AngleAxis(SwingAngle(frontPivot, Vector3.back, 95f), Vector3.up);
+            return frontPivot;
         }
 
         public static GameObject CreateTriggerZone(Transform parent, string name, Vector3 center, Vector3 size)
@@ -450,43 +593,40 @@ namespace SafeZoneVR.Editor
 
         // ------------------------------------------------------------------ Interactables
 
-        public static BreakerLever SetupBreaker(Transform parent, MissionStepSO step, Vector3 boxPos)
+        /// <summary>
+        /// Alavanca do quadro de energia na face frontal <paramref name="frontCenter"/>; <paramref name="facing"/> aponta
+        /// para fora da parede (+Z local). Com <paramref name="withBox"/> falso, aproveita a caixa do modelo.
+        /// </summary>
+        public static BreakerLever SetupBreaker(Transform parent, MissionStepSO step, Vector3 frontCenter, Quaternion facing, bool withBox)
         {
-            var box = GameObject.Find("Disjuntor_PowerOff");
-            if (box == null)
+            var box = UIBuilderUtil.Child(parent, "Disjuntor_PowerOff");
+            box.transform.SetPositionAndRotation(frontCenter, facing);
+            if (withBox)
             {
-                box = UIBuilderUtil.Child(parent, "Disjuntor_PowerOff");
-                UIBuilderUtil.Primitive(PrimitiveType.Cube, "Caixa", box.transform, boxPos, Vector3.zero, new Vector3(0.26f, 0.34f, 0.10f), MatFlashlight);
+                var caixa = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Caixa", box.transform, Vector3.zero, Vector3.zero,
+                    new Vector3(0.26f, 0.34f, 0.10f), MatFlashlight);
+                caixa.transform.localPosition = new Vector3(0f, 0f, -0.05f);
+                caixa.transform.localRotation = Quaternion.identity;
             }
 
-            // Reposiciona a raiz sobre a caixa mantendo os filhos existentes no lugar.
-            var keep = new List<(Transform t, Vector3 pos, Quaternion rot)>();
-            foreach (Transform c in box.transform)
-                keep.Add((c, c.position, c.rotation));
-            box.transform.SetPositionAndRotation(boxPos, Quaternion.identity);
-            foreach (var k in keep)
-                k.t.SetPositionAndRotation(k.pos, k.rot);
-
-            // Idempotente: remove o que este builder criou em execuções anteriores.
-            foreach (var childName in new[] { "Alavanca_Pivot", "Indicador", "Label" })
-            {
-                var previous = box.transform.Find(childName);
-                if (previous != null)
-                    Object.DestroyImmediate(previous.gameObject);
-            }
             var pivotGo = UIBuilderUtil.Child(box.transform, "Alavanca_Pivot");
-            pivotGo.transform.SetPositionAndRotation(boxPos + new Vector3(0f, 0f, 0.085f), Quaternion.identity);
+            pivotGo.transform.localPosition = new Vector3(0f, 0f, 0.01f);
+            pivotGo.transform.localRotation = Quaternion.identity;
 
-            UIBuilderUtil.Primitive(PrimitiveType.Cube, "Alavanca", pivotGo.transform, pivotGo.transform.position + new Vector3(0f, 0f, 0.035f), Vector3.zero,
+            var handle = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Alavanca", pivotGo.transform, Vector3.zero, Vector3.zero,
                 new Vector3(0.035f, 0.025f, 0.075f), MatLever, false);
+            handle.transform.localPosition = new Vector3(0f, 0f, 0.035f);
+            handle.transform.localRotation = Quaternion.identity;
 
             var col = pivotGo.AddComponent<BoxCollider>();
             col.center = new Vector3(0f, 0f, 0.04f);
             col.size = new Vector3(0.10f, 0.12f, 0.12f);
             pivotGo.AddComponent<XRSimpleInteractable>();
 
-            var indicator = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Indicador", box.transform, boxPos + new Vector3(0.09f, 0.13f, 0.055f), Vector3.zero,
+            var indicator = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Indicador", box.transform, Vector3.zero, Vector3.zero,
                 new Vector3(0.025f, 0.025f, 0.01f), MatIndicator, false);
+            indicator.transform.localPosition = new Vector3(0.09f, 0.13f, 0.01f);
+            indicator.transform.localRotation = Quaternion.identity;
 
             var lever = pivotGo.AddComponent<BreakerLever>();
             lever.pivot = pivotGo.transform;
@@ -496,13 +636,47 @@ namespace SafeZoneVR.Editor
             lever.startsOn = true;
             lever.indicatorRenderer = indicator.GetComponent<Renderer>();
 
-            UIBuilderUtil.WorldText(box.transform, "Label", "QUADRO DE ENERGIA", 0.7f, Color.white,
-                boxPos + new Vector3(0f, 0.22f, 0.06f), new Vector3(0f, 180f, 0f), new Vector2(0.6f, 0.12f));
+            // Legível para quem está de frente para o quadro (lado +Z local).
+            UIBuilderUtil.WorldText(box.transform, "Label", "QUADRO DE ENERGIA", 0.35f, Color.white,
+                frontCenter + facing * new Vector3(0f, 0.36f, 0.03f), (facing * Quaternion.Euler(0f, 180f, 0f)).eulerAngles, new Vector2(0.7f, 0.16f));
 
             var target = pivotGo.AddComponent<ObjectiveTarget>();
             target.step = step;
             target.markerHeightOffset = 0.2f;
             return lever;
+        }
+
+        /// <summary>
+        /// Luzes da casa acesas sem bake: os marcadores DC_LUZ_* do modelo viram luzes Realtime sem sombra, num
+        /// <see cref="HouseLights"/> que a alavanca do quadro de energia apaga.
+        /// </summary>
+        public static HouseLights SetupHouseLights(GameObject house, Transform parent, BreakerLever breaker)
+        {
+            var go = UIBuilderUtil.Child(parent, "LuzesDaCasa");
+            var control = go.AddComponent<HouseLights>();
+            foreach (var light in house.GetComponentsInChildren<Light>(true))
+            {
+                if (light.type == LightType.Directional)
+                    continue;
+                light.lightmapBakeType = LightmapBakeType.Realtime;
+                light.shadows = LightShadows.None;   // 20+ luzes em tempo real: sombra sai caro no Quest
+                light.enabled = true;
+                control.lights.Add(light);
+            }
+
+            if (breaker != null)
+                UnityEditor.Events.UnityEventTools.AddPersistentListener(breaker.onStateChanged, control.SetPowered);
+            return control;
+        }
+
+        /// <summary>Alavanca sobre o quadro de energia da casa DC_Casa (corredor), no lugar do disjuntor geral do FBX.</summary>
+        public static BreakerLever SetupHouseBreaker(GameObject house, Transform parent, MissionStepSO step)
+        {
+            HidePart(house, "DC_CASA_QDL_DisjuntorGeral");
+            var panel = PartBounds(ModelPart(house, "DC_CASA_QuadroLuz"));
+            // O quadro fica na parede do corredor e olha para −Z.
+            var front = new Vector3(panel.center.x, panel.center.y, panel.min.z);
+            return SetupBreaker(parent, step, front, Quaternion.Euler(0f, 180f, 0f), false);
         }
 
         /// <summary>Registro/botão giratório genérico (XRKnob) com volante cilíndrico e etiqueta.</summary>

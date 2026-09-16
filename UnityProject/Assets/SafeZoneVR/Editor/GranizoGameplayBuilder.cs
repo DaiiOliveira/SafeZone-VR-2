@@ -1,6 +1,5 @@
 #if UNITY_EDITOR
 using System.Collections.Generic;
-using TMPro;
 using UnityEditor;
 using UnityEditor.Events;
 using UnityEditor.SceneManagement;
@@ -10,36 +9,42 @@ using UnityEngine.XR.Interaction.Toolkit.Interactables;
 namespace SafeZoneVR.Editor
 {
     /// <summary>
-    /// Monta (idempotente) a fase Granizo: praça do bairro, UBS de alvenaria, abrigos errados, vagas, NPCs,
-    /// granizo por partículas, gelo no chão, fase "Depois" na casa (prefab Casa_SafeZone), validadores e UI.
+    /// Monta (idempotente) a fase Granizo sobre a praça DC_Praca e a casa DC_Casa (mesmo referencial: praça ao norte da
+    /// rua, casa ao sul). Acrescenta o que os modelos não têm: UBS de alvenaria na esquina da praça, abrigos errados
+    /// (ponto de ônibus metálico e barraca), placa de propaganda, torre, vagas, NPCs, granizo, gelo, danos da casa,
+    /// validadores e UI.
     /// </summary>
     public static class GranizoGameplayBuilder
     {
         const string k_ScenePath = "Assets/Scenes/Fases/Granizo_Praca.unity";
         const string k_HailLayer = "HailBlockers";
 
-        const float k_PlazaY = 0.15f;
-        static readonly Vector3 k_PlayerStart = new Vector3(-52f, k_PlazaY, 30f);
-        static readonly Vector3 k_JoaquimBench = new Vector3(-49f, k_PlazaY, 33f);
-        static readonly Vector3 k_Ubs = new Vector3(-55f, 0f, 43f);          // centro; x −60..−50, z 40..46
-        static readonly Vector3 k_BigTree = new Vector3(-56f, k_PlazaY, 36f);
-        static readonly Vector3 k_BusStop = new Vector3(-47f, k_PlazaY, 29.5f);
-        static readonly Vector3 k_Shack = new Vector3(-66f, k_PlazaY, 33f);
-        static readonly Vector3 k_CarStart = new Vector3(-62f, 0f, 24f);
-        static readonly Vector3 k_Carlos = new Vector3(-60.3f, 0f, 25.6f);
-        static readonly Vector3 k_SpotA = new Vector3(-70f, 0f, 22f);       // placa de propaganda
-        static readonly Vector3 k_SpotB = new Vector3(-76f, 0f, 24.5f);     // torre de transmissão (torre em x −76, z 30)
-        static readonly Vector3 k_SpotC = new Vector3(-40f, 0f, 24f);       // estacionamento do mercado
-        static readonly Vector3 k_Billboard = new Vector3(-70f, 0f, 19.2f);
-        static readonly Vector3 k_Tower = new Vector3(-76f, 0f, 30f);
-        static readonly Vector3 k_RampCenter = new Vector3(-44f, 0.08f, 26f);
-        static readonly Vector3 k_Ladder = new Vector3(-34.8f, 0f, 15.25f);
-        static readonly Vector3 k_Ceiling = new Vector3(-30.9f, 1.98f, 7.8f);
-        static readonly Vector3 k_GateZone = new Vector3(-33.0f, 1.2f, 17.7f);
+        // Praça: x −16,5..5,5, z 12,1..27,8. Rua principal em z 7,2..12,1. Casa: frente em z 0, portão em (−4,9; 5,2).
+        static readonly Vector3 k_PlayerStart = new Vector3(-4.9f, 0f, 13.4f);            // praça, junto à faixa de pedestres
+        static readonly Vector3 k_JoaquimBench = new Vector3(-9.2f, 0f, 16.7f);           // banco perto do canteiro da esquerda
+        // UBS no lote da casa vizinha à direita da praça (x 8..16, z 13,6..22), porta na parede oeste, de frente para a praça.
+        static readonly Vector3 k_Ubs = new Vector3(12f, 0f, 17.8f);
+        static readonly Vector3 k_UbsSize = new Vector3(8f, 3f, 8.4f);
+        const float k_UbsDoorZ = 16f;
+        const float k_UbsFloorY = 0.15f;
+        static readonly Vector3 k_BusStop = new Vector3(-12f, 0f, 6.3f);                  // calçada da casa, aberto para a rua
+        static readonly Vector3 k_Shack = new Vector3(-22.4f, 0.12f, 20f);                // calçada do outro lado da rua lateral
+        const float k_StreetLaneZ = 10.9f;                                                 // faixa da rua do lado da praça
+        static readonly Vector3 k_CarStart = new Vector3(-36f, -0.06f, k_StreetLaneZ);
+        static readonly Vector3 k_Carlos = new Vector3(-34.5f, 0f, 12.8f);
+        static readonly Vector3 k_SpotA = new Vector3(-30.5f, -0.06f, k_StreetLaneZ);    // embaixo da placa de propaganda
+        static readonly Vector3 k_SpotB = new Vector3(24.5f, -0.06f, k_StreetLaneZ);     // em frente à torre de transmissão
+        static readonly Vector3 k_SpotC = new Vector3(-12.5f, -0.06f, k_StreetLaneZ);    // longe das duas
+        static readonly Vector3 k_Billboard = new Vector3(-30.5f, 0f, 13.3f);
+        static readonly Vector3 k_Tower = new Vector3(24.5f, 0f, 16f);
+        static readonly Vector3 k_Ladder = new Vector3(-10f, 0f, 1.25f);                  // encostada na fachada da casa
+        static readonly Vector3 k_Ceiling = new Vector3(-2.9f, 2.68f, -8.9f);             // forro do quarto de casal
+        static readonly Vector3 k_GateZone = new Vector3(-4.9f, 1.2f, 4.4f);              // logo depois do portão de pedestres
+        static readonly Color k_StormSky = new Color(0.55f, 0.58f, 0.63f);                // céu fechado, sem sol
 
         const string k_IntroText =
             "<b>Alerta da Defesa Civil (SMS 40199):</b> tempestade com possibilidade de <b>granizo</b> no seu bairro nos próximos minutos.\n" +
-            "Você está na praça, a duas quadras de casa. Procure um local seguro e ajude quem estiver por perto.\n\n" +
+            "Você está na praça, do outro lado da rua de casa. Procure um local seguro e ajude quem estiver por perto.\n\n" +
             "O relógio no pulso esquerdo mostra cada missão e permite ligar para a Defesa Civil e os Bombeiros. " +
             "Aponte para o chão e aperte o gatilho para se teleportar.";
 
@@ -58,11 +63,21 @@ namespace SafeZoneVR.Editor
             ScenarioSceneKit.CreateMaterials();
             ScenarioSceneKit.DestroyRoot(scene, ScenarioSceneKit.k_RootName);
             ScenarioSceneKit.SetupDirectionalLight(scene, new Color(0.75f, 0.78f, 0.85f), 0.65f, new Vector3(40f, -30f, 0f));
+            SetupStormSky();
             var hailLayer = ScenarioSceneKit.EnsureLayer(k_HailLayer);
 
             var house = ScenarioSceneKit.EnsureHouseInstance(scene);
+            var praca = ScenarioSceneKit.EnsurePracaInstance(scene);
+            ScenarioSceneKit.OpenHouseDoors(house, true);
+            HideNeighborForUbs(praca);
+            ScenarioSceneKit.SetupModelPhysics(house);
+            ScenarioSceneKit.SetupModelPhysics(praca);
+
             var origin = ScenarioSceneKit.SetupXROrigin(scene, k_PlayerStart, Quaternion.identity);
             var camera = origin.Camera.transform;
+            // Montanhas da praça a ~190 m e nuvens a ~320 m.
+            origin.Camera.farClipPlane = Mathf.Max(origin.Camera.farClipPlane, 600f);
+            SetupStormCamera(origin.Camera);
             var leftHand = ScenarioSceneKit.FindChildRecursive(origin.transform, "Left Controller");
 
             var root = ScenarioSceneKit.CreateRoot(scene);
@@ -71,22 +86,16 @@ namespace SafeZoneVR.Editor
 
             // ---- Ambiente
             var env = UIBuilderUtil.Child(root.transform, "Environment");
-            ScenarioSceneKit.SetupTeleportFloors();
-            ScenarioSceneKit.AddFurnitureColliders();
-            ScenarioSceneKit.MarkHouseStatic();
-            ScenarioSceneKit.CreateStreet(env.transform, -50f, 60f);          // rua x −80..−20
-            var iceLayers = new List<Renderer>();
-            CreatePlaza(env.transform, iceLayers);
-            CreateNorthSidewalk(env.transform, iceLayers);
-            CreateRamp(env.transform, iceLayers);
-            CreateMarketLot(env.transform);
+            var iceLayers = CreateIce(env.transform);
             var ubsZoneBounds = CreateUbs(env.transform, out var ubsRoof);
             var busRoof = CreateBusStop(env.transform);
             var shackRoof = CreateShack(env.transform);
-            CreateTrees(env.transform);
             CreateBillboardAndTower(env.transform);
-            CreateHailBlockers(env.transform, hailLayer, house, ubsRoof, busRoof, shackRoof);
+            CreateHailBlockers(env.transform, hailLayer, ubsRoof, busRoof, shackRoof);
             var hail = CreateHail(env.transform, hailLayer, iceLayers, data.aguardar, k_Ubs + new Vector3(0f, 3.2f, 0f), k_SpotC + new Vector3(0f, 1.2f, 0f));
+
+            // Sem quadro de energia nesta fase: as luzes da casa ficam acesas.
+            ScenarioSceneKit.SetupHouseLights(house, root.transform, null);
 
             // ---- NPCs e carro
             var actors = UIBuilderUtil.Child(root.transform, "Atores");
@@ -106,44 +115,49 @@ namespace SafeZoneVR.Editor
                 "Não estacione perto de placas de propaganda: elas podem cair com o vento e o granizo.", data.vaga);
             var optB = CreateSpot(spots.transform, "Vaga_B_Torre", k_SpotB, false, "vaga_torre",
                 "Não estacione perto de torres de transmissão: há risco de queda e de danos à rede elétrica.", data.vaga);
-            var optC = CreateSpot(spots.transform, "Vaga_C_Mercado", k_SpotC, true, "", "Carlos: boa! Longe da placa e da torre.", data.vaga);
+            var optC = CreateSpot(spots.transform, "Vaga_C_Rua", k_SpotC, true, "", "Carlos: boa! Longe da placa e da torre.", data.vaga);
 
             // ---- Zonas de abrigo errado (fase Granizo) e praça aberta
             var wrongShelters = UIBuilderUtil.Child(root.transform, "ZonasAbrigoErrado");
-            ScenarioSceneKit.CreateWrongZone(wrongShelters.transform, "Zona_Arvore", k_BigTree + new Vector3(0f, 1.5f, 0f), new Vector3(7f, 3f, 7f),
-                "abrigo_arvore", "Não fique debaixo de árvores: galhos podem quebrar com o granizo e o vento.");
+            CreateTreeZones(wrongShelters.transform, praca);
+            var pergola = ScenarioSceneKit.ModelPart(praca, "DC_PRACA_PergoladoMadeira");
+            if (pergola != null)
+            {
+                var pb = ScenarioSceneKit.PartBounds(pergola);
+                ScenarioSceneKit.CreateWrongZone(wrongShelters.transform, "Zona_Pergolado", new Vector3(pb.center.x, 1.5f, pb.center.z), new Vector3(pb.size.x - 0.6f, 3f, pb.size.z - 0.5f),
+                    "abrigo_pergolado", "O pergolado tem ripas abertas: não protege do granizo. Procure uma construção resistente.");
+            }
             ScenarioSceneKit.CreateWrongZone(wrongShelters.transform, "Zona_PontoOnibus", k_BusStop + new Vector3(0f, 1.5f, 0f), new Vector3(3.2f, 3f, 2f),
                 "abrigo_metalico", "Evite estruturas metálicas: elas podem cair ou ser danificadas pelo granizo.");
             ScenarioSceneKit.CreateWrongZone(wrongShelters.transform, "Zona_Barraca", k_Shack + new Vector3(0f, 1.5f, 0f), new Vector3(2.8f, 3f, 2.8f),
                 "abrigo_precario", "Não se abrigue em construções precárias: o telhado pode ser arrancado.");
             wrongShelters.SetActive(false);
 
-            var openPlaza = ScenarioSceneKit.CreateWrongZone(root.transform, "ZonaPracaAberta", new Vector3(-58f, 1.5f, 34f), new Vector3(28f, 3f, 12f),
+            // Praça, calçadas e a faixa até a porta da UBS (a UBS começa em x 8 e fica de fora).
+            var openPlaza = ScenarioSceneKit.CreateWrongZone(root.transform, "ZonaPracaAberta", new Vector3(-4.4f, 1.5f, 18f), new Vector3(24.4f, 3f, 14f),
                 "sair_durante_granizo", "Espere o granizo passar dentro do abrigo.");
             openPlaza.gameObject.SetActive(false);
 
             // ---- Fase Depois (casa)
             var after = UIBuilderUtil.Child(root.transform, "Depois");
-            var ceilingSign = CreateDamagedCeiling(after.transform, data.forro, out var ceilingInteractable);
+            CreateDamagedCeiling(after.transform, data.forro, out var ceilingInteractable);
             CreateLadder(after.transform);
-            CreateRoofDamage(after.transform, house);
-            var rampZone = ScenarioSceneKit.CreateWrongZone(after.transform, "Zona_RampaGelada", k_RampCenter + new Vector3(0f, 1.2f, 0f), new Vector3(2.4f, 2.4f, 4.4f),
-                "atalho_escorregadio", "Cuidado: o gelo deixa o piso escorregadio. Use o caminho com corrimão.");
+            CreateRoofDamage(after.transform);
+            // Atalho escorregadio: atravessar a rua gelada fora da faixa de pedestres (a faixa fica em x −6,9..−2,9).
+            ScenarioSceneKit.CreateWrongZone(after.transform, "Zona_RuaForaDaFaixa", new Vector3(2.6f, 1.2f, 9.7f), new Vector3(11f, 2.4f, 4.4f),
+                "atalho_escorregadio", "Cuidado: com gelo, o meio-fio e o asfalto ficam escorregadios. Atravesse pela faixa de pedestres.");
             after.SetActive(false);
 
-            var bedroomZone = ScenarioSceneKit.CreateWrongZone(root.transform, "Zona_VoltarAoQuarto", new Vector3(-30.9f, 1.2f, 7.8f), new Vector3(3.6f, 2.4f, 3.0f),
+            var bedroomZone = ScenarioSceneKit.CreateWrongZone(root.transform, "Zona_VoltarAoQuarto", new Vector3(-2.2f, 1.2f, -8.47f), new Vector3(3.9f, 2.4f, 3.8f),
                 "voltar_ao_quarto", "Não volte ao cômodo com risco de desabamento até a vistoria das autoridades.");
             bedroomZone.gameObject.SetActive(false);
 
-            // ---- Rota segura (missão 5)
-            var gateZone = ScenarioSceneKit.CreateTriggerZone(env.transform, "Zona_Portao", k_GateZone, new Vector3(1.6f, 2.4f, 1.4f));
+            // ---- Rota segura (missão 5): porta da UBS → calçada da praça → faixa → portão de casa.
+            var gateZone = ScenarioSceneKit.CreateTriggerZone(env.transform, "Zona_Portao", k_GateZone, new Vector3(1.8f, 2.4f, 1.4f));
             var routeGroup = UIBuilderUtil.Child(env.transform, "RotaSegura");
-            ScenarioSceneKit.CreateRouteChevrons(routeGroup.transform, new[]
-            {
-                new Vector3(-55f, k_PlazaY + 0.02f, 38.5f), new Vector3(-53f, k_PlazaY + 0.02f, 34f), new Vector3(-50f, k_PlazaY + 0.02f, 30.5f),
-                new Vector3(-48f, 0.1f, 27.5f), new Vector3(-44f, 0.1f, 27.5f), new Vector3(-40f, 0.1f, 27.5f), new Vector3(-37f, 0.1f, 27.5f),
-                new Vector3(-35.5f, 0.02f, 24f), new Vector3(-34f, 0.02f, 21f), new Vector3(-33.2f, 0.1f, 19f),
-            });
+            ScenarioSceneKit.CreateRouteChevrons(routeGroup.transform, Snap(0.03f,
+                new Vector2(9.5f, 16f), new Vector2(7f, 15.2f), new Vector2(6.6f, 13f), new Vector2(3.5f, 12.5f), new Vector2(0f, 12.5f),
+                new Vector2(-3.2f, 12.5f), new Vector2(-4.9f, 11.4f), new Vector2(-4.9f, 9.6f), new Vector2(-4.9f, 7.8f), new Vector2(-4.9f, 6f)));
 
             // ---- Validadores
             var validators = UIBuilderUtil.Child(root.transform, "Validators");
@@ -177,7 +191,7 @@ namespace SafeZoneVR.Editor
             v6.scenarioManager = manager; v6.step = data.forro;
             v6.interactables.Add(ceilingInteractable); v6.requiredCount = 1;
 
-            var livingZone = ScenarioSceneKit.CreateTriggerZone(validators.transform, "Validator_07_Sair", new Vector3(-31f, 1.2f, 12.1f), new Vector3(3.6f, 2.4f, 5f));
+            var livingZone = ScenarioSceneKit.CreateTriggerZone(validators.transform, "Validator_07_Sair", new Vector3(-2.8f, 1.2f, -2.5f), new Vector3(5f, 2.4f, 4.4f));
             var v7 = livingZone.AddComponent<StepCompleteOnTriggerZone>();
             v7.scenarioManager = manager; v7.step = data.sair;
             var livingTarget = livingZone.AddComponent<ObjectiveTarget>();
@@ -236,6 +250,26 @@ namespace SafeZoneVR.Editor
 
         // ------------------------------------------------------------------ Helpers
 
+        /// <summary>Céu fechado de tempestade: sem sol no horizonte, ambiente cinza e névoa curta.</summary>
+        static void SetupStormSky()
+        {
+            RenderSettings.skybox = null;                       // a câmera passa a pintar o céu de cinza (ver SetupStormCamera)
+            RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Trilight;
+            RenderSettings.ambientSkyColor = new Color(0.42f, 0.45f, 0.5f);
+            RenderSettings.ambientEquatorColor = new Color(0.35f, 0.37f, 0.4f);
+            RenderSettings.ambientGroundColor = new Color(0.2f, 0.21f, 0.22f);
+            RenderSettings.fog = true;
+            RenderSettings.fogMode = FogMode.ExponentialSquared;
+            RenderSettings.fogColor = k_StormSky;
+            RenderSettings.fogDensity = 0.012f;
+        }
+
+        static void SetupStormCamera(Camera camera)
+        {
+            camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.backgroundColor = k_StormSky;
+        }
+
         static void AddActivate(Transform parent, string name, MissionStepSO step, params GameObject[] activate)
         {
             var a = UIBuilderUtil.Child(parent, name).AddComponent<ActivateOnStepCompleted>();
@@ -244,12 +278,13 @@ namespace SafeZoneVR.Editor
             foreach (var go in activate) if (go != null) go.SetActive(false);
         }
 
-        static GameObject Floor(Transform parent, string name, Vector3 center, Vector3 size, Material mat, bool teleport = true)
+        /// <summary>Pontos (x, z) apoiados no chão por raycast baixo (passa por baixo de portões e copas).</summary>
+        static Vector3[] Snap(float lift, params Vector2[] xz)
         {
-            var go = UIBuilderUtil.Primitive(PrimitiveType.Cube, name, parent, center, Vector3.zero, size, mat);
-            if (teleport) ScenarioSceneKit.AddTeleportArea(go);
-            UIBuilderUtil.MarkStatic(go);
-            return go;
+            var points = new Vector3[xz.Length];
+            for (var i = 0; i < xz.Length; i++)
+                points[i] = ScenarioSceneKit.OnSurface(xz[i].x, xz[i].y, 0.3f, lift);
+            return points;
         }
 
         static Renderer IceLayer(Transform parent, string name, Vector3 center, Vector2 size)
@@ -261,93 +296,73 @@ namespace SafeZoneVR.Editor
             return r;
         }
 
-        static void CreatePlaza(Transform parent, List<Renderer> ice)
+        /// <summary>Camadas de gelo (começam transparentes; o HailController as revela). Gramas e canteiros ficam acima delas.</summary>
+        static List<Renderer> CreateIce(Transform parent)
         {
-            var g = UIBuilderUtil.Child(parent, "Praca");
-            var stone = UIBuilderUtil.GetOrCreateMaterial("Mat_PisoPraca", new Color(0.62f, 0.6f, 0.56f), false, false, 0.15f);
-            var grass = UIBuilderUtil.GetOrCreateMaterial("Mat_GramaPraca", new Color(0.3f, 0.5f, 0.25f), false, false, 0.05f);
-            Floor(g.transform, "Piso", new Vector3(-58f, k_PlazaY * 0.5f, 37f), new Vector3(28f, k_PlazaY, 18f), stone);
-            ice.Add(IceLayer(g.transform, "Gelo_Praca", new Vector3(-58f, k_PlazaY + 0.01f, 37f), new Vector2(28f, 18f)));
-            // Canteiros (visuais, sem teleporte por cima).
-            foreach (var (x, z) in new[] { (-66f, 42f), (-48f, 42f), (-62f, 30f) })
-                UIBuilderUtil.Primitive(PrimitiveType.Cube, "Canteiro", g.transform, new Vector3(x, k_PlazaY + 0.15f, z), Vector3.zero, new Vector3(3f, 0.3f, 2f), grass);
-            // Bancos.
-            foreach (var (x, z, yaw) in new[] { (-49f, 33.6f, 0f), (-58f, 33f, 0f), (-66f, 38f, 90f) })
+            var g = UIBuilderUtil.Child(parent, "Gelo");
+            return new List<Renderer>
             {
-                var bench = UIBuilderUtil.Child(g.transform, "Banco");
-                bench.transform.SetPositionAndRotation(new Vector3(x, k_PlazaY, z), Quaternion.Euler(0f, yaw, 0f));
-                var seat = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Assento", bench.transform, Vector3.zero, Vector3.zero, new Vector3(1.6f, 0.06f, 0.45f), ScenarioSceneKit.MatWood);
-                seat.transform.localPosition = new Vector3(0f, 0.45f, 0f);
-                var back = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Encosto", bench.transform, Vector3.zero, Vector3.zero, new Vector3(1.6f, 0.45f, 0.05f), ScenarioSceneKit.MatWood);
-                back.transform.localPosition = new Vector3(0f, 0.7f, 0.22f);
-                UIBuilderUtil.MarkStatic(bench);
+                IceLayer(g.transform, "Gelo_PracaECalcadas", new Vector3(-5.4f, 0.035f, 27.05f), new Vector2(67.2f, 29.9f)),
+                IceLayer(g.transform, "Gelo_CalcadaCasa", new Vector3(-5.4f, 0.0f, 6.2f), new Vector2(67.2f, 2.0f)),
+                IceLayer(g.transform, "Gelo_Rua", new Vector3(-5.4f, -0.045f, 9.65f), new Vector2(67.2f, 4.9f)),
+            };
+        }
+
+        /// <summary>A casa vizinha à direita da praça dá lugar à UBS.</summary>
+        static void HideNeighborForUbs(GameObject praca)
+        {
+            foreach (var part in new[] { "DC_PRACA_VizinhoOeste0_Corpo", "DC_PRACA_VizinhoOeste0_Fachada", "DC_PRACA_VizinhoOeste0_Rodape", "DC_PRACA_VizinhoOeste0_Telhado" })
+            {
+                var t = ScenarioSceneKit.ModelPart(praca, part);
+                if (t != null)
+                    Object.DestroyImmediate(t.gameObject);
             }
         }
 
-        static void CreateNorthSidewalk(Transform parent, List<Renderer> ice)
-        {
-            var g = UIBuilderUtil.Child(parent, "CalcadaNorte");
-            Floor(g.transform, "Calcada", new Vector3(-56f, 0.04f, 27.5f), new Vector3(44f, 0.08f, 1.2f), ScenarioSceneKit.MatStreet);
-            ice.Add(IceLayer(g.transform, "Gelo_Calcada", new Vector3(-56f, 0.09f, 27.5f), new Vector2(44f, 1.2f)));
-            // Corrimão entre a praça e a casa (x −56..−36), lado da rua.
-            var rail = UIBuilderUtil.Child(g.transform, "Corrimao");
-            for (var x = -56f; x <= -36f; x += 2f)
-                UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "Poste", rail.transform, new Vector3(x, 0.55f, 26.95f), Vector3.zero, new Vector3(0.05f, 0.5f, 0.05f), ScenarioSceneKit.MatMetal, false);
-            UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "Barra", rail.transform, new Vector3(-46f, 1.0f, 26.95f), new Vector3(0f, 0f, 90f), new Vector3(0.05f, 10.2f, 0.05f), ScenarioSceneKit.MatMetal, false);
-            UIBuilderUtil.MarkStatic(rail);
-            // Faixa de pedestres até a calçada sul (em frente à casa).
-            var stripe = UIBuilderUtil.GetOrCreateMaterial("Mat_Faixa", new Color(0.9f, 0.9f, 0.85f), false, false, 0.1f);
-            for (var z = 19.5f; z <= 26.5f; z += 1f)
-                UIBuilderUtil.Primitive(PrimitiveType.Cube, "Faixa", g.transform, new Vector3(-36f, 0.005f, z), Vector3.zero, new Vector3(2.4f, 0.01f, 0.4f), stripe, false);
-        }
-
-        static void CreateRamp(Transform parent, List<Renderer> ice)
-        {
-            var g = UIBuilderUtil.Child(parent, "RampaAtalho");
-            var ramp = Floor(g.transform, "Rampa", k_RampCenter, new Vector3(2.2f, 0.06f, 4.2f), ScenarioSceneKit.MatConcrete);
-            ramp.transform.rotation = Quaternion.Euler(-2f, 0f, 0f);
-            ice.Add(IceLayer(g.transform, "Gelo_Rampa", k_RampCenter + new Vector3(0f, 0.045f, 0f), new Vector2(2.2f, 4.2f)));
-            UIBuilderUtil.WorldText(g.transform, "Label", "ATALHO", 0.8f, Color.white, k_RampCenter + new Vector3(0f, 1.6f, 1.5f), Vector3.zero, new Vector2(1.5f, 0.3f));
-        }
-
-        static void CreateMarketLot(Transform parent)
-        {
-            var g = UIBuilderUtil.Child(parent, "Mercado");
-            Floor(g.transform, "Estacionamento", new Vector3(-40f, 0.005f, 24f), new Vector3(8f, 0.01f, 6f), UIBuilderUtil.GetOrCreateMaterial("Mat_Estacionamento", new Color(0.35f, 0.35f, 0.36f), false, false, 0.1f));
-            var wall = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Fachada", g.transform, new Vector3(-40f, 2f, 29.5f), Vector3.zero, new Vector3(9f, 4f, 3f), ScenarioSceneKit.MatConcrete);
-            UIBuilderUtil.WorldText(wall.transform, "Texto", "MERCADO", 3f, Color.white, new Vector3(-40f, 3.2f, 27.95f), Vector3.zero, new Vector2(6f, 1f));
-            UIBuilderUtil.MarkStatic(g);
-        }
-
-        /// <summary>UBS de alvenaria: paredes, laje, piso interno com teleporte, vão da porta em x −55 (z 40) e placa.</summary>
+        /// <summary>UBS de alvenaria: paredes, laje, piso interno com teleporte, vão da porta na parede oeste e placa.</summary>
         static Bounds CreateUbs(Transform parent, out GameObject roof)
         {
             var g = UIBuilderUtil.Child(parent, "UBS");
             var wallMat = UIBuilderUtil.GetOrCreateMaterial("Mat_UBS", new Color(0.93f, 0.9f, 0.82f), false, false, 0.1f);
-            const float h = 3f;
-            // Piso interno (nível da praça).
-            Floor(g.transform, "PisoUBS", new Vector3(-55f, k_PlazaY * 0.5f, 43f), new Vector3(10f, k_PlazaY, 6f), ScenarioSceneKit.MatConcrete);
-            // Paredes (sul com vão de 1,8 m em x −55).
-            UIBuilderUtil.Primitive(PrimitiveType.Cube, "ParedeSul_Esq", g.transform, new Vector3(-58f, h * 0.5f, 40f), Vector3.zero, new Vector3(4.1f, h, 0.25f), wallMat);
-            UIBuilderUtil.Primitive(PrimitiveType.Cube, "ParedeSul_Dir", g.transform, new Vector3(-52f, h * 0.5f, 40f), Vector3.zero, new Vector3(4.1f, h, 0.25f), wallMat);
-            UIBuilderUtil.Primitive(PrimitiveType.Cube, "ParedeSul_Verga", g.transform, new Vector3(-55f, 2.6f, 40f), Vector3.zero, new Vector3(1.9f, 0.8f, 0.25f), wallMat);
-            UIBuilderUtil.Primitive(PrimitiveType.Cube, "ParedeNorte", g.transform, new Vector3(-55f, h * 0.5f, 46f), Vector3.zero, new Vector3(10.25f, h, 0.25f), wallMat);
-            UIBuilderUtil.Primitive(PrimitiveType.Cube, "ParedeOeste", g.transform, new Vector3(-60f, h * 0.5f, 43f), Vector3.zero, new Vector3(0.25f, h, 6f), wallMat);
-            UIBuilderUtil.Primitive(PrimitiveType.Cube, "ParedeLeste", g.transform, new Vector3(-50f, h * 0.5f, 43f), Vector3.zero, new Vector3(0.25f, h, 6f), wallMat);
-            roof = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Laje", g.transform, new Vector3(-55f, h + 0.1f, 43f), Vector3.zero, new Vector3(10.6f, 0.2f, 6.6f), ScenarioSceneKit.MatConcrete);
-            // Bancos internos.
-            UIBuilderUtil.Primitive(PrimitiveType.Cube, "BancoInterno", g.transform, new Vector3(-58f, k_PlazaY + 0.45f, 44.5f), Vector3.zero, new Vector3(2.5f, 0.06f, 0.45f), ScenarioSceneKit.MatWood);
-            UIBuilderUtil.Primitive(PrimitiveType.Cube, "BancoInterno", g.transform, new Vector3(-52f, k_PlazaY + 0.45f, 44.5f), Vector3.zero, new Vector3(2.5f, 0.06f, 0.45f), ScenarioSceneKit.MatWood);
-            // Luz interna e placa.
+            var h = k_UbsSize.y;
+            var minX = k_Ubs.x - k_UbsSize.x * 0.5f; var maxX = k_Ubs.x + k_UbsSize.x * 0.5f;
+            var minZ = k_Ubs.z - k_UbsSize.z * 0.5f; var maxZ = k_Ubs.z + k_UbsSize.z * 0.5f;
+            const float t = 0.25f;
+            const float door = 1.8f;
+
+            var floor = UIBuilderUtil.Primitive(PrimitiveType.Cube, "PisoUBS", g.transform, new Vector3(k_Ubs.x, k_UbsFloorY * 0.5f, k_Ubs.z), Vector3.zero,
+                new Vector3(k_UbsSize.x, k_UbsFloorY, k_UbsSize.z), ScenarioSceneKit.MatConcrete);
+            ScenarioSceneKit.AddTeleportArea(floor);
+
+            // Parede oeste (de frente para a praça) com o vão da porta.
+            var southLen = k_UbsDoorZ - door * 0.5f - minZ;
+            var northLen = maxZ - (k_UbsDoorZ + door * 0.5f);
+            UIBuilderUtil.Primitive(PrimitiveType.Cube, "ParedeOeste_Sul", g.transform, new Vector3(minX, h * 0.5f, minZ + southLen * 0.5f), Vector3.zero, new Vector3(t, h, southLen), wallMat);
+            UIBuilderUtil.Primitive(PrimitiveType.Cube, "ParedeOeste_Norte", g.transform, new Vector3(minX, h * 0.5f, maxZ - northLen * 0.5f), Vector3.zero, new Vector3(t, h, northLen), wallMat);
+            UIBuilderUtil.Primitive(PrimitiveType.Cube, "ParedeOeste_Verga", g.transform, new Vector3(minX, 2.6f, k_UbsDoorZ), Vector3.zero, new Vector3(t, 0.8f, door + 0.1f), wallMat);
+            UIBuilderUtil.Primitive(PrimitiveType.Cube, "ParedeLeste", g.transform, new Vector3(maxX, h * 0.5f, k_Ubs.z), Vector3.zero, new Vector3(t, h, k_UbsSize.z), wallMat);
+            UIBuilderUtil.Primitive(PrimitiveType.Cube, "ParedeSul", g.transform, new Vector3(k_Ubs.x, h * 0.5f, minZ), Vector3.zero, new Vector3(k_UbsSize.x + t, h, t), wallMat);
+            UIBuilderUtil.Primitive(PrimitiveType.Cube, "ParedeNorte", g.transform, new Vector3(k_Ubs.x, h * 0.5f, maxZ), Vector3.zero, new Vector3(k_UbsSize.x + t, h, t), wallMat);
+            roof = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Laje", g.transform, new Vector3(k_Ubs.x, h + 0.1f, k_Ubs.z), Vector3.zero,
+                new Vector3(k_UbsSize.x + 0.6f, 0.2f, k_UbsSize.z + 0.6f), ScenarioSceneKit.MatConcrete);
+
+            // Bancos internos junto à parede leste.
+            UIBuilderUtil.Primitive(PrimitiveType.Cube, "BancoInterno", g.transform, new Vector3(maxX - 0.5f, k_UbsFloorY + 0.45f, k_Ubs.z - 2f), Vector3.zero, new Vector3(0.45f, 0.06f, 2.5f), ScenarioSceneKit.MatWood);
+            UIBuilderUtil.Primitive(PrimitiveType.Cube, "BancoInterno", g.transform, new Vector3(maxX - 0.5f, k_UbsFloorY + 0.45f, k_Ubs.z + 2f), Vector3.zero, new Vector3(0.45f, 0.06f, 2.5f), ScenarioSceneKit.MatWood);
+
             var lightGo = UIBuilderUtil.Child(g.transform, "Luz");
-            lightGo.transform.position = new Vector3(-55f, 2.7f, 43f);
+            lightGo.transform.position = new Vector3(k_Ubs.x, 2.7f, k_Ubs.z);
             var light = lightGo.AddComponent<Light>(); light.type = LightType.Point; light.range = 8f; light.intensity = 1.2f; light.shadows = LightShadows.None;
-            var sign = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Placa", g.transform, new Vector3(-55f, 3.5f, 39.9f), Vector3.zero, new Vector3(3f, 0.6f, 0.05f), ScenarioSceneKit.MatSign);
-            UIBuilderUtil.WorldText(sign.transform, "Texto", "UBS — ABRIGO\n<size=60%>alvenaria com laje</size>", 1.8f, Color.white, new Vector3(-55f, 3.5f, 39.86f), Vector3.zero, new Vector2(2.9f, 0.6f));
+
+            // Placa sobre a porta, legível da praça (lado −X).
+            var sign = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Placa", g.transform, new Vector3(minX - 0.15f, 2.6f, k_UbsDoorZ), Vector3.zero, new Vector3(0.05f, 0.6f, 3f), ScenarioSceneKit.MatSign);
+            UIBuilderUtil.WorldText(sign.transform, "Texto", "UBS — ABRIGO\n<size=60%>alvenaria com laje</size>", 1.8f, Color.white,
+                new Vector3(minX - 0.19f, 2.6f, k_UbsDoorZ), new Vector3(0f, 90f, 0f), new Vector2(2.9f, 0.6f));
             UIBuilderUtil.MarkStatic(g);
-            return new Bounds(new Vector3(-55f, 1.5f, 43f), new Vector3(9.6f, 3f, 5.6f));
+            return new Bounds(new Vector3(k_Ubs.x, 1.5f, k_Ubs.z), new Vector3(k_UbsSize.x - 0.4f, 3f, k_UbsSize.z - 0.4f));
         }
 
+        /// <summary>Ponto de ônibus metálico na calçada da casa, com o lado aberto voltado para a rua (+Z).</summary>
         static GameObject CreateBusStop(Transform parent)
         {
             var g = UIBuilderUtil.Child(parent, "PontoOnibus");
@@ -356,6 +371,8 @@ namespace SafeZoneVR.Editor
             var roof = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Cobertura", g.transform, k_BusStop + new Vector3(0f, 2.45f, 0f), Vector3.zero, new Vector3(3f, 0.06f, 1.6f), ScenarioSceneKit.MatMetal);
             UIBuilderUtil.Primitive(PrimitiveType.Cube, "Fundo", g.transform, k_BusStop + new Vector3(0f, 1.2f, 0.75f), Vector3.zero, new Vector3(3f, 2.4f, 0.05f), ScenarioSceneKit.MatGlass);
             UIBuilderUtil.WorldText(g.transform, "Label", "PONTO DE ÔNIBUS\n<size=60%>cobertura metálica</size>", 0.8f, Color.white, k_BusStop + new Vector3(0f, 2.75f, -0.2f), Vector3.zero, new Vector2(2.5f, 0.4f));
+            // Montado de costas para a rua; meia-volta em torno do próprio centro deixa o fundo junto ao muro da casa.
+            g.transform.RotateAround(k_BusStop, Vector3.up, 180f);
             UIBuilderUtil.MarkStatic(g);
             return roof;
         }
@@ -373,38 +390,26 @@ namespace SafeZoneVR.Editor
             return roof;
         }
 
-        static void CreateTrees(Transform parent)
+        /// <summary>Zonas "não é abrigo" sob as árvores da praça (marcadas no modelo como abrigo_inadequado).</summary>
+        static void CreateTreeZones(Transform parent, GameObject praca)
         {
-            var g = UIBuilderUtil.Child(parent, "Arvores");
-            var leaves = UIBuilderUtil.GetOrCreateMaterial("Mat_Copa", new Color(0.2f, 0.45f, 0.2f), false, false, 0.05f);
-            void Tree(Vector3 feet, float trunkH, float canopy, string name)
+            foreach (var r in praca.GetComponentsInChildren<MeshRenderer>(true))
             {
-                var t = UIBuilderUtil.Child(g.transform, name);
-                t.transform.position = feet;
-                UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "Tronco", t.transform, feet + new Vector3(0f, trunkH * 0.5f, 0f), Vector3.zero, new Vector3(0.35f, trunkH * 0.5f, 0.35f), ScenarioSceneKit.MatWood);
-                UIBuilderUtil.Primitive(PrimitiveType.Sphere, "Copa", t.transform, feet + new Vector3(0f, trunkH + canopy * 0.35f, 0f), Vector3.zero, Vector3.one * canopy, leaves, false);
-                UIBuilderUtil.MarkStatic(t);
+                if (!r.name.StartsWith("DC_PRACA_Arvore"))
+                    continue;
+                var b = r.bounds;
+                ScenarioSceneKit.CreateWrongZone(parent, "Zona_" + r.name.Replace("DC_PRACA_", ""), new Vector3(b.center.x, 1.5f, b.center.z),
+                    new Vector3(Mathf.Min(b.size.x, 3.4f), 3f, Mathf.Min(b.size.z, 3.4f)),
+                    "abrigo_arvore", "Não fique debaixo de árvores: galhos podem quebrar com o granizo e o vento.");
             }
-            Tree(k_BigTree, 3.5f, 8f, "ArvoreGrande");
-            Tree(new Vector3(-70f, k_PlazaY, 44f), 2.5f, 4f, "Arvore");
-            Tree(new Vector3(-46f, k_PlazaY, 44f), 2.5f, 4f, "Arvore");
-            Tree(new Vector3(-64f, k_PlazaY, 40f), 2.2f, 3.5f, "Arvore");
-            // Árvore doente na calçada em frente à casa (etiqueta de prevenção).
-            var sick = UIBuilderUtil.Child(g.transform, "ArvoreDoente");
-            sick.transform.position = new Vector3(-29.5f, 0.08f, 19.3f);
-            UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "Tronco", sick.transform, sick.transform.position + new Vector3(0f, 1.5f, 0f), Vector3.zero, new Vector3(0.3f, 1.5f, 0.3f), ScenarioSceneKit.MatWood);
-            UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "GalhoSeco", sick.transform, sick.transform.position + new Vector3(0.7f, 2.9f, 0f), new Vector3(0f, 0f, 60f), new Vector3(0.12f, 0.9f, 0.12f), ScenarioSceneKit.MatWood, false);
-            UIBuilderUtil.Primitive(PrimitiveType.Sphere, "Copa", sick.transform, sick.transform.position + new Vector3(0f, 3.6f, 0f), Vector3.zero, Vector3.one * 2.4f, leaves, false);
-            UIBuilderUtil.WorldText(sick.transform, "Etiqueta", "<size=70%>galho seco:\navise a Prefeitura</size>", 0.7f, new Color(1f, 0.85f, 0.4f),
-                sick.transform.position + new Vector3(0f, 2.2f, -0.5f), Vector3.zero, new Vector2(1.6f, 0.4f)).gameObject.AddComponent<FacePlayer>().yawOnly = true;
         }
 
         static void CreateBillboardAndTower(Transform parent)
         {
             var g = UIBuilderUtil.Child(parent, "PlacaETorre");
             UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "PostePlaca", g.transform, k_Billboard + new Vector3(0f, 3f, 0f), Vector3.zero, new Vector3(0.25f, 3f, 0.25f), ScenarioSceneKit.MatMetal);
-            var board = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Placa", g.transform, k_Billboard + new Vector3(0f, 7f, 1.2f), new Vector3(15f, 0f, 0f), new Vector3(6f, 2.5f, 0.1f), ScenarioSceneKit.MatSign);
-            UIBuilderUtil.WorldText(board.transform, "Texto", "PROPAGANDA", 4f, Color.white, k_Billboard + new Vector3(0f, 7f, 1.14f), new Vector3(15f, 0f, 0f), new Vector2(5.8f, 2f));
+            var board = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Placa", g.transform, k_Billboard + new Vector3(0f, 7f, 0.4f), new Vector3(15f, 0f, 0f), new Vector3(6f, 2.5f, 0.1f), ScenarioSceneKit.MatSign);
+            UIBuilderUtil.WorldText(board.transform, "Texto", "PROPAGANDA", 4f, Color.white, k_Billboard + new Vector3(0f, 7f, 0.34f), new Vector3(15f, 0f, 0f), new Vector2(5.8f, 2f));
             // Torre de transmissão (treliça simplificada).
             var tower = UIBuilderUtil.Child(g.transform, "TorreTransmissao");
             tower.transform.position = k_Tower;
@@ -420,7 +425,7 @@ namespace SafeZoneVR.Editor
             UIBuilderUtil.MarkStatic(g);
         }
 
-        static void CreateHailBlockers(Transform parent, int layer, GameObject house, GameObject ubsRoof, GameObject busRoof, GameObject shackRoof)
+        static void CreateHailBlockers(Transform parent, int layer, GameObject ubsRoof, GameObject busRoof, GameObject shackRoof)
         {
             var g = UIBuilderUtil.Child(parent, "HailBlockers");
             void Block(string name, Vector3 center, Vector3 size)
@@ -432,14 +437,15 @@ namespace SafeZoneVR.Editor
                 b.size = size;
             }
             // Colliders grossos (topo na superfície visível): partículas rápidas não atravessam com colisão "Low".
-            Block("Chao", new Vector3(-52f, -0.5f, 30f), new Vector3(80f, 1f, 50f));
+            Block("Chao", new Vector3(-5f, -0.5f, 10f), new Vector3(90f, 1f, 60f));
             var laje = ubsRoof.transform.position; var lajeSize = ubsRoof.transform.localScale;
             Block("LajeUBS", new Vector3(laje.x, laje.y + lajeSize.y * 0.5f - 0.6f, laje.z), new Vector3(lajeSize.x, 1.2f, lajeSize.z));
             var bus = busRoof.transform.position; var busSize = busRoof.transform.localScale;
             Block("CoberturaPonto", new Vector3(bus.x, bus.y + busSize.y * 0.5f - 0.5f, bus.z), new Vector3(busSize.x, 1f, busSize.z));
             Block("TelhadoBarraca", shackRoof.transform.position + new Vector3(0f, -0.4f, 0f), new Vector3(3.2f, 1.2f, 3.2f));
-            // Telhados da casa (bounds medidos).
-            Block("TelhadoCasa", new Vector3(-32.47f, 3.0f, 10.6f), new Vector3(7.8f, 2.1f, 9.5f));
+            // Telhado da casa (duas águas, beiral em y 2,8) e cobertura da garagem.
+            Block("TelhadoCasa", new Vector3(-5.5f, 3.3f, -5.3f), new Vector3(12.5f, 1.6f, 12.1f));
+            Block("CoberturaGaragem", new Vector3(1.73f, 2.2f, -2.58f), new Vector3(3.7f, 0.6f, 5.3f));
         }
 
         static HailController CreateHail(Transform parent, int layer, List<Renderer> iceLayers, MissionStepSO stopStep, params Vector3[] soundPositions)
@@ -448,10 +454,11 @@ namespace SafeZoneVR.Editor
             var ctrl = g.AddComponent<HailController>();
 
             var psGo = UIBuilderUtil.Child(g.transform, "Particulas");
-            psGo.transform.position = k_PlayerStart + Vector3.up * 6f;
+            // Cobre a praça, a UBS, o ponto de ônibus e a frente da casa.
+            psGo.transform.position = new Vector3(-2f, 7f, 17f);
             var ps = psGo.AddComponent<ParticleSystem>();
             var main = ps.main;
-            main.maxParticles = 400;
+            main.maxParticles = 700;
             main.startLifetime = 3f;
             main.startSpeed = 0f;
             main.startSize = new ParticleSystem.MinMaxCurve(0.03f, 0.06f);
@@ -463,7 +470,7 @@ namespace SafeZoneVR.Editor
             emission.rateOverTime = 0f;
             var shape = ps.shape;
             shape.shapeType = ParticleSystemShapeType.Box;
-            shape.scale = new Vector3(20f, 0.5f, 20f);
+            shape.scale = new Vector3(32f, 0.5f, 24f);
             var collision = ps.collision;
             collision.enabled = true;
             collision.type = ParticleSystemCollisionType.World;
@@ -508,48 +515,44 @@ namespace SafeZoneVR.Editor
             follower.maxLeadDistance = 3f;
             follower.speechBubble = speech;
             var routes = UIBuilderUtil.Child(parent, "Rota_Joaquim");
+            // Pelo passeio central até a calçada da frente, junto ao meio-fio, e dali até a porta da UBS.
             follower.waypoints.AddRange(ScenarioSceneKit.CreateWaypoints(routes.transform, "WP",
-                new Vector3(-49f, 0f, 33f), new Vector3(-52f, 0f, 37f), new Vector3(-55f, 0f, 39.5f), new Vector3(-55f, 0f, 42f)));
+                k_JoaquimBench, new Vector3(-5f, 0f, 16.5f), new Vector3(-5f, 0f, 12.35f), new Vector3(5.9f, 0f, 12.35f),
+                new Vector3(6.9f, 0f, 13.5f), new Vector3(6.9f, 0f, k_UbsDoorZ), new Vector3(9.5f, k_UbsFloorY, k_UbsDoorZ), new Vector3(11.5f, k_UbsFloorY, 17f)));
             var target = npc.AddComponent<ObjectiveTarget>();
             target.step = step; target.markerHeightOffset = 0.5f;
             return follower;
         }
 
-        /// <summary>Carro do Carlos: cópia do prefab da Kombi da casa, ou caixa simples se não existir.</summary>
+        /// <summary>Carro do Carlos: cópia do carro da garagem da casa, virado para andar ao longo da rua (+X).</summary>
         static GameObject CreateCar(Transform parent, GameObject house)
         {
-            GameObject car = null;
-            var kombi = ScenarioSceneKit.FindChildRecursive(house.transform, "Kombi");
-            if (kombi != null)
+            var car = UIBuilderUtil.Child(parent, "Carro_Carlos");
+            car.transform.SetPositionAndRotation(k_CarStart, Quaternion.Euler(0f, 90f, 0f));
+
+            var source = ScenarioSceneKit.ModelPart(house, "DC_CASA_Carro");
+            if (source == null)
             {
-                var source = PrefabUtility.GetCorrespondingObjectFromSource(kombi.gameObject);
-                if (source != null)
-                {
-                    var asset = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(kombi.gameObject);
-                    var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(asset);
-                    if (prefab != null)
-                    {
-                        car = (GameObject)PrefabUtility.InstantiatePrefab(prefab, parent);
-                        car.name = "Carro_Carlos";
-                        car.transform.SetPositionAndRotation(k_CarStart, Quaternion.Euler(0f, 90f, 0f));
-                        car.transform.localScale = kombi.localScale;
-                        foreach (var mf in car.GetComponentsInChildren<MeshFilter>(true))
-                        {
-                            if (mf.GetComponent<Collider>() != null) continue;
-                            var box = mf.gameObject.AddComponent<BoxCollider>();
-                            box.center = mf.sharedMesh.bounds.center; box.size = mf.sharedMesh.bounds.size;
-                        }
-                    }
-                }
+                var body = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Carroceria", car.transform, Vector3.zero, Vector3.zero, new Vector3(1.9f, 1.5f, 4.2f), ScenarioSceneKit.MatCloth);
+                body.transform.localPosition = new Vector3(0f, 0.75f, 0f);
+                return car;
             }
-            if (car == null)
-            {
-                car = UIBuilderUtil.Child(parent, "Carro_Carlos");
-                car.transform.SetPositionAndRotation(k_CarStart, Quaternion.Euler(0f, 90f, 0f));
-                var body = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Carroceria", car.transform, Vector3.zero, Vector3.zero, new Vector3(4.2f, 1.5f, 1.9f), ScenarioSceneKit.MatCloth);
-                body.transform.localPosition = new Vector3(0f, 0.95f, 0f);
-            }
-            // Vidro que racha em silêncio caso o carro fique sob a placa (detalhe visual só na vaga A: mantido simples).
+
+            var sb = ScenarioSceneKit.PartBounds(source);
+            var copy = Object.Instantiate(source.gameObject);
+            copy.name = "Modelo";
+            foreach (var c in copy.GetComponentsInChildren<Collider>(true))
+                Object.DestroyImmediate(c);
+            foreach (var t in copy.GetComponentsInChildren<Transform>(true))
+                GameObjectUtility.SetStaticEditorFlags(t.gameObject, 0);
+            copy.transform.SetParent(car.transform, false);
+            // Mesma pose do carro da garagem, com o centro do chão do carro na origem do objeto.
+            copy.transform.localRotation = source.rotation;
+            copy.transform.localPosition = source.position - new Vector3(sb.center.x, sb.min.y, sb.center.z);
+
+            var box = car.AddComponent<BoxCollider>();
+            box.center = new Vector3(0f, sb.size.y * 0.5f, 0f);
+            box.size = new Vector3(sb.size.x, sb.size.y, sb.size.z);
             return car;
         }
 
@@ -603,10 +606,11 @@ namespace SafeZoneVR.Editor
             var pr = dripGo.GetComponent<ParticleSystemRenderer>();
             pr.sharedMaterial = ScenarioSceneKit.MatBottle;
             pr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "Poca", g.transform, new Vector3(k_Ceiling.x + 0.3f, 0.005f, k_Ceiling.z), Vector3.zero, new Vector3(0.6f, 0.003f, 0.5f), ScenarioSceneKit.MatWater, false);
+            UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "Poca", g.transform, new Vector3(k_Ceiling.x + 0.3f, 0.02f, k_Ceiling.z), Vector3.zero, new Vector3(0.6f, 0.003f, 0.5f), ScenarioSceneKit.MatWater, false);
             return sign;
         }
 
+        /// <summary>Escada encostada na fachada (parede em z 0, escada do lado da rua, inclinada para −Z).</summary>
         static void CreateLadder(Transform parent)
         {
             var g = UIBuilderUtil.Child(parent, "EscadaTelhado");
@@ -617,8 +621,8 @@ namespace SafeZoneVR.Editor
             rail2.transform.localPosition = new Vector3(0.25f, 1.7f, 0f);
             for (var i = 0; i < 9; i++)
             {
-                var step = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Degrau" + i, g.transform, Vector3.zero, Vector3.zero, new Vector3(0.5f, 0.04f, 0.04f), ScenarioSceneKit.MatMetal, false);
-                step.transform.localPosition = new Vector3(0f, 0.3f + i * 0.36f, 0f);
+                var rung = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Degrau" + i, g.transform, Vector3.zero, Vector3.zero, new Vector3(0.5f, 0.04f, 0.04f), ScenarioSceneKit.MatMetal, false);
+                rung.transform.localPosition = new Vector3(0f, 0.3f + i * 0.36f, 0f);
             }
             var col = g.AddComponent<BoxCollider>();
             col.center = new Vector3(0f, 1.7f, 0f);
@@ -627,22 +631,23 @@ namespace SafeZoneVR.Editor
             var wrong = g.AddComponent<WrongActionInteractable>();
             wrong.mistakeId = "subir_telhado";
             wrong.message = "Não suba em telhados molhados: há risco de queda. Peça a vistoria às autoridades.";
-            UIBuilderUtil.WorldText(g.transform, "Label", "Subir no telhado?", 0.7f, new Color(1f, 0.75f, 0.35f), k_Ladder + new Vector3(0f, 2.2f, -0.6f), Vector3.zero, new Vector2(1.4f, 0.2f))
+            UIBuilderUtil.WorldText(g.transform, "Label", "Subir no telhado?", 0.7f, new Color(1f, 0.75f, 0.35f), k_Ladder + new Vector3(0f, 2.2f, 0.6f), Vector3.zero, new Vector2(1.4f, 0.2f))
                 .gameObject.AddComponent<FacePlayer>().yawOnly = true;
         }
 
-        static void CreateRoofDamage(Transform parent, GameObject house)
+        static void CreateRoofDamage(Transform parent)
         {
             var g = UIBuilderUtil.Child(parent, "TelhasQuebradas");
             var dark = UIBuilderUtil.GetOrCreateMaterial("Mat_TelhaQuebrada", new Color(0.25f, 0.15f, 0.1f), false, false, 0.05f);
-            foreach (var (x, z) in new[] { (-31f, 8f), (-30f, 12f), (-34f, 9.5f), (-33.5f, 13f), (-29.8f, 10f) })
+            // Duas águas com cumeeira ao longo de Z em x −5,5 (y 5,17) e beirais em y 2,8: inclinação ≈ 20,8°.
+            const float ridgeX = -5.5f, ridgeY = 5.17f, slope = 0.379f, angle = 20.8f;
+            foreach (var (x, z) in new[] { (-8f, -3f), (-3f, -6f), (-9.5f, -8f), (-2f, -2f), (-7f, -9f) })
             {
-                // Aproximação da altura do telhado (duas águas, cumeeira em x −32.47, y 4.0).
-                var y = 4.0f - Mathf.Abs(x + 32.47f) * 0.52f + 0.05f;
-                UIBuilderUtil.Primitive(PrimitiveType.Cube, "Telha", g.transform, new Vector3(x, y, z), new Vector3(0f, 0f, x < -32.47f ? 27f : -27f), new Vector3(0.4f, 0.03f, 0.5f), dark, false);
+                var y = ridgeY - Mathf.Abs(x - ridgeX) * slope + 0.05f;
+                UIBuilderUtil.Primitive(PrimitiveType.Cube, "Telha", g.transform, new Vector3(x, y, z), new Vector3(0f, 0f, x < ridgeX ? angle : -angle), new Vector3(0.4f, 0.03f, 0.5f), dark, false);
             }
             UIBuilderUtil.WorldText(g.transform, "Etiqueta", "<size=70%>telhas quebradas:\nmantenha o madeiramento em dia</size>", 0.8f, new Color(1f, 0.85f, 0.4f),
-                new Vector3(-32.5f, 3.2f, 16.2f), Vector3.zero, new Vector2(2.4f, 0.5f)).gameObject.AddComponent<FacePlayer>().yawOnly = true;
+                new Vector3(-5.5f, 3.4f, 2f), Vector3.zero, new Vector2(2.4f, 0.5f)).gameObject.AddComponent<FacePlayer>().yawOnly = true;
         }
     }
 }

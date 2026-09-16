@@ -15,9 +15,10 @@ MonoBehaviour:
   m_StepId: gran_03_abrigo
   m_OrderIndex: 2
   m_Title: Leve-o a um abrigo seguro
-  m_InstructionText: "Entre com o Seu Joaquim na UBS de alvenaria. Evite \xE1rvores,
-    o ponto de \xF4nibus met\xE1lico e a barraca."
-  m_LocationHint: "UBS, ao norte da pra\xE7a"
+  m_InstructionText: "Leve o Seu Joaquim at\xE9 a UBS de alvenaria, na esquina \xE0
+    direita da pra\xE7a. Evite as \xE1rvores, o pergolado, o ponto de \xF4nibus met\xE1lico
+    e a barraca."
+  m_LocationHint: "UBS, na esquina da pra\xE7a"
   m_WhyItMatters: "Constru\xE7\xF5es resistentes, sem risco de destelhamento, protegem
     do granizo e do vento. \xC1rvores, estruturas met\xE1licas e constru\xE7\xF5es
     prec\xE1rias podem cair."

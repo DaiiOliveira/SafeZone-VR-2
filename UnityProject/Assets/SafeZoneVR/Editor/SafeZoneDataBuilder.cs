@@ -55,32 +55,32 @@ namespace SafeZoneVR.Editor
 
             data.stepValuables = Step("Step_01_ProtegerValores", "step_01_valores", 0,
                 "Proteja documentos e objetos de valor",
-                "Pegue a pasta de documentos e o porta-retrato que estão no sofá e coloque-os no alto do armário do quarto.",
-                "Sala → Quarto",
+                "Pegue a pasta de documentos e o porta-retrato que estão no sofá e coloque-os em cima do guarda-roupa do quarto de casal.",
+                "Sala → Quarto de casal",
                 "A Defesa Civil orienta guardar documentos e objetos de valor em local alto e protegido, de fácil acesso para uma evacuação.");
 
             data.stepPower = Step("Step_02_DesligarEnergia", "step_02_energia", 1,
                 "Desligue o quadro geral de energia",
-                "Abaixe a alavanca do quadro de energia na parede do quarto.",
-                "Quarto",
+                "Abaixe a alavanca do quadro de energia na parede do corredor.",
+                "Corredor",
                 "Água e eletricidade juntas causam choque e curto-circuito. Desligar o quadro geral evita acidentes.");
 
             data.stepWater = Step("Step_03_FecharRegistro", "step_03_registro", 2,
                 "Feche o registro de entrada de água",
-                "Saia pela porta da frente, vá até a garagem e gire o registro geral até fechar.",
-                "Garagem (junto à parede da casa)",
+                "Saia pela porta da frente, vá até a garagem e gire o registro geral, na parede da casa ao lado do carro, até fechar.",
+                "Garagem (parede da casa, ao lado do carro)",
                 "Fechar o registro impede que a água contaminada do alagamento entre na rede interna da casa.");
 
             data.stepKit = Step("Step_04_KitEmergencia", "step_04_kit", 3,
                 "Monte o kit de emergência",
-                "Coloque na mochila ao lado da porta: água potável (cozinha), remédios (banheiro) e lanterna (quarto).",
-                "Cozinha, banheiro e quarto → mochila na entrada",
+                "Coloque na mochila da sala: água potável (bancada da cozinha), remédios (bancada do banheiro) e lanterna (cama do quarto de casal).",
+                "Cozinha, banheiro e quarto → mochila na sala",
                 "Um kit com água, remédios, roupas e lanterna permite sair rápido de casa. Não use velas: risco de incêndio.");
 
             data.stepEvacuate = Step("Step_05_Evacuar", "step_05_evacuar", 4,
                 "Vá para o ponto de encontro seguro",
-                "Saia pela porta da frente, siga as setas verdes até o portão e suba no ponto de encontro. Nunca use o carro.",
-                "Rua, em frente à casa",
+                "Saia pela porta da frente, siga as setas verdes pelo portão e suba no ponto de encontro na calçada. Nunca use o carro.",
+                "Calçada, em frente à casa",
                 "Procure um local alto e espere a água baixar. Nunca atravesse ruas alagadas, nem mesmo de carro.");
 
             var cards = new List<EducationCardSO>
@@ -198,8 +198,8 @@ namespace SafeZoneVR.Editor
                 "Cozinha",
                 "A fumaça é tóxica: ventilar ajuda a tirá-la de casa. Se a tampa sair cedo, o fogo pode voltar.");
             d.energia = StepAt(f, "Step_04_Energia", "inc_04_energia", 3, "Desligue a energia",
-                "Faíscas atrás da TV! Não jogue água. Vá ao quarto e abaixe a alavanca do quadro de energia.",
-                "Quarto",
+                "Faíscas atrás da TV! Não jogue água. Vá ao corredor e abaixe a alavanca do quadro de energia.",
+                "Corredor",
                 "Fogo em aparelho elétrico nunca se apaga com água. Desligar a energia corta a fonte das faíscas.");
             d.sair = StepAt(f, "Step_05_Sair", "inc_05_sair", 4, "Saia abaixado",
                 "O fogo cresceu: não tente apagar sozinho. Abaixe-se por baixo da fumaça e saia pela porta da frente.",
@@ -271,20 +271,20 @@ namespace SafeZoneVR.Editor
                 "Banco da praça",
                 "Idosos e pessoas com dificuldade de locomoção precisam de ajuda para chegar a um abrigo a tempo.");
             d.abrigo = StepAt(f, "Step_03_Abrigo", "gran_03_abrigo", 2, "Leve-o a um abrigo seguro",
-                "Entre com o Seu Joaquim na UBS de alvenaria. Evite árvores, o ponto de ônibus metálico e a barraca.",
-                "UBS, ao norte da praça",
+                "Leve o Seu Joaquim até a UBS de alvenaria, na esquina à direita da praça. Evite as árvores, o pergolado, o ponto de ônibus metálico e a barraca.",
+                "UBS, na esquina da praça",
                 "Construções resistentes, sem risco de destelhamento, protegem do granizo e do vento. Árvores, estruturas metálicas e construções precárias podem cair.");
             d.aguardar = StepAt(f, "Step_04_Aguardar", "gran_04_aguardar", 3, "Espere o granizo passar",
                 "Fique dentro da UBS até o granizo parar.",
                 "UBS",
                 "Em local seguro, espere a chuva de granizo terminar antes de sair.");
             d.voltar = StepAt(f, "Step_05_Voltar", "gran_05_voltar", 4, "Volte para casa com cuidado",
-                "O chão está coberto de gelo. Volte pela calçada com corrimão, não pela rampa do atalho.",
-                "Calçada norte → portão de casa",
+                "O chão está coberto de gelo. Volte pela calçada da praça e atravesse a rua na faixa de pedestres até o portão de casa.",
+                "Calçada → faixa de pedestres → portão de casa",
                 "O granizo deixa o piso escorregadio. Prefira o caminho mais seguro, mesmo que seja mais longo.");
             d.forro = StepAt(f, "Step_06_Forro", "gran_06_forro", 5, "Confira a casa por dentro",
-                "Entre em casa e olhe o teto do quarto. Aponte para o forro e aperte o gatilho.",
-                "Quarto",
+                "Entre em casa e olhe o teto do quarto de casal. Aponte para o forro e aperte o gatilho.",
+                "Quarto de casal",
                 "Telhas quebradas pelo granizo deixam a água entrar e podem enfraquecer o telhado e o forro.");
             d.sair = StepAt(f, "Step_07_Sair", "gran_07_sair", 6, "Saia do quarto imediatamente",
                 "O forro está cedendo. Saia do quarto e vá para a sala.",
@@ -314,7 +314,7 @@ namespace SafeZoneVR.Editor
 
             d.scenario = CreateOrLoad<ScenarioSO>($"{k_DataFolder}/Scenario_Granizo.asset");
             d.scenario.EditorInitialize("granizo", "Granizo",
-                "Tempestade com granizo chegando e você na praça do bairro. Oriente onde estacionar, ajude o Seu Joaquim, escolha um abrigo resistente e, depois, volte com cuidado e aja se o telhado ameaçar ceder.",
+                "Tempestade com granizo chegando e você na praça em frente de casa. Oriente onde estacionar, ajude o Seu Joaquim, escolha um abrigo resistente e, depois, volte com cuidado e aja se o telhado ameaçar ceder.",
                 k_GranizoSceneName, true, 360f, 600f,
                 new List<MissionStepSO> { d.vaga, d.joaquim, d.abrigo, d.aguardar, d.voltar, d.forro, d.sair, d.comunicar }, cards);
             EditorUtility.SetDirty(d.scenario);

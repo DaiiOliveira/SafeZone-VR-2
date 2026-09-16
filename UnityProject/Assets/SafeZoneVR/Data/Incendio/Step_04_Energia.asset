@@ -15,9 +15,9 @@ MonoBehaviour:
   m_StepId: inc_04_energia
   m_OrderIndex: 3
   m_Title: Desligue a energia
-  m_InstructionText: "Fa\xEDscas atr\xE1s da TV! N\xE3o jogue \xE1gua. V\xE1 ao quarto
+  m_InstructionText: "Fa\xEDscas atr\xE1s da TV! N\xE3o jogue \xE1gua. V\xE1 ao corredor
     e abaixe a alavanca do quadro de energia."
-  m_LocationHint: Quarto
+  m_LocationHint: Corredor
   m_WhyItMatters: "Fogo em aparelho el\xE9trico nunca se apaga com \xE1gua. Desligar
     a energia corta a fonte das fa\xEDscas."
   m_OrderGroup: 0
