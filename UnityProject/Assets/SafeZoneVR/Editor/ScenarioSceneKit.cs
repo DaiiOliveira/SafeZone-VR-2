@@ -259,6 +259,16 @@ namespace SafeZoneVR.Editor
                 go.AddComponent<UnityEngine.EventSystems.EventSystem>();
                 go.AddComponent<UnityEngine.XR.Interaction.Toolkit.UI.XRUIInputModule>();
             }
+
+            // O XRUIInputModule nasce com mouse e toque desligados: no XR Interaction Simulator o clique
+            // do mouse não chegava na UI e nenhum botão respondia. No headset não muda nada (não há mouse).
+            var inputModule = Object.FindAnyObjectByType<UnityEngine.XR.Interaction.Toolkit.UI.XRUIInputModule>();
+            if (inputModule != null)
+            {
+                inputModule.enableMouseInput = true;
+                inputModule.enableTouchInput = true;
+                EditorUtility.SetDirty(inputModule);
+            }
         }
 
         static void AddVignetteProvider(List<LocomotionVignetteProvider> list, LocomotionProvider provider)
