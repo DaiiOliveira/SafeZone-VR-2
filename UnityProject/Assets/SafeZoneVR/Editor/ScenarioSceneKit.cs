@@ -1049,7 +1049,7 @@ namespace SafeZoneVR.Editor
             col.center = new Vector3(0f, 0.9f, 0f);
             col.height = 1.8f;
             col.radius = 0.3f;
-            npc.layer = LayerMask.NameToLayer("Ignore Raycast");
+            npc.layer = 0;
             var interactable = npc.AddComponent<XRSimpleInteractable>();
             interactable.colliders.Add(col);
 
