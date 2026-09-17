@@ -14,7 +14,7 @@ namespace SafeZoneVR.Editor
         const string k_HailLayer = "HailBlockers";
 
         static readonly Vector3 k_PlayerStart = new Vector3(-4.9f, 0f, 13.4f);
-        static readonly Vector3 k_JoaquimBench = new Vector3(-9.2f, 0f, 16.7f);
+        static readonly Vector3 k_JoaquimBench = new Vector3(-7.9f, 0f, 16.1f);
 
         static readonly Vector3 k_Ubs = new Vector3(12f, 0f, 17.8f);
         static readonly Vector3 k_UbsSize = new Vector3(8f, 3f, 8.4f);
@@ -484,7 +484,7 @@ namespace SafeZoneVR.Editor
 
         static CompanionFollower CreateJoaquim(Transform parent, MissionStepSO step, out XRSimpleInteractable interactable)
         {
-            interactable = ScenarioSceneKit.CreateNpc(parent, "SeuJoaquim", k_JoaquimBench, 180f, new Color(0.45f, 0.4f, 0.35f), true, "Obrigado, meu filho! Vamos.", out var speech);
+            interactable = ScenarioSceneKit.CreateNpc(parent, "SeuJoaquim", k_JoaquimBench, 132f, new Color(0.45f, 0.4f, 0.35f), true, "Obrigado, meu filho! Vamos.", out var speech);
             var npc = interactable.gameObject;
             if (npc.transform.Find("Modelo") == null)
             {
