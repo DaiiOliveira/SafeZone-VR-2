@@ -64,6 +64,25 @@ namespace SafeZoneVR
             return other.GetComponentInParent<XROrigin>() != null;
         }
 
+        public static Transform GetController(bool left)
+        {
+            var o = origin;
+            return o != null ? FindChild(o.transform, left ? "Left Controller" : "Right Controller") : null;
+        }
+
+        public static Transform GetNonDominantController() => GetController(!ComfortSettings.leftHanded);
+
+        static Transform FindChild(Transform root, string name)
+        {
+            if (root.name == name) return root;
+            foreach (Transform c in root)
+            {
+                var r = FindChild(c, name);
+                if (r != null) return r;
+            }
+            return null;
+        }
+
         public static void Invalidate()
         {
             s_Origin = null;

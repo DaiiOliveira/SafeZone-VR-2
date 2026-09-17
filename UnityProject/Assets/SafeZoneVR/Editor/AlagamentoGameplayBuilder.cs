@@ -28,6 +28,7 @@ namespace SafeZoneVR.Editor
 
         static readonly Vector3 k_BackpackBench = new Vector3(-4.0f, 0.225f, -4.30f);
         static readonly Vector3 k_Backpack = new Vector3(-4.0f, 0.67f, -4.30f);
+        static readonly Vector3 k_BackpackBase = new Vector3(-4.0f, 0.45f, -4.30f);
 
         static readonly Vector3 k_MeetingPoint = new Vector3(-9.5f, 0.2f, 6.2f);
         static readonly Vector3 k_CarDoor = new Vector3(0.42f, 1.0f, -2.3f);
@@ -67,6 +68,7 @@ namespace SafeZoneVR.Editor
             ScenarioSceneKit.OpenHouseDoors(house, true);
             ScenarioSceneKit.SetupModelPhysics(house);
             var water = CreateWater(env.transform, manager);
+            water.gameObject.AddComponent<WaterWadingSlowdown>().water = water;
             var evacZone = CreateMeetingPoint(env.transform, out var routeGroup);
             CreateRouteChevrons(routeGroup.transform);
 
@@ -75,66 +77,61 @@ namespace SafeZoneVR.Editor
             var knob = SetupValve(interactables.transform, data.stepWater);
             ScenarioSceneKit.SetupHouseLights(house, root.transform, lever);
 
-            var docs = ScenarioSceneKit.CreateItem(interactables.transform, "Item_Documentos", PrimitiveType.Cube, OnSurface(k_SofaDocs, 0.03f), new Vector3(0f, 90f, 0f),
-                new Vector3(0.24f, 0.03f, 0.32f), ScenarioSceneKit.MatDocs, "documentos", "Documentos", data.stepValuables);
-            var photo = ScenarioSceneKit.CreateItem(interactables.transform, "Item_PortaRetrato", PrimitiveType.Cube, OnSurface(k_SofaPhoto, 0.03f), new Vector3(0f, 90f, 0f),
-                new Vector3(0.16f, 0.02f, 0.20f), ScenarioSceneKit.MatPhoto, "porta_retrato", "Porta-retrato", data.stepValuables);
-            var bottle = ScenarioSceneKit.CreateItem(interactables.transform, "Item_Agua", PrimitiveType.Cylinder, OnSurface(k_KitchenWater, 0.12f), Vector3.zero,
-                new Vector3(0.07f, 0.11f, 0.07f), ScenarioSceneKit.MatBottle, "agua", "Água potável", data.stepKit);
-            var meds = ScenarioSceneKit.CreateItem(interactables.transform, "Item_Remedios", PrimitiveType.Cube, OnSurface(k_BathroomMeds, 0.04f), Vector3.zero,
-                new Vector3(0.10f, 0.05f, 0.06f), ScenarioSceneKit.MatMeds, "remedios", "Remédios", data.stepKit);
-            var flashlight = ScenarioSceneKit.CreateItem(interactables.transform, "Item_Lanterna", PrimitiveType.Cylinder, OnSurface(k_BedFlashlight, 0.06f, 2.0f), new Vector3(0f, 0f, 90f),
-                new Vector3(0.045f, 0.09f, 0.045f), ScenarioSceneKit.MatFlashlight, "lanterna", "Lanterna", data.stepKit);
+            var docs = ScenarioSceneKit.CreateModelItem(interactables.transform, "Item_Documentos", OnSurface(k_SofaDocs, 0.004f), Vector3.zero,
+                "documentos", "Documentos", data.stepKit);
+            var photo = ScenarioSceneKit.CreateModelItem(interactables.transform, "Item_PortaRetrato", OnSurface(k_SofaPhoto, 0.004f), Vector3.zero,
+                "porta_retrato", "Porta-retrato", data.stepValuables);
+            var bottle = ScenarioSceneKit.CreateModelItem(interactables.transform, "Item_Agua", OnSurface(k_KitchenWater, 0.004f), Vector3.zero,
+                "agua", "Água potável", data.stepKit);
+            var meds = ScenarioSceneKit.CreateModelItem(interactables.transform, "Item_Remedios", OnSurface(k_BathroomMeds, 0.004f), Vector3.zero,
+                "remedios", "Remédios", data.stepKit);
+            var flashlight = ScenarioSceneKit.CreateModelItem(interactables.transform, "Item_Lanterna", OnSurface(k_BedFlashlight, 0.004f, 2.0f), Vector3.zero,
+                "lanterna", "Lanterna", data.stepKit);
 
             var wardrobe = ScenarioSceneKit.PartBounds(ScenarioSceneKit.ModelPart(house, "DC_CASA_GuardaRoupa1"));
-            var shelfPosA = new Vector3(wardrobe.center.x, wardrobe.max.y + 0.05f, wardrobe.center.z + 0.45f);
-            var shelfPosB = new Vector3(wardrobe.center.x, wardrobe.max.y + 0.05f, wardrobe.center.z - 0.45f);
+            var shelfPos = new Vector3(wardrobe.center.x, wardrobe.max.y + 0.05f, wardrobe.center.z);
             var shelfTop = UIBuilderUtil.Child(interactables.transform, "ArmarioTopo");
-            shelfTop.transform.position = (shelfPosA + shelfPosB) * 0.5f;
+            shelfTop.transform.position = shelfPos;
             var shelfTarget = shelfTop.AddComponent<ObjectiveTarget>();
             shelfTarget.step = data.stepValuables;
             shelfTarget.markerHeightOffset = 0.3f;
             UIBuilderUtil.WorldText(shelfTop.transform, "Label", "LOCAL ALTO E SEGURO", 0.9f, UIBuilderUtil.AccentGreen,
                 shelfTop.transform.position + new Vector3(0.35f, 0.15f, 0f), new Vector3(0f, -90f, 0f), new Vector2(1.6f, 0.3f));
-            var valuableIds = new List<string> { "documentos", "porta_retrato" };
-            var shelfSocketA = ScenarioSceneKit.CreateSocket(shelfTop.transform, "Socket_Valores_A", shelfPosA, valuableIds, 0.16f);
-            var shelfSocketB = ScenarioSceneKit.CreateSocket(shelfTop.transform, "Socket_Valores_B", shelfPosB, valuableIds, 0.16f);
+            var valuableIds = new List<string> { "porta_retrato" };
+            var shelfSocket = ScenarioSceneKit.CreateSocket(shelfTop.transform, "Socket_Valores", shelfPos, valuableIds, 0.18f);
 
             var bench = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Banco_Mochila", interactables.transform, k_BackpackBench, Vector3.zero,
                 new Vector3(0.5f, 0.45f, 0.36f), ScenarioSceneKit.MatPhoto);
             UIBuilderUtil.MarkStatic(bench, false);
-            var backpack = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Mochila_Kit", interactables.transform, k_Backpack, Vector3.zero,
-                new Vector3(0.34f, 0.44f, 0.22f), ScenarioSceneKit.MatBackpack);
+            var backpack = ScenarioSceneKit.CreateModelVisual(interactables.transform, "Mochila_Kit", $"{ScenarioSceneKit.k_ItemsFolder}/Mochila_Kit.fbx", k_BackpackBase, Vector3.zero);
+            ScenarioSceneKit.AddFittedBox(backpack, Vector3.zero);
             var backpackTarget = backpack.AddComponent<ObjectiveTarget>();
             backpackTarget.step = data.stepKit;
             backpackTarget.markerHeightOffset = 0.35f;
             UIBuilderUtil.WorldText(backpack.transform, "Label", "MOCHILA DE EMERGÊNCIA\n<size=60%>solte os itens perto dela</size>", 0.8f, UIBuilderUtil.AccentGreen,
                 k_Backpack + new Vector3(0f, 0.55f, -0.05f), new Vector3(0f, 180f, 0f), new Vector2(1.6f, 0.4f));
-            var opening = UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "Abertura", backpack.transform, k_Backpack + new Vector3(0f, 0.222f, 0f), Vector3.zero,
-                Vector3.one, ScenarioSceneKit.MatSocket, false);
-            opening.transform.localScale = new Vector3(0.9f, 0.006f, 0.8f);
-            opening.GetComponent<MeshRenderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 
-            var kitIds = new List<string> { "agua", "remedios", "lanterna" };
+            var kitIds = new List<string> { "documentos", "agua", "remedios", "lanterna" };
             var zoneCenter = k_Backpack + new Vector3(0f, 0.15f, 0f);
             var zoneSize = new Vector3(0.8f, 0.9f, 0.64f);
             var kitSockets = new List<XRSocketInteractor>
             {
-                ScenarioSceneKit.CreateBackpackSlot(interactables.transform, "Socket_Kit_A", k_Backpack + new Vector3(-0.105f, 0.22f, 0f), zoneCenter, zoneSize, kitIds),
-                ScenarioSceneKit.CreateBackpackSlot(interactables.transform, "Socket_Kit_B", k_Backpack + new Vector3(0f, 0.22f, 0f), zoneCenter, zoneSize, kitIds),
-                ScenarioSceneKit.CreateBackpackSlot(interactables.transform, "Socket_Kit_C", k_Backpack + new Vector3(0.105f, 0.22f, 0f), zoneCenter, zoneSize, kitIds),
+                ScenarioSceneKit.CreateBackpackSlot(interactables.transform, "Socket_Kit_A", k_BackpackBase + new Vector3(-0.12f, 0.3f, 0f), zoneCenter, zoneSize, kitIds),
+                ScenarioSceneKit.CreateBackpackSlot(interactables.transform, "Socket_Kit_B", k_BackpackBase + new Vector3(-0.04f, 0.3f, 0f), zoneCenter, zoneSize, kitIds),
+                ScenarioSceneKit.CreateBackpackSlot(interactables.transform, "Socket_Kit_C", k_BackpackBase + new Vector3(0.04f, 0.3f, 0f), zoneCenter, zoneSize, kitIds),
+                ScenarioSceneKit.CreateBackpackSlot(interactables.transform, "Socket_Kit_D", k_BackpackBase + new Vector3(0.12f, 0.3f, 0f), zoneCenter, zoneSize, kitIds),
             };
             backpack.AddComponent<BackpackStorage>().slots.AddRange(kitSockets);
 
             CreateCarWrongAction(interactables.transform);
+            CreateElectricHazards(interactables.transform, house, lever, water);
 
             var validators = UIBuilderUtil.Child(root.transform, "Validators");
 
             var vValuables = UIBuilderUtil.Child(validators.transform, "Validator_01_Valores").AddComponent<StepCompleteOnSocket>();
             vValuables.scenarioManager = manager;
             vValuables.step = data.stepValuables;
-            vValuables.sockets.Add(shelfSocketA);
-            vValuables.sockets.Add(shelfSocketB);
+            vValuables.sockets.Add(shelfSocket);
             vValuables.requiredItemIds.AddRange(valuableIds);
 
             var vPower = UIBuilderUtil.Child(validators.transform, "Validator_02_Energia").AddComponent<StepCompleteOnBreaker>();
@@ -165,6 +162,7 @@ namespace SafeZoneVR.Editor
             var ui = UIBuilderUtil.Child(root.transform, "UI");
             var options = ScenarioSceneKit.CreateOptionsPanel(ui.transform, camera, true);
             ScenarioSceneKit.CreateWristUI(leftHand != null ? leftHand : camera, manager, water, options, false, out _);
+            ScenarioSceneKit.CreateLoadingPanel(ui.transform, camera);
             ScenarioSceneKit.CreateIntroPanel(ui.transform, camera, manager, "Alagamento em Casa", k_IntroText);
             ScenarioSceneKit.CreateEndReportPanel(ui.transform, camera, manager);
 
@@ -306,6 +304,27 @@ namespace SafeZoneVR.Editor
             return knob;
         }
 
+        static void CreateElectricHazards(Transform parent, GameObject house, BreakerLever lever, FloodWaterController water)
+        {
+            var deadline = UIBuilderUtil.Child(parent, "PrazoDoQuadro").AddComponent<BreakerDeadline>();
+            deadline.lever = lever;
+            deadline.water = water;
+            deadline.outletLevel = 0.12f;
+
+            var tv = ScenarioSceneKit.ModelPart(house, "DC_CASA_TV");
+            var pos = tv != null ? ScenarioSceneKit.PartBounds(tv).center : new Vector3(-5.19f, 0.99f, -2.0f);
+            var go = UIBuilderUtil.Child(parent, "TV_Energizada");
+            go.transform.position = pos;
+            var box = go.AddComponent<BoxCollider>();
+            box.size = new Vector3(0.45f, 1.1f, 1.3f);
+            go.AddComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRSimpleInteractable>();
+            var hazard = go.AddComponent<EnergizedAppliance>();
+            hazard.lever = lever;
+            hazard.water = water;
+            UIBuilderUtil.WorldText(go.transform, "Label", "Mexer na TV ligada?", 0.7f, new Color(1f, 0.75f, 0.35f),
+                pos + new Vector3(0.3f, 0.75f, 0f), Vector3.zero, new Vector2(1.4f, 0.2f)).gameObject.AddComponent<FacePlayer>().yawOnly = true;
+        }
+
         static void CreateCarWrongAction(Transform parent)
         {
             var go = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Carro_PortaMotorista", parent, k_CarDoor, Vector3.zero,
@@ -314,6 +333,8 @@ namespace SafeZoneVR.Editor
             var wrong = go.AddComponent<WrongActionInteractable>();
             wrong.mistakeId = "sair_de_carro";
             wrong.message = "Nunca saia de carro em alagamento: a força da água arrasta veículos. Siga a pé até o local alto.";
+            wrong.kind = ActionKind.ErroGrave;
+            wrong.advice = "Vá a pé até um ponto alto e seguro. Nunca atravesse ruas alagadas, nem de carro.";
             UIBuilderUtil.WorldText(parent, "Carro_Label", "Sair de carro?", 0.7f, new Color(1f, 0.75f, 0.35f),
                 k_CarDoor + new Vector3(-0.1f, 0.85f, 0f), Vector3.zero, new Vector2(1.2f, 0.2f)).gameObject.AddComponent<FacePlayer>().yawOnly = true;
         }

@@ -1,0 +1,354 @@
+{
+  "gerado_por": "blender/scripts/itens/build_itens.py",
+  "textura": "Texturas/DC_T_Itens_Atlas.png",
+  "materiais": [
+    "DC_M_Itens_Atlas",
+    "DC_M_Itens_Translucido"
+  ],
+  "itens": [
+    {
+      "objeto": "Panela",
+      "medida_unity_m": [
+        0.4695,
+        0.12,
+        0.28
+      ],
+      "alvo_unity_m": [
+        0.28,
+        0.12,
+        0.28
+      ],
+      "fora_da_tolerancia": [
+        "X 0.470 (alvo 0.28)"
+      ],
+      "excecao": "o cabo passa da caixa de O 0,28 (o placeholder tambem tem cabo fora do cilindro)",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.0,
+      "triangulos": 1012,
+      "arestas_abertas": 0,
+      "filhos": [],
+      "materiais": [
+        "DC_M_Itens_Atlas"
+      ],
+      "fbx": "Panela.fbx"
+    },
+    {
+      "objeto": "Item_Tampa",
+      "medida_unity_m": [
+        0.3,
+        0.044,
+        0.3
+      ],
+      "alvo_unity_m": [
+        0.3,
+        0.04,
+        0.3
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.0,
+      "triangulos": 768,
+      "arestas_abertas": 0,
+      "filhos": [],
+      "materiais": [
+        "DC_M_Itens_Atlas"
+      ],
+      "fbx": "Item_Tampa.fbx"
+    },
+    {
+      "objeto": "Jarra_Agua",
+      "medida_unity_m": [
+        0.148,
+        0.226,
+        0.114
+      ],
+      "alvo_unity_m": [
+        0.14,
+        0.22,
+        0.14
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.0,
+      "triangulos": 564,
+      "arestas_abertas": 0,
+      "filhos": [],
+      "materiais": [
+        "DC_M_Itens_Atlas",
+        "DC_M_Itens_Translucido"
+      ],
+      "fbx": "Jarra_Agua.fbx"
+    },
+    {
+      "objeto": "Item_Documentos",
+      "medida_unity_m": [
+        0.2272,
+        0.0231,
+        0.301
+      ],
+      "alvo_unity_m": [
+        0.22,
+        0.03,
+        0.3
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": -0.0003,
+      "triangulos": 188,
+      "arestas_abertas": 0,
+      "filhos": [],
+      "materiais": [
+        "DC_M_Itens_Atlas"
+      ],
+      "fbx": "Item_Documentos.fbx"
+    },
+    {
+      "objeto": "Item_PortaRetrato",
+      "medida_unity_m": [
+        0.18,
+        0.02,
+        0.22
+      ],
+      "alvo_unity_m": [
+        0.18,
+        0.02,
+        0.22
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.0,
+      "triangulos": 316,
+      "arestas_abertas": 0,
+      "filhos": [],
+      "materiais": [
+        "DC_M_Itens_Atlas",
+        "DC_M_Itens_Translucido"
+      ],
+      "fbx": "Item_PortaRetrato.fbx"
+    },
+    {
+      "objeto": "Item_Remedios",
+      "medida_unity_m": [
+        0.1463,
+        0.0843,
+        0.1
+      ],
+      "alvo_unity_m": [
+        0.14,
+        0.08,
+        0.1
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.0,
+      "triangulos": 736,
+      "arestas_abertas": 0,
+      "filhos": [],
+      "materiais": [
+        "DC_M_Itens_Atlas"
+      ],
+      "fbx": "Item_Remedios.fbx"
+    },
+    {
+      "objeto": "Item_Lanterna",
+      "medida_unity_m": [
+        0.1923,
+        0.06,
+        0.06
+      ],
+      "alvo_unity_m": [
+        0.18,
+        0.06,
+        0.06
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.0,
+      "triangulos": 844,
+      "arestas_abertas": 0,
+      "filhos": [],
+      "materiais": [
+        "DC_M_Itens_Atlas"
+      ],
+      "fbx": "Item_Lanterna.fbx"
+    },
+    {
+      "objeto": "Item_Agua",
+      "medida_unity_m": [
+        0.1,
+        0.26,
+        0.1
+      ],
+      "alvo_unity_m": [
+        0.1,
+        0.26,
+        0.1
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.0,
+      "triangulos": 960,
+      "arestas_abertas": 0,
+      "filhos": [],
+      "materiais": [
+        "DC_M_Itens_Atlas"
+      ],
+      "fbx": "Item_Agua.fbx"
+    },
+    {
+      "objeto": "Mochila_Kit",
+      "medida_unity_m": [
+        0.3295,
+        0.448,
+        0.203
+      ],
+      "alvo_unity_m": [
+        0.34,
+        0.44,
+        0.2
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.0,
+      "triangulos": 648,
+      "arestas_abertas": 0,
+      "filhos": [
+        "Abertura"
+      ],
+      "materiais": [
+        "DC_M_Itens_Atlas"
+      ],
+      "fbx": "Mochila_Kit.fbx"
+    },
+    {
+      "objeto": "Chave",
+      "medida_unity_m": [
+        0.0044,
+        0.0265,
+        0.0648
+      ],
+      "alvo_unity_m": [
+        0.02,
+        0.05,
+        0.04
+      ],
+      "fora_da_tolerancia": [
+        "Z 0.065 (alvo 0.04)"
+      ],
+      "excecao": "0,04 e so a parte para fora da porta; a lamina (0,025) fica dentro da fechadura",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": -0.0132,
+      "triangulos": 212,
+      "arestas_abertas": 0,
+      "filhos": [],
+      "materiais": [
+        "DC_M_Itens_Atlas"
+      ],
+      "fbx": "Chave.fbx"
+    },
+    {
+      "objeto": "Notebook",
+      "medida_unity_m": [
+        0.3406,
+        0.024,
+        0.2441
+      ],
+      "alvo_unity_m": [
+        0.34,
+        0.03,
+        0.24
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.0,
+      "triangulos": 384,
+      "arestas_abertas": 0,
+      "filhos": [],
+      "materiais": [
+        "DC_M_Itens_Atlas"
+      ],
+      "fbx": "Notebook.fbx"
+    },
+    {
+      "objeto": "Cobertor",
+      "medida_unity_m": [
+        0.4188,
+        0.179,
+        0.3094
+      ],
+      "alvo_unity_m": [
+        0.4,
+        0.18,
+        0.3
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.001,
+      "triangulos": 872,
+      "arestas_abertas": 0,
+      "filhos": [],
+      "materiais": [
+        "DC_M_Itens_Atlas"
+      ],
+      "fbx": "Cobertor.fbx"
+    }
+  ]
+}

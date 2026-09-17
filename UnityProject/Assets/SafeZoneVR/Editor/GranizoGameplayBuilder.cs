@@ -101,9 +101,11 @@ namespace SafeZoneVR.Editor
 
             var spots = UIBuilderUtil.Child(root.transform, "Vagas");
             var optA = CreateSpot(spots.transform, "Vaga_A_Placa", k_SpotA, false, "vaga_placa",
-                "Não estacione perto de placas de propaganda: elas podem cair com o vento e o granizo.", data.vaga);
+                "Não estacione perto de placas de propaganda: elas podem cair com o vento e o granizo.", data.vaga,
+                "Estacione longe de placas de propaganda e torres de transmissão.");
             var optB = CreateSpot(spots.transform, "Vaga_B_Torre", k_SpotB, false, "vaga_torre",
-                "Não estacione perto de torres de transmissão: há risco de queda e de danos à rede elétrica.", data.vaga);
+                "Não estacione perto de torres de transmissão: há risco de queda e de danos à rede elétrica.", data.vaga,
+                "Estacione longe de torres de transmissão e de placas de propaganda.");
             var optC = CreateSpot(spots.transform, "Vaga_C_Rua", k_SpotC, true, "", "Carlos: boa! Longe da placa e da torre.", data.vaga);
 
             var wrongShelters = UIBuilderUtil.Child(root.transform, "ZonasAbrigoErrado");
@@ -113,16 +115,20 @@ namespace SafeZoneVR.Editor
             {
                 var pb = ScenarioSceneKit.PartBounds(pergola);
                 ScenarioSceneKit.CreateWrongZone(wrongShelters.transform, "Zona_Pergolado", new Vector3(pb.center.x, 1.5f, pb.center.z), new Vector3(pb.size.x - 0.6f, 3f, pb.size.z - 0.5f),
-                    "abrigo_pergolado", "O pergolado tem ripas abertas: não protege do granizo. Procure uma construção resistente.");
+                    "abrigo_pergolado", "O pergolado tem ripas abertas: não protege do granizo. Procure uma construção resistente.",
+                    ActionKind.ErroGrave, "Abrigue-se em construção de alvenaria, sem risco de destelhamento.");
             }
             ScenarioSceneKit.CreateWrongZone(wrongShelters.transform, "Zona_PontoOnibus", k_BusStop + new Vector3(0f, 1.5f, 0f), new Vector3(3.2f, 3f, 2f),
-                "abrigo_metalico", "Evite estruturas metálicas: elas podem cair ou ser danificadas pelo granizo.");
+                "abrigo_metalico", "Evite estruturas metálicas: elas podem cair ou ser danificadas pelo granizo.",
+                ActionKind.ErroGrave, "Procure uma construção resistente, longe de estruturas metálicas e de árvores.");
             ScenarioSceneKit.CreateWrongZone(wrongShelters.transform, "Zona_Barraca", k_Shack + new Vector3(0f, 1.5f, 0f), new Vector3(2.8f, 3f, 2.8f),
-                "abrigo_precario", "Não se abrigue em construções precárias: o telhado pode ser arrancado.");
+                "abrigo_precario", "Não se abrigue em construções precárias: o telhado pode ser arrancado.",
+                ActionKind.ErroGrave, "Procure uma construção resistente, sem risco de destelhamento.");
             wrongShelters.SetActive(false);
 
             var openPlaza = ScenarioSceneKit.CreateWrongZone(root.transform, "ZonaPracaAberta", new Vector3(-4.4f, 1.5f, 18f), new Vector3(24.4f, 3f, 14f),
-                "sair_durante_granizo", "Espere o granizo passar dentro do abrigo.");
+                "sair_durante_granizo", "Espere o granizo passar dentro do abrigo.",
+                ActionKind.ErroGrave, "Fique no abrigo até a chuva de granizo terminar.");
             openPlaza.gameObject.SetActive(false);
 
             var after = UIBuilderUtil.Child(root.transform, "Depois");
@@ -131,11 +137,13 @@ namespace SafeZoneVR.Editor
             CreateRoofDamage(after.transform);
 
             ScenarioSceneKit.CreateWrongZone(after.transform, "Zona_RuaForaDaFaixa", new Vector3(2.6f, 1.2f, 9.7f), new Vector3(11f, 2.4f, 4.4f),
-                "atalho_escorregadio", "Cuidado: com gelo, o meio-fio e o asfalto ficam escorregadios. Atravesse pela faixa de pedestres.");
+                "atalho_escorregadio", "Cuidado: com gelo, o meio-fio e o asfalto ficam escorregadios. Atravesse pela faixa de pedestres.",
+                ActionKind.ErroLeve, "Volte pela calçada e atravesse na faixa de pedestres.");
             after.SetActive(false);
 
             var bedroomZone = ScenarioSceneKit.CreateWrongZone(root.transform, "Zona_VoltarAoQuarto", new Vector3(-2.2f, 1.2f, -8.47f), new Vector3(3.9f, 2.4f, 3.8f),
-                "voltar_ao_quarto", "Não volte ao cômodo com risco de desabamento até a vistoria das autoridades.");
+                "voltar_ao_quarto", "Não volte ao cômodo com risco de desabamento até a vistoria das autoridades.",
+                ActionKind.ErroGrave, "Fique fora do cômodo e espere a vistoria da Defesa Civil.");
             bedroomZone.gameObject.SetActive(false);
 
             var gateZone = ScenarioSceneKit.CreateTriggerZone(env.transform, "Zona_Portao", k_GateZone, new Vector3(1.8f, 2.4f, 1.4f));
@@ -221,6 +229,7 @@ namespace SafeZoneVR.Editor
                 "Vamos repassar, mas para risco de desabamento de telhado ligue para a Defesa Civil (199) ou para os Bombeiros (193).",
                 "199", "193");
             UnityEventTools.AddPersistentListener(callPanel.onAcceptedCall, v8.OnButtonPressed);
+            ScenarioSceneKit.CreateLoadingPanel(ui.transform, camera);
             ScenarioSceneKit.CreateIntroPanel(ui.transform, camera, manager, "Granizo", k_IntroText);
             ScenarioSceneKit.CreateEndReportPanel(ui.transform, camera, manager);
 
@@ -370,7 +379,8 @@ namespace SafeZoneVR.Editor
                 var b = r.bounds;
                 ScenarioSceneKit.CreateWrongZone(parent, "Zona_" + r.name.Replace("DC_PRACA_", ""), new Vector3(b.center.x, 1.5f, b.center.z),
                     new Vector3(Mathf.Min(b.size.x, 3.4f), 3f, Mathf.Min(b.size.z, 3.4f)),
-                    "abrigo_arvore", "Não fique debaixo de árvores: galhos podem quebrar com o granizo e o vento.");
+                    "abrigo_arvore", "Não fique debaixo de árvores: galhos podem quebrar com o granizo e o vento.",
+                    ActionKind.ErroGrave, "Nunca se abrigue sob árvores: procure uma construção de alvenaria.");
             }
         }
 
@@ -466,7 +476,7 @@ namespace SafeZoneVR.Editor
                 var src = sGo.AddComponent<AudioSource>();
                 src.spatialBlend = 1f; src.minDistance = 2f; src.maxDistance = 30f; src.volume = 0f; src.loop = true; src.playOnAwake = false;
                 var loop = sGo.AddComponent<SimpleLoopSound>();
-                loop.source = src; loop.kind = SimpleLoopSound.ClipKind.Hail;
+                loop.source = src; loop.kind = SimpleLoopSound.ClipKind.Hail; loop.manageVolume = false;
                 ctrl.roofSounds.Add(src);
             }
             return ctrl;
@@ -476,8 +486,11 @@ namespace SafeZoneVR.Editor
         {
             interactable = ScenarioSceneKit.CreateNpc(parent, "SeuJoaquim", k_JoaquimBench, 180f, new Color(0.45f, 0.4f, 0.35f), true, "Obrigado, meu filho! Vamos.", out var speech);
             var npc = interactable.gameObject;
-            var cap = UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "Boina", npc.transform, Vector3.zero, Vector3.zero, new Vector3(0.28f, 0.02f, 0.28f), ScenarioSceneKit.MatFlashlight, false);
-            cap.transform.localPosition = new Vector3(0f, 1.71f, 0f);
+            if (npc.transform.Find("Modelo") == null)
+            {
+                var cap = UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "Boina", npc.transform, Vector3.zero, Vector3.zero, new Vector3(0.28f, 0.02f, 0.28f), ScenarioSceneKit.MatFlashlight, false);
+                cap.transform.localPosition = new Vector3(0f, 1.71f, 0f);
+            }
             var follower = npc.AddComponent<CompanionFollower>();
             follower.talkInteractable = interactable;
             follower.speed = 0.8f;
@@ -524,7 +537,7 @@ namespace SafeZoneVR.Editor
             return car;
         }
 
-        static DecisionOption CreateSpot(Transform parent, string name, Vector3 pos, bool correct, string mistakeId, string feedback, MissionStepSO step)
+        static DecisionOption CreateSpot(Transform parent, string name, Vector3 pos, bool correct, string mistakeId, string feedback, MissionStepSO step, string advice = "")
         {
             var g = UIBuilderUtil.Child(parent, name);
             g.transform.position = pos;
@@ -540,6 +553,7 @@ namespace SafeZoneVR.Editor
             opt.isCorrect = correct;
             opt.mistakeId = mistakeId;
             opt.feedback = feedback;
+            opt.advice = advice;
             var target = sign.AddComponent<ObjectiveTarget>();
             target.step = step; target.markerHeightOffset = 0.3f;
             return opt;
@@ -597,6 +611,8 @@ namespace SafeZoneVR.Editor
             var wrong = g.AddComponent<WrongActionInteractable>();
             wrong.mistakeId = "subir_telhado";
             wrong.message = "Não suba em telhados molhados: há risco de queda. Peça a vistoria às autoridades.";
+            wrong.kind = ActionKind.ErroGrave;
+            wrong.advice = "Não suba no telhado: ligue 199 ou 193 e peça vistoria.";
             UIBuilderUtil.WorldText(g.transform, "Label", "Subir no telhado?", 0.7f, new Color(1f, 0.75f, 0.35f), k_Ladder + new Vector3(0f, 2.2f, 0.6f), Vector3.zero, new Vector2(1.4f, 0.2f))
                 .gameObject.AddComponent<FacePlayer>().yawOnly = true;
         }

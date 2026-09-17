@@ -102,6 +102,12 @@ namespace SafeZoneVR.Editor
             ctrl.optionsButton = CreateDiscButton(root.transform, hub, "DC_UI_ButtonSettings", "BotaoConfiguracoes");
             ctrl.quitButton = CreateDiscButton(root.transform, hub, "DC_UI_ButtonExit", "BotaoSair");
 
+            ScenarioSceneKit.CreateLoadingPanel(root.transform, cam.transform);
+            var notice = ScenarioSceneKit.CreateSafetyNotice(root.transform, cam.transform);
+            notice.blockedButtons.Add(ctrl.optionsButton);
+            notice.blockedButtons.Add(ctrl.quitButton);
+            UnityEditor.Events.UnityEventTools.AddPersistentListener(notice.onAccepted, ctrl.RefreshKiosks);
+
             UIBuilderUtil.MarkStatic(hub);
 
             EditorSceneManager.SaveScene(scene, k_ScenePath);

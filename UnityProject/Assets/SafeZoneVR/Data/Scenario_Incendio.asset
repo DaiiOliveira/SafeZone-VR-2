@@ -21,6 +21,7 @@ MonoBehaviour:
   m_IsAvailable: 1
   m_TargetTimeSeconds: 300
   m_GoodTimeSeconds: 480
+  m_TimeLimitSeconds: 480
   m_Steps:
   - {fileID: 11400000, guid: 6efa7f1b2cd55d84fa6833b7d2828ffa, type: 2}
   - {fileID: 11400000, guid: a6dd9ecee3f74b44fb6c8487ce4b5258, type: 2}
@@ -30,6 +31,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 312b6a9cc42975b4fbbb14cfb37e8c9e, type: 2}
   - {fileID: 11400000, guid: 455007e7ce8293648ac43bbc2532d467, type: 2}
   - {fileID: 11400000, guid: dbba029683b1dd34b8839cc5048579fd, type: 2}
+  - {fileID: 11400000, guid: 4d7f7dc038befa44ab7b1ec843e356e0, type: 2}
   m_RecapCards:
   - {fileID: 11400000, guid: fa5b5867ea4f2a247abcd1b2d55d5e9d, type: 2}
   - {fileID: 11400000, guid: d4e1fbcc956f9b54483a16593730bfd2, type: 2}

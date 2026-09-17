@@ -29,6 +29,12 @@ Legenda de prioridade:
 
 ## P1 — Itens que o jogador pega (maior impacto visual)
 
+> **Substituídos em 17/09/2026.** Todos os itens desta tabela vêm de `Assets/Itens/` (um FBX por item,
+> atlas `DC_T_Itens_Atlas`). O builder monta cada um com `ScenarioSceneKit.CreateModelItem` (item que o
+> jogador pega), `CreateWrongInteractableModel` (`Notebook`, `Cobertor`) ou `CreateModelVisual`
+> (`Panela`, `Jarra_Agua`, `Mochila_Kit`, `Chave`). O `BoxCollider` é calculado a partir da malha.
+> A tabela fica como referência de medidas.
+
 | Objeto | Fase | Hoje | Tamanho alvo (m) | Observações |
 |---|---|---|---|---|
 | `Panela` | Incêndio | cilindro achatado + cubo de cabo | Ø 0,28 × 0,12 | **Prioridade máxima.** Precisa de corpo com parede e fundo, cabo de baquelite e borda onde a tampa encaixa. Fica em cima do fogão e o fogo sai de dentro dela — deixar o interior vazado. |
@@ -74,6 +80,11 @@ Dois placeholders desta faixa **não precisam de modelo**:
 | `Poca`, `Gelo` (quads), fumaça (quads) | Granizo / Incêndio | quads com material | São efeitos, não modelos — resolver com shader/VFX, não com malha. |
 
 ## NPCs
+
+> **Substituídos em 17/09/2026** pelos modelos de `Assets/NPC/` (`Carlos`, `Vizinho`, `SeuJoaquim`,
+> `Andador`), com Animator `DC_NPC.controller` (Idle, Andar, Apontar) dirigido por `NpcAnimatorDriver`.
+> O `CreateNpc` usa o FBX quando existe `Assets/NPC/<nome>.fbx` e cai nas primitivas só se não existir.
+> Atenção: o FBX importado olha para **−Z** (o `IMPORTAR_NPC.md` diz +Z); o builder gira o modelo 180°.
 
 Hoje todo NPC é **cápsula + esfera** (`ScenarioSceneKit.CreateNpc`): `Vizinho` (Incêndio),
 `Joaquim` e `Carlos` (Granizo). O Joaquim ainda ganha uma `Boina` (cilindro) e um andador de

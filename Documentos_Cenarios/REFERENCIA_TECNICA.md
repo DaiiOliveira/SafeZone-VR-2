@@ -105,6 +105,61 @@ Luzes da casa: os marcadores `DC_LUZ_*` viram luzes Realtime **sem sombra** — 
 sombra em tempo real é cara demais no Quest. Todas ficam num `HouseLights` que a alavanca do
 quadro de energia apaga. Na fase Granizo não há quadro de energia e elas ficam acesas.
 
+## Itens e NPCs modelados (17/09/2026)
+
+- Itens em `Assets/Itens/` e NPCs em `Assets/NPC/`, cada pasta com o próprio `AssetPostprocessor`
+  (atlas, material translúcido, rig Humanoid). O builder procura o FBX pelo **nome do objeto**.
+- Itens têm **pivô na base**: a posição passada ao builder é o ponto da superfície (`OnSurface` com
+  folga de 2–4 mm), não o centro. Sockets da mochila ficam 30 cm acima do banco, para o item entrar
+  pela boca; a tampa encaixa 10,5 cm acima da base da panela; a panela é girada 180° para o cabo
+  ficar do mesmo lado do placeholder antigo.
+- NPCs: o FBX olha para **−Z**. `CreateNpc` gira o modelo e o andador 180°; o andador fica a 25 cm à
+  frente do Seu Joaquim. `NpcAnimatorDriver` liga "Andando" pela velocidade real do NPC e dispara
+  "Apontar" quando o balão de fala muda (desligado para quem usa andador).
+
+## Portas pela maçaneta
+
+- `OpenHouseDoors` monta as portas **fechadas** no editor; o `ToggleOpening` (`startsOpen`) as abre no
+  `Awake`. Portanto a cena salva mostra as portas internas fechadas, e isso é esperado.
+- A pega (`Macaneta_Pega`) é uma caixa filha da folha que atravessa a folha e cobre a maçaneta dos
+  dois lados. A porta da frente do modelo só tem maçaneta do lado de fora; sem isso, por dentro o
+  raio batia na folha e a mão não alcançava.
+- Perto (≤ 40 cm da pega, medido da mão até o colisor) a porta segue a mão; de longe, apontar e
+  apertar alterna. A distância **não** pode usar `GetDistanceSqrToInteractor`: o Near-Far mede pelo
+  attach, que num agarre à distância pula para o ponto atingido pelo raio (`InteractionDistance`).
+
+## Conforto, som, dicas e aviso
+
+- Mão dominante: a mão **não dominante** anda no modo contínuo e a dominante gira/teleporta; o
+  relógio muda de pulso. Se as duas mãos tiverem `smoothMotionEnabled`, o XRI desliga o giro das duas.
+- Volumes por categoria (`AudioVolumes`: Efeitos, Narração, Ambiente). `SimpleLoopSound` aplica o
+  volume sozinho, exceto quando outro script controla o volume em tempo real (`manageVolume = false`
+  no crepitar do fogo e no granizo).
+- `IdleHintSystem`: 30 s / 60 s sem avanço, erro ou interação (andar não conta).
+- `SafetyNoticePanel` (hub): chave `safezone.safety.accepted`; aumente `k_NoticeVersion` para reexibir.
+- Ao testar pelo MCP, apague depois as chaves `safezone.comfort.*`, `safezone.audio.*` e
+  `safezone.safety.accepted` que o teste criar.
+
+## Avaliação, integridade e falha (17/09/2026)
+
+- Toda ação relevante vira um `ActionRecord` no `ScenarioManager` (`id`, instante, `ActionKind`
+  Acerto/ErroLeve/ErroGrave, `fatal`, `advice`). O relatório monta as listas a partir disso.
+- `PerformanceEvaluator` aplica RN01–RN05: 100 pontos, −5 leve, −25 grave, −10 acima do
+  `ScenarioSO.timeLimitSeconds` (420/480/600 s). Faixas 90/70/50. **Passo fora de ordem conta como
+  erro leve**; repetição de passo não tira mais pontos. Recorde agora é `safezone.best.score.<id>`
+  (o melhor tempo continua em `safezone.best.time.<id>`).
+- `PlayerIntegrity` (Systems) zera → `RegisterMistake(..., fatal: true)` → `FailScenario`: o
+  relatório vira "Fase interrompida" com o motivo e a orientação. Nada de dano visível: a proposta
+  é manter a classificação livre.
+- Erro grave **fatal** hoje: só o choque elétrico (`EnergizedAppliance`) e a integridade zerada.
+- `BreakerDeadline` avisa aos 5 cm de água e registra erro grave aos 12 cm com o quadro ligado.
+- `WallClipGuard` compara a última posição válida da cabeça com a atual; se o trajeto atravessa
+  geometria, escurece (até 0,92) e vibra. Saltos > 1,2 m são teleporte e resetam a referência.
+  Ele usa `ScreenFader.SetOverlay`, que não age enquanto o fader está em transição.
+- `LoadingScreen` carrega a cena com `allowSceneActivation = false` e só ativa no fim, então a cena
+  antiga continua de pé (ambiente estático) enquanto a barra anda. O painel usa materiais com
+  `renderQueue` 4010/4011 para aparecer **por cima** do quad preto do `ScreenFader`.
+
 ## Hub (MainMenu)
 
 O jogador entra pelos fundos do terraço, pelo lado aberto do guarda-corpo, de frente para os

@@ -13,6 +13,8 @@ namespace SafeZoneVR
         [SerializeField, TextArea] string m_Message = "Abaixe-se: a fumaça tóxica fica no alto e o ar perto do chão é mais limpo.";
         [SerializeField, TextArea] string m_SeatedTip = "Em pé, você deveria se abaixar: a fumaça fica no alto.";
         [SerializeField] float m_CheckInterval = 0.2f;
+        [SerializeField] float m_DamagePerSecond = 7f;
+        [SerializeField, TextArea] string m_Advice = "Ande agachado: a fumaça tóxica sobe e o ar limpo fica perto do chão.";
         float m_StartTime, m_NextCheck; bool m_Active, m_FogOn;
         bool m_SavedFog; Color m_SavedColor; float m_SavedDensity; FogMode m_SavedMode;
 
@@ -52,8 +54,12 @@ namespace SafeZoneVR
 
             var inSmoke = m_Zone != null && PlayerLocator.TryGetHeadPosition(out var head) && m_Zone.bounds.Contains(head) && head.y > currentBottom;
             SetFog(inSmoke);
-            if (inSmoke && !seated && k >= 0.5f && ScenarioManager.instance != null)
-                ScenarioManager.instance.RegisterMistake(m_MistakeId, m_Message, 10f);
+            if (!inSmoke || seated || k < 0.5f)
+                return;
+            if (ScenarioManager.instance != null)
+                ScenarioManager.instance.RegisterMistake(m_MistakeId, m_Message, 10f, ActionKind.ErroGrave, false, m_Advice);
+            if (PlayerIntegrity.instance != null)
+                PlayerIntegrity.instance.Damage(m_DamagePerSecond * m_CheckInterval, "A fumaça tomou o cômodo enquanto você estava em pé.");
         }
 
         void SetFog(bool on)

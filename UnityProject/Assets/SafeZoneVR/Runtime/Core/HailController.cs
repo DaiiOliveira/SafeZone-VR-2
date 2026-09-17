@@ -94,7 +94,7 @@ namespace SafeZoneVR
             foreach (var s in m_RoofSounds)
             {
                 if (s == null) continue;
-                s.volume = 0.5f * m_Intensity;
+                s.volume = 0.5f * m_Intensity * AudioVolumes.Get(AudioCategory.Ambient);
                 if (m_Intensity <= 0.01f && m_Target <= 0f && s.isPlaying) s.Stop();
             }
         }

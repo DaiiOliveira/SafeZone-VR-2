@@ -36,6 +36,9 @@ namespace SafeZoneVR
         TextMeshProUGUI m_WaterText;
 
         [SerializeField]
+        TextMeshProUGUI m_IntegrityText;
+
+        [SerializeField]
         TextMeshProUGUI m_WarningText;
 
         [SerializeField]
@@ -73,6 +76,7 @@ namespace SafeZoneVR
         public TextMeshProUGUI locationText { get => m_LocationText; set => m_LocationText = value; }
         public TextMeshProUGUI timerText { get => m_TimerText; set => m_TimerText = value; }
         public TextMeshProUGUI waterText { get => m_WaterText; set => m_WaterText = value; }
+        public TextMeshProUGUI integrityText { get => m_IntegrityText; set => m_IntegrityText = value; }
         public TextMeshProUGUI warningText { get => m_WarningText; set => m_WarningText = value; }
         public TextMeshProUGUI subProgressText { get => m_SubProgressText; set => m_SubProgressText = value; }
         public Transform compassArrow { get => m_CompassArrow; set => m_CompassArrow = value; }
@@ -84,6 +88,7 @@ namespace SafeZoneVR
             var action = m_ToggleOptionsInput.action;
             if (action == null)
                 return;
+            ComfortSettings.changed += MountOnNonDominantHand;
             action.performed += OnToggleOptionsInput;
             if (m_ToggleOptionsInput.reference == null)
                 action.Enable();
@@ -94,6 +99,7 @@ namespace SafeZoneVR
             var action = m_ToggleOptionsInput.action;
             if (action == null)
                 return;
+            ComfortSettings.changed -= MountOnNonDominantHand;
             action.performed -= OnToggleOptionsInput;
             if (m_ToggleOptionsInput.reference == null)
                 action.Disable();
@@ -104,8 +110,17 @@ namespace SafeZoneVR
             ToggleOptions();
         }
 
+        void MountOnNonDominantHand()
+        {
+            var hand = PlayerLocator.GetNonDominantController();
+            if (hand == null || transform.parent == hand)
+                return;
+            transform.SetParent(hand, false);
+        }
+
         void Start()
         {
+            MountOnNonDominantHand();
             if (m_PanelRoot == null)
             {
                 var canvas = GetComponentInChildren<Canvas>(true);
@@ -176,6 +191,7 @@ namespace SafeZoneVR
                 m_NextTimerUpdate = Time.time + 0.25f;
                 UpdateTimer();
                 UpdateWater();
+                UpdateIntegrity();
             }
 
             if (m_WarningText != null && m_WarningUntil > 0f && Time.time > m_WarningUntil)
@@ -205,6 +221,22 @@ namespace SafeZoneVR
                 return;
             m_LastWaterCm = cm;
             m_WaterText.text = cm > 0 ? $"Água: {cm} cm" : "Água: subindo";
+        }
+
+        void UpdateIntegrity()
+        {
+            if (m_IntegrityText == null)
+                return;
+            var integrity = PlayerIntegrity.instance;
+            if (integrity == null || !integrity.isHurt)
+            {
+                if (m_IntegrityText.text.Length > 0)
+                    m_IntegrityText.text = "";
+                return;
+            }
+            var percent = Mathf.CeilToInt(integrity.normalized * 100f);
+            m_IntegrityText.color = percent <= 40 ? new Color(1f, 0.45f, 0.4f) : new Color(1f, 0.8f, 0.4f);
+            m_IntegrityText.text = $"Você: {percent}%";
         }
 
         void UpdateCompass()

@@ -12,6 +12,7 @@ namespace SafeZoneVR
         [SerializeField] float m_CoolSeconds = 45f;
         [SerializeField] string m_MistakeId = "tampa_cedo";
         [SerializeField, TextArea] string m_Message = "Não levante a tampa logo: espere a panela esfriar, senão o fogo pode voltar.";
+        [SerializeField, TextArea] string m_Advice = "Deixe a panela tampada até esfriar; só então destampe, com o gás já fechado.";
         [SerializeField] UnityEvent m_OnCovered = new UnityEvent();
         float m_CoveredAt = -1f;
 
@@ -40,7 +41,7 @@ namespace SafeZoneVR
             {
                 if (m_PanFire != null) m_PanFire.Ignite(FireController.Size.Small);
                 var m = ScenarioManager.instance;
-                if (m != null) m.RegisterMistake(m_MistakeId, m_Message, 10f);
+                if (m != null) m.RegisterMistake(m_MistakeId, m_Message, 10f, ActionKind.ErroLeve, false, m_Advice);
             }
             m_CoveredAt = -1f;
         }

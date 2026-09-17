@@ -8,6 +8,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.XR.Interaction.Toolkit.Feedback;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using UnityEngine.XR.Interaction.Toolkit.Locomotion;
@@ -206,9 +207,24 @@ namespace SafeZoneVR.Editor
                 fader.fadeMaterial = MatFade;
             }
 
+            SetupHaptics(origin);
             EnsureXRInteractionManager(scene);
             RemoveStrayCameras(scene, origin);
             return origin;
+        }
+
+        static void SetupHaptics(XROrigin origin)
+        {
+            foreach (var haptics in origin.GetComponentsInChildren<SimpleHapticFeedback>(true))
+            {
+                haptics.playSelectEntered = true;
+                haptics.selectEnteredData.amplitude = 0.45f;
+                haptics.selectEnteredData.duration = 0.08f;
+                haptics.playSelectExited = true;
+                haptics.selectExitedData.amplitude = 0.2f;
+                haptics.selectExitedData.duration = 0.05f;
+                EditorUtility.SetDirty(haptics);
+            }
         }
 
         static void RemoveStrayCameras(Scene scene, XROrigin origin)
@@ -284,6 +300,16 @@ namespace SafeZoneVR.Editor
             var comfort = systems.AddComponent<ComfortSettingsApplier>();
             comfort.origin = origin;
             comfort.vignette = origin.GetComponentInChildren<TunnelingVignetteController>(true);
+
+            var integrity = systems.AddComponent<PlayerIntegrity>();
+            integrity.feedback = feedback;
+            systems.AddComponent<WallClipGuard>();
+            systems.AddComponent<CrouchController>().origin = origin;
+            systems.AddComponent<InteractableHighlighter>();
+            var hints = systems.AddComponent<IdleHintSystem>();
+            hints.scenarioManager = manager;
+            hints.feedback = feedback;
+            CreateHintPanel(root, origin.Camera.transform, hints);
 
             var beaconGo = UIBuilderUtil.Child(root, "ObjectiveBeacons");
             var beacons = beaconGo.AddComponent<ObjectiveBeaconSystem>();
@@ -454,6 +480,10 @@ namespace SafeZoneVR.Editor
             return Vector3.Dot(plus, towards) >= 0f ? degrees : -degrees;
         }
 
+        public const string k_ItemsFolder = "Assets/Itens";
+        public const string k_NpcFolder = "Assets/NPC";
+        public const string k_NpcController = "Assets/NPC/DC_NPC.controller";
+
         public static Transform OpenModelDoor(GameObject model, string leafName, Vector3 towards, float degrees = 95f)
         {
             var leaf = ModelPart(model, leafName);
@@ -463,8 +493,80 @@ namespace SafeZoneVR.Editor
                 return null;
             }
             var pivot = HingePivot(leaf, leaf.position);
-            pivot.rotation = Quaternion.AngleAxis(SwingAngle(pivot, towards, degrees), Vector3.up);
+            MakeDoorOperable(pivot, SwingAngle(pivot, towards, degrees), true);
             return pivot;
+        }
+
+        public static ToggleOpening MakeDoorOperable(Transform pivot, float openAngle, bool startsOpen)
+        {
+            var leaf = pivot.GetChild(0);
+            var interactable = pivot.GetComponent<XRSimpleInteractable>();
+            if (interactable == null)
+                interactable = pivot.gameObject.AddComponent<XRSimpleInteractable>();
+            interactable.colliders.Clear();
+
+            var handle = FindChildRecursive(leaf, leaf.name + "_Macaneta");
+            var grip = handle != null ? CreateDoorGrip(leaf, handle) : FitBoxCollider(leaf, 0f);
+            if (grip != null)
+                interactable.colliders.Add(grip);
+
+            var toggle = pivot.GetComponent<ToggleOpening>();
+            if (toggle == null)
+                toggle = pivot.gameObject.AddComponent<ToggleOpening>();
+            toggle.hinge = pivot;
+            toggle.axis = Vector3.up;
+            toggle.openAngle = openAngle;
+            toggle.startsOpen = startsOpen;
+            toggle.dragWhenNear = true;
+            return toggle;
+        }
+
+        static BoxCollider CreateDoorGrip(Transform leaf, Transform handle)
+        {
+            var existing = leaf.Find("Macaneta_Pega");
+            if (existing != null) Object.DestroyImmediate(existing.gameObject);
+
+            var lb = PartBounds(leaf);
+            var hb = handle.GetComponent<Renderer>() != null ? handle.GetComponent<Renderer>().bounds : PartBounds(handle);
+            var thinIsX = lb.size.x < lb.size.z;
+            var center = hb.center;
+            var size = hb.size + new Vector3(0.05f, 0.05f, 0.05f);
+            if (thinIsX)
+            {
+                var reach = Mathf.Max(Mathf.Abs(hb.max.x - lb.center.x), Mathf.Abs(hb.min.x - lb.center.x));
+                center.x = lb.center.x;
+                size.x = reach * 2f + 0.06f;
+            }
+            else
+            {
+                var reach = Mathf.Max(Mathf.Abs(hb.max.z - lb.center.z), Mathf.Abs(hb.min.z - lb.center.z));
+                center.z = lb.center.z;
+                size.z = reach * 2f + 0.06f;
+            }
+
+            var go = new GameObject("Macaneta_Pega");
+            go.transform.SetPositionAndRotation(center, Quaternion.identity);
+            go.transform.SetParent(leaf, true);
+            GameObjectUtility.SetStaticEditorFlags(go, 0);
+            var box = go.AddComponent<BoxCollider>();
+            var lossy = go.transform.lossyScale;
+            box.size = new Vector3(size.x / Mathf.Abs(lossy.x), size.y / Mathf.Abs(lossy.y), size.z / Mathf.Abs(lossy.z));
+            return box;
+        }
+
+        static BoxCollider FitBoxCollider(Transform part, float worldPadding)
+        {
+            var mf = part.GetComponent<MeshFilter>();
+            if (mf == null || mf.sharedMesh == null)
+                return null;
+            foreach (var c in part.GetComponents<Collider>())
+                Object.DestroyImmediate(c);
+            var box = part.gameObject.AddComponent<BoxCollider>();
+            var b = mf.sharedMesh.bounds;
+            var scale = Mathf.Max(Mathf.Abs(part.lossyScale.x), 0.0001f);
+            box.center = b.center;
+            box.size = b.size + Vector3.one * (worldPadding / scale);
+            return box;
         }
 
         public static Transform OpenHouseDoors(GameObject house, bool openFrontDoor)
@@ -489,8 +591,112 @@ namespace SafeZoneVR.Editor
                 return null;
             var frontPivot = HingePivot(front, front.position);
             if (openFrontDoor)
-                frontPivot.rotation = Quaternion.AngleAxis(SwingAngle(frontPivot, Vector3.back, 95f), Vector3.up);
+                MakeDoorOperable(frontPivot, SwingAngle(frontPivot, Vector3.back, 95f), true);
             return frontPivot;
+        }
+
+        public static GameObject CreateModelVisual(Transform parent, string name, string modelPath, Vector3 basePos, Vector3 euler)
+        {
+            var asset = AssetDatabase.LoadAssetAtPath<GameObject>(modelPath);
+            if (asset == null)
+                throw new System.Exception($"Modelo não encontrado: {modelPath}. Copie a pasta Itens/NPC para Assets.");
+            var root = UIBuilderUtil.Child(parent, name);
+            root.transform.SetPositionAndRotation(basePos, Quaternion.Euler(euler));
+            var instance = (GameObject)PrefabUtility.InstantiatePrefab(asset, parent.gameObject.scene);
+            instance.name = "Modelo";
+            instance.transform.SetParent(root.transform, false);
+            instance.transform.localPosition = Vector3.zero;
+            instance.transform.localRotation = Quaternion.identity;
+            instance.transform.localScale = Vector3.one;
+            foreach (var r in instance.GetComponentsInChildren<MeshRenderer>(true))
+                r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            return root;
+        }
+
+        public static Bounds LocalMeshBounds(Transform root)
+        {
+            var has = false;
+            var result = new Bounds();
+            foreach (var mf in root.GetComponentsInChildren<MeshFilter>(true))
+            {
+                if (mf.sharedMesh == null || mf.GetComponent<TMP_Text>() != null) continue;
+                var b = mf.sharedMesh.bounds;
+                for (var i = 0; i < 8; i++)
+                {
+                    var corner = b.center + Vector3.Scale(b.extents, new Vector3((i & 1) == 0 ? -1 : 1, (i & 2) == 0 ? -1 : 1, (i & 4) == 0 ? -1 : 1));
+                    var local = root.InverseTransformPoint(mf.transform.TransformPoint(corner));
+                    if (!has) { result = new Bounds(local, Vector3.zero); has = true; }
+                    else result.Encapsulate(local);
+                }
+            }
+            return result;
+        }
+
+        public static BoxCollider AddFittedBox(GameObject root, Vector3 minSize)
+        {
+            var b = LocalMeshBounds(root.transform);
+            var size = Vector3.Max(b.size, minSize);
+            var center = b.center;
+            center.y = b.min.y + size.y * 0.5f;
+            var box = root.AddComponent<BoxCollider>();
+            box.center = center;
+            box.size = size;
+            return box;
+        }
+
+        public static GameObject CreateModelItem(Transform parent, string name, Vector3 basePos, Vector3 euler,
+            string itemId, string displayName, MissionStepSO step)
+        {
+            var go = CreateModelVisual(parent, name, $"{k_ItemsFolder}/{name}.fbx", basePos, euler);
+            AddFittedBox(go, new Vector3(0.03f, 0.03f, 0.03f));
+
+            var rb = go.AddComponent<Rigidbody>();
+            rb.mass = 0.4f;
+            rb.interpolation = RigidbodyInterpolation.Interpolate;
+            rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+
+            var grab = go.AddComponent<XRGrabInteractable>();
+            grab.useDynamicAttach = true;
+            grab.throwOnDetach = true;
+            grab.movementType = XRBaseInteractable.MovementType.VelocityTracking;
+
+            var id = go.AddComponent<ObjectiveItemId>();
+            id.itemId = itemId;
+            id.displayName = displayName;
+
+            if (step != null)
+            {
+                var target = go.AddComponent<ObjectiveTarget>();
+                target.step = step;
+                target.markerHeightOffset = 0.18f;
+            }
+
+            go.AddComponent<RespawnIfFallen>();
+
+            var height = LocalMeshBounds(go.transform).max.y;
+            var label = UIBuilderUtil.WorldText(go.transform, "Label", displayName, 0.5f, Color.white, basePos + Vector3.up * (height + 0.1f), Vector3.zero, new Vector2(0.6f, 0.12f));
+            label.gameObject.AddComponent<FacePlayer>().yawOnly = true;
+            return go;
+        }
+
+        public static WrongActionInteractable CreateWrongInteractableModel(Transform parent, string name, Vector3 basePos, Vector3 euler,
+            string mistakeId, string message, string labelText, ActionKind kind = ActionKind.ErroLeve, string advice = "")
+        {
+            var go = CreateModelVisual(parent, name, $"{k_ItemsFolder}/{name}.fbx", basePos, euler);
+            var box = AddFittedBox(go, new Vector3(0.05f, 0.05f, 0.05f));
+            go.AddComponent<XRSimpleInteractable>();
+            var wrong = go.AddComponent<WrongActionInteractable>();
+            wrong.mistakeId = mistakeId;
+            wrong.message = message;
+            wrong.kind = kind;
+            wrong.advice = advice;
+            if (!string.IsNullOrEmpty(labelText))
+            {
+                var label = UIBuilderUtil.WorldText(parent, name + "_Label", labelText, 0.7f, new Color(1f, 0.75f, 0.35f),
+                    basePos + new Vector3(0f, box.center.y + box.size.y * 0.5f + 0.25f, 0f), Vector3.zero, new Vector2(1.2f, 0.2f));
+                label.gameObject.AddComponent<FacePlayer>().yawOnly = true;
+            }
+            return wrong;
         }
 
         public static GameObject CreateTriggerZone(Transform parent, string name, Vector3 center, Vector3 size)
@@ -503,23 +709,29 @@ namespace SafeZoneVR.Editor
             return zone;
         }
 
-        public static WrongActionZone CreateWrongZone(Transform parent, string name, Vector3 center, Vector3 size, string mistakeId, string message)
+        public static WrongActionZone CreateWrongZone(Transform parent, string name, Vector3 center, Vector3 size, string mistakeId, string message,
+            ActionKind kind = ActionKind.ErroLeve, string advice = "", bool fatal = false)
         {
             var zone = CreateTriggerZone(parent, name, center, size);
             var wrong = zone.AddComponent<WrongActionZone>();
             wrong.mistakeId = mistakeId;
             wrong.message = message;
+            wrong.kind = kind;
+            wrong.advice = advice;
+            wrong.fatal = fatal;
             return wrong;
         }
 
         public static WrongActionInteractable CreateWrongInteractable(Transform parent, string name, Vector3 pos, Vector3 scale, Material mat,
-            string mistakeId, string message, string labelText)
+            string mistakeId, string message, string labelText, ActionKind kind = ActionKind.ErroLeve, string advice = "")
         {
             var go = UIBuilderUtil.Primitive(PrimitiveType.Cube, name, parent, pos, Vector3.zero, scale, mat);
             go.AddComponent<XRSimpleInteractable>();
             var wrong = go.AddComponent<WrongActionInteractable>();
             wrong.mistakeId = mistakeId;
             wrong.message = message;
+            wrong.kind = kind;
+            wrong.advice = advice;
             if (!string.IsNullOrEmpty(labelText))
             {
                 var label = UIBuilderUtil.WorldText(parent, name + "_Label", labelText, 0.7f, new Color(1f, 0.75f, 0.35f),
@@ -781,23 +993,56 @@ namespace SafeZoneVR.Editor
         {
             var npc = UIBuilderUtil.Child(parent, name);
             npc.transform.SetPositionAndRotation(feetPos, Quaternion.Euler(0f, yaw, 0f));
-            var cloth = UIBuilderUtil.GetOrCreateMaterial("Mat_Roupa_" + name, clothColor, false, false, 0.1f);
 
-            var body = UIBuilderUtil.Primitive(PrimitiveType.Capsule, "Corpo", npc.transform, Vector3.zero, Vector3.zero, new Vector3(0.42f, 0.62f, 0.42f), cloth, false);
-            body.transform.localPosition = new Vector3(0f, 0.85f, 0f);
-            var head = UIBuilderUtil.Primitive(PrimitiveType.Sphere, "Cabeca", npc.transform, Vector3.zero, Vector3.zero, new Vector3(0.24f, 0.24f, 0.24f), MatSkin, false);
-            head.transform.localPosition = new Vector3(0f, 1.6f, 0f);
-            if (walker)
+            var model = AssetDatabase.LoadAssetAtPath<GameObject>($"{k_NpcFolder}/{name}.fbx");
+            Animator animator = null;
+            if (model != null)
             {
-                var w = UIBuilderUtil.Child(npc.transform, "Andador");
-                w.transform.localPosition = new Vector3(0f, 0f, 0.35f);
-                for (var i = 0; i < 4; i++)
+                var instance = (GameObject)PrefabUtility.InstantiatePrefab(model, parent.gameObject.scene);
+                instance.name = "Modelo";
+                instance.transform.SetParent(npc.transform, false);
+                instance.transform.localPosition = Vector3.zero;
+                instance.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
+                animator = instance.GetComponent<Animator>();
+                if (animator == null) animator = instance.AddComponent<Animator>();
+                animator.runtimeAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(k_NpcController);
+                animator.applyRootMotion = false;
+                animator.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
+                foreach (var smr in instance.GetComponentsInChildren<SkinnedMeshRenderer>(true))
+                    smr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+
+                if (walker)
                 {
-                    var leg = UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "Perna" + i, w.transform, Vector3.zero, Vector3.zero, new Vector3(0.02f, 0.4f, 0.02f), MatMetal, false);
-                    leg.transform.localPosition = new Vector3(i % 2 == 0 ? -0.22f : 0.22f, 0.4f, i < 2 ? 0f : 0.25f);
+                    var walkerModel = AssetDatabase.LoadAssetAtPath<GameObject>($"{k_NpcFolder}/Andador.fbx");
+                    if (walkerModel != null)
+                    {
+                        var w = (GameObject)PrefabUtility.InstantiatePrefab(walkerModel, parent.gameObject.scene);
+                        w.name = "Andador";
+                        w.transform.SetParent(npc.transform, false);
+                        w.transform.localPosition = new Vector3(0f, 0f, 0.25f);
+                        w.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
+                    }
                 }
-                var bar = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Barra", w.transform, Vector3.zero, Vector3.zero, new Vector3(0.48f, 0.03f, 0.03f), MatMetal, false);
-                bar.transform.localPosition = new Vector3(0f, 0.8f, 0f);
+            }
+            else
+            {
+                var cloth = UIBuilderUtil.GetOrCreateMaterial("Mat_Roupa_" + name, clothColor, false, false, 0.1f);
+                var body = UIBuilderUtil.Primitive(PrimitiveType.Capsule, "Corpo", npc.transform, Vector3.zero, Vector3.zero, new Vector3(0.42f, 0.62f, 0.42f), cloth, false);
+                body.transform.localPosition = new Vector3(0f, 0.85f, 0f);
+                var head = UIBuilderUtil.Primitive(PrimitiveType.Sphere, "Cabeca", npc.transform, Vector3.zero, Vector3.zero, new Vector3(0.24f, 0.24f, 0.24f), MatSkin, false);
+                head.transform.localPosition = new Vector3(0f, 1.6f, 0f);
+                if (walker)
+                {
+                    var w = UIBuilderUtil.Child(npc.transform, "Andador");
+                    w.transform.localPosition = new Vector3(0f, 0f, 0.35f);
+                    for (var i = 0; i < 4; i++)
+                    {
+                        var leg = UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "Perna" + i, w.transform, Vector3.zero, Vector3.zero, new Vector3(0.02f, 0.4f, 0.02f), MatMetal, false);
+                        leg.transform.localPosition = new Vector3(i % 2 == 0 ? -0.22f : 0.22f, 0.4f, i < 2 ? 0f : 0.25f);
+                    }
+                    var bar = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Barra", w.transform, Vector3.zero, Vector3.zero, new Vector3(0.48f, 0.03f, 0.03f), MatMetal, false);
+                    bar.transform.localPosition = new Vector3(0f, 0.8f, 0f);
+                }
             }
 
             var col = npc.AddComponent<CapsuleCollider>();
@@ -806,11 +1051,21 @@ namespace SafeZoneVR.Editor
             col.radius = 0.3f;
             npc.layer = LayerMask.NameToLayer("Ignore Raycast");
             var interactable = npc.AddComponent<XRSimpleInteractable>();
+            interactable.colliders.Add(col);
 
             speechBubble = UIBuilderUtil.WorldText(npc.transform, "Fala", speech, 0.55f, Color.white, Vector3.zero, Vector3.zero, new Vector2(1.6f, 0.4f));
             speechBubble.transform.localPosition = new Vector3(0f, 2.05f, 0f);
             speechBubble.gameObject.AddComponent<FacePlayer>().yawOnly = true;
             speechBubble.gameObject.SetActive(false);
+
+            if (animator != null)
+            {
+                var driver = npc.AddComponent<NpcAnimatorDriver>();
+                driver.animator = animator;
+                driver.speechBubble = speechBubble;
+                driver.pointWhenSpeaking = !walker;
+                driver.referenceWalkSpeed = walker ? 0.5f : 0.9f;
+            }
             return interactable;
         }
 
@@ -835,7 +1090,7 @@ namespace SafeZoneVR.Editor
             var wrist = UIBuilderUtil.Child(hand, "WristUI");
             wrist.transform.localPosition = new Vector3(0f, 0.09f, -0.07f);
 
-            var canvas = UIBuilderUtil.CreateWorldCanvas("Canvas", wrist.transform, new Vector2(320f, 300f), 0.00045f);
+            var canvas = UIBuilderUtil.CreateWorldCanvas("Canvas", wrist.transform, new Vector2(320f, 300f), 0.0005f);
             var face = canvas.gameObject.AddComponent<FacePlayer>();
             face.yawOnly = false;
             var panel = canvas.transform;
@@ -860,6 +1115,8 @@ namespace SafeZoneVR.Editor
             ctrl.subProgressText = UIBuilderUtil.Text(panel, "SubProgress", "", 13f, UIBuilderUtil.AccentGreen, TextAlignmentOptions.Right,
                 new Vector2(0.5f, 1f), new Vector2(1f, 1f), new Vector2(0f, -182f), new Vector2(-10f, -164f), FontStyles.Bold);
             ctrl.waterText = UIBuilderUtil.TopText(panel, "Water", "", 12f, new Color(0.55f, 0.8f, 1f), TextAlignmentOptions.Left, 182f, 18f, 10f);
+            ctrl.integrityText = UIBuilderUtil.Text(panel, "Integrity", "", 12f, new Color(1f, 0.8f, 0.4f), TextAlignmentOptions.Right,
+                new Vector2(0.5f, 1f), new Vector2(1f, 1f), new Vector2(0f, -200f), new Vector2(-10f, -182f), FontStyles.Bold);
             ctrl.warningText = UIBuilderUtil.TopText(panel, "Warning", "", 12f, new Color(1f, 0.8f, 0.4f), TextAlignmentOptions.TopLeft, 200f, 22f, 10f);
 
             callButton = null;
@@ -887,30 +1144,125 @@ namespace SafeZoneVR.Editor
         {
             var go = UIBuilderUtil.Child(parent, "OptionsPanel");
             UIBuilderUtil.AddLazyFollow(go, camera, new Vector3(0f, -0.1f, 1.1f), 4f);
-            var canvas = UIBuilderUtil.CreateWorldCanvas("Canvas", go.transform, new Vector2(520f, 600f), 0.001f);
+            var canvas = UIBuilderUtil.CreateWorldCanvas("Canvas", go.transform, new Vector2(920f, 640f), 0.001f);
             var panel = canvas.transform;
             UIBuilderUtil.FullPanel(panel, "Background", UIBuilderUtil.PanelColor);
             UIBuilderUtil.Panel(panel, "HeaderBar", UIBuilderUtil.Accent, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -56f), Vector2.zero);
-            UIBuilderUtil.TopText(panel, "Title", "Conforto e acessibilidade", 26f, Color.white, TextAlignmentOptions.Center, 8f, 40f, 20f, FontStyles.Bold);
+            UIBuilderUtil.TopText(panel, "Title", "Conforto, som e acessibilidade", 26f, Color.white, TextAlignmentOptions.Center, 8f, 40f, 20f, FontStyles.Bold);
 
             var ctrl = go.AddComponent<OptionsPanelController>();
             ctrl.root = go;
             ctrl.startHidden = true;
 
-            var y = 76f;
-            const float h = 56f;
+            const float h = 54f;
             const float gap = 10f;
-            ctrl.locomotionButton = UIBuilderUtil.TopButton(panel, "Locomotion", "Locomoção", 20f, UIBuilderUtil.PanelLight, y, h, 24f, out var l1); ctrl.locomotionLabel = l1; y += h + gap;
-            ctrl.turnButton = UIBuilderUtil.TopButton(panel, "Turn", "Giro", 20f, UIBuilderUtil.PanelLight, y, h, 24f, out var l2); ctrl.turnLabel = l2; y += h + gap;
-            ctrl.vignetteButton = UIBuilderUtil.TopButton(panel, "Vignette", "Vinheta", 20f, UIBuilderUtil.PanelLight, y, h, 24f, out var l3); ctrl.vignetteLabel = l3; y += h + gap;
-            ctrl.seatedButton = UIBuilderUtil.TopButton(panel, "Seated", "Posição", 20f, UIBuilderUtil.PanelLight, y, h, 24f, out var l4); ctrl.seatedLabel = l4; y += h + gap;
-            ctrl.recenterButton = UIBuilderUtil.TopButton(panel, "Recenter", "Recentrar visão", 20f, UIBuilderUtil.PanelLight, y, h, 24f, out _); y += h + gap;
+            var y = 72f;
+            SectionTitle(panel, "ConfortoTitulo", "Conforto", 0f, 0.5f, y);
+            y += 34f;
+            ctrl.locomotionButton = ColumnButton(panel, "Locomotion", "Locomoção", 0f, 0.5f, y, h, out var l1); ctrl.locomotionLabel = l1; y += h + gap;
+            ctrl.turnButton = ColumnButton(panel, "Turn", "Giro", 0f, 0.5f, y, h, out var l2); ctrl.turnLabel = l2; y += h + gap;
+            ctrl.vignetteButton = ColumnButton(panel, "Vignette", "Vinheta", 0f, 0.5f, y, h, out var l3); ctrl.vignetteLabel = l3; y += h + gap;
+            ctrl.seatedButton = ColumnButton(panel, "Seated", "Posição", 0f, 0.5f, y, h, out var l4); ctrl.seatedLabel = l4; y += h + gap;
+            ctrl.dominantHandButton = ColumnButton(panel, "DominantHand", "Mão dominante", 0f, 0.5f, y, h, out var l5); ctrl.dominantHandLabel = l5; y += h + gap;
+            ctrl.recenterButton = ColumnButton(panel, "Recenter", "Recentrar visão", 0f, 0.5f, y, h, out _);
+            y += h + gap;
+            UIBuilderUtil.Text(panel, "CrouchHint", "Para se abaixar sem agachar de verdade: segure o botão B ou Y do controle.",
+                16f, UIBuilderUtil.MutedText, TextAlignmentOptions.TopLeft,
+                new Vector2(0f, 1f), new Vector2(0.5f, 1f), new Vector2(24f, -(y + 60f)), new Vector2(-12f, -y));
+
+            y = 72f;
+            SectionTitle(panel, "SomTitulo", "Volume", 0.5f, 1f, y);
+            y += 34f;
+            foreach (var category in new[] { AudioCategory.Effects, AudioCategory.Narration, AudioCategory.Ambient })
+            {
+                ctrl.volumeRows.Add(CreateVolumeRow(panel, category, y, h));
+                y += h + gap;
+            }
             if (showRestart)
             {
-                ctrl.restartButton = UIBuilderUtil.TopButton(panel, "Restart", "Reiniciar fase", 20f, new Color(0.55f, 0.35f, 0.15f), y, h, 24f, out _); y += h + gap;
-                ctrl.menuButton = UIBuilderUtil.TopButton(panel, "Menu", "Voltar ao menu", 20f, new Color(0.45f, 0.2f, 0.2f), y, h, 24f, out _); y += h + gap;
+                y += 20f;
+                ctrl.restartButton = ColumnButton(panel, "Restart", "Reiniciar fase", 0.5f, 1f, y, h, out _, new Color(0.55f, 0.35f, 0.15f)); y += h + gap;
+                ctrl.menuButton = ColumnButton(panel, "Menu", "Voltar ao menu", 0.5f, 1f, y, h, out _, new Color(0.45f, 0.2f, 0.2f));
             }
-            ctrl.closeButton = UIBuilderUtil.BottomButton(panel, "Close", "Fechar", 20f, UIBuilderUtil.Accent, 16f, 50f, 0.25f, 0.75f, 0f, out _);
+            ctrl.closeButton = UIBuilderUtil.BottomButton(panel, "Close", "Fechar", 20f, UIBuilderUtil.Accent, 16f, 50f, 0.35f, 0.65f, 0f, out _);
+            return ctrl;
+        }
+
+        static void AutoShrink(TextMeshProUGUI text, float min, float max)
+        {
+            if (text == null) return;
+            text.enableAutoSizing = true;
+            text.fontSizeMin = min;
+            text.fontSizeMax = max;
+            text.overflowMode = TextOverflowModes.Truncate;
+        }
+
+        static void SectionTitle(Transform panel, string name, string text, float x0, float x1, float top)
+        {
+            UIBuilderUtil.Text(panel, name, text, 18f, UIBuilderUtil.MutedText, TextAlignmentOptions.Left,
+                new Vector2(x0, 1f), new Vector2(x1, 1f), new Vector2(24f, -(top + 28f)), new Vector2(-12f, -top), FontStyles.Bold);
+        }
+
+        static Button ColumnButton(Transform panel, string name, string label, float x0, float x1, float top, float height,
+            out TextMeshProUGUI labelText, Color? color = null)
+        {
+            var left = x0 < 0.01f ? 24f : 12f;
+            var right = x1 > 0.99f ? -24f : -12f;
+            return UIBuilderUtil.Button(panel, name, label, 19f, color ?? UIBuilderUtil.PanelLight, UIBuilderUtil.TextColor,
+                new Vector2(x0, 1f), new Vector2(x1, 1f), new Vector2(left, -(top + height)), new Vector2(right, -top), out labelText);
+        }
+
+        static OptionsPanelController.VolumeRow CreateVolumeRow(Transform panel, AudioCategory category, float top, float height)
+        {
+            var row = new OptionsPanelController.VolumeRow { category = category };
+            const float side = 12f;
+            const float btn = 64f;
+            row.minus = UIBuilderUtil.Button(panel, "Volume_" + category + "_Menos", "−", 28f, UIBuilderUtil.Accent, UIBuilderUtil.TextColor,
+                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(side, -(top + height)), new Vector2(side + btn, -top), out _);
+            row.plus = UIBuilderUtil.Button(panel, "Volume_" + category + "_Mais", "+", 28f, UIBuilderUtil.Accent, UIBuilderUtil.TextColor,
+                new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-(24f + btn), -(top + height)), new Vector2(-24f, -top), out _);
+            UIBuilderUtil.Panel(panel, "Volume_" + category + "_Fundo", UIBuilderUtil.PanelLight,
+                new Vector2(0.5f, 1f), new Vector2(1f, 1f), new Vector2(side + btn + 8f, -(top + height)), new Vector2(-(24f + btn + 8f), -top));
+            row.label = UIBuilderUtil.Text(panel, "Volume_" + category + "_Label", AudioVolumes.Label(category), 19f, UIBuilderUtil.TextColor, TextAlignmentOptions.Center,
+                new Vector2(0.5f, 1f), new Vector2(1f, 1f), new Vector2(side + btn + 8f, -(top + height)), new Vector2(-(24f + btn + 8f), -top), FontStyles.Bold);
+            return row;
+        }
+
+        public static IdleHintSystem CreateHintPanel(Transform parent, Transform camera, IdleHintSystem hints)
+        {
+            var go = UIBuilderUtil.Child(parent, "IdleHintPanel");
+            UIBuilderUtil.AddLazyFollow(go, camera, new Vector3(0f, -0.28f, 1.3f), 2.5f);
+            var canvas = UIBuilderUtil.CreateWorldCanvas("Canvas", go.transform, new Vector2(620f, 190f), 0.0012f);
+            var panel = canvas.transform;
+            UIBuilderUtil.FullPanel(panel, "Background", UIBuilderUtil.PanelColor);
+            UIBuilderUtil.Panel(panel, "Faixa", new Color(1f, 0.75f, 0.25f), new Vector2(0f, 0f), new Vector2(0f, 1f), Vector2.zero, new Vector2(10f, 0f));
+            hints.titleText = UIBuilderUtil.TopText(panel, "Title", "Dica", 22f, new Color(1f, 0.82f, 0.4f), TextAlignmentOptions.Left, 12f, 32f, 28f, FontStyles.Bold);
+            hints.bodyText = UIBuilderUtil.TopText(panel, "Body", "", 19f, UIBuilderUtil.TextColor, TextAlignmentOptions.TopLeft, 48f, 130f, 28f);
+            hints.panelRoot = go;
+            go.SetActive(false);
+            return hints;
+        }
+
+        public static SafetyNoticePanel CreateSafetyNotice(Transform parent, Transform camera)
+        {
+            var go = UIBuilderUtil.Child(parent, "SafetyNoticePanel");
+            UIBuilderUtil.AddLazyFollow(go, camera, new Vector3(0f, 0f, 1.5f), 3f);
+            var canvas = UIBuilderUtil.CreateWorldCanvas("Canvas", go.transform, new Vector2(820f, 720f), 0.0011f);
+            var panel = canvas.transform;
+            UIBuilderUtil.FullPanel(panel, "Background", new Color(0.08f, 0.11f, 0.16f, 1f));
+            UIBuilderUtil.Panel(panel, "HeaderBar", new Color(0.85f, 0.55f, 0.15f), new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -70f), Vector2.zero);
+            UIBuilderUtil.TopText(panel, "Title", "Antes de começar: sua segurança", 30f, Color.white, TextAlignmentOptions.Center, 12f, 48f, 24f, FontStyles.Bold);
+            UIBuilderUtil.TopText(panel, "Body",
+                "• <b>Área livre:</b> afaste móveis, objetos e pessoas e confirme o limite de segurança (Guardian) do headset.\n" +
+                "• <b>Desconforto:</b> a realidade virtual pode causar enjoo, tontura, dor de cabeça ou cansaço visual. " +
+                "Se sentir qualquer mal-estar, <b>pare na hora</b>, tire o headset e sente-se.\n" +
+                "• <b>Sensibilidade à luz:</b> há fogo, fumaça e luzes piscando. Quem tem epilepsia ou sensibilidade à luz deve consultar um médico antes de jogar.\n" +
+                "• <b>Acompanhante:</b> jogue com alguém por perto; crianças sempre com supervisão de um adulto.\n" +
+                "• <b>Pausas:</b> faça intervalos entre as fases. Isto é um treino: em uma emergência real, siga a Defesa Civil (199) e os Bombeiros (193).",
+                21f, UIBuilderUtil.TextColor, TextAlignmentOptions.TopLeft, 92f, 500f, 36f);
+            var ctrl = go.AddComponent<SafetyNoticePanel>();
+            ctrl.root = go;
+            ctrl.acceptButton = UIBuilderUtil.BottomButton(panel, "Accept", "Li e entendi", 26f, UIBuilderUtil.AccentGreen, 24f, 64f, 0.25f, 0.75f, 0f, out _);
             return ctrl;
         }
 
@@ -918,7 +1270,7 @@ namespace SafeZoneVR.Editor
         {
             var go = UIBuilderUtil.Child(parent, "IntroBriefingPanel");
             UIBuilderUtil.AddLazyFollow(go, camera, new Vector3(0f, 0.06f, 1.5f), 3f);
-            var canvas = UIBuilderUtil.CreateWorldCanvas("Canvas", go.transform, new Vector2(760f, 620f), 0.001f);
+            var canvas = UIBuilderUtil.CreateWorldCanvas("Canvas", go.transform, new Vector2(760f, 620f), 0.0012f);
             var panel = canvas.transform;
             UIBuilderUtil.FullPanel(panel, "Background", UIBuilderUtil.PanelColor);
             UIBuilderUtil.Panel(panel, "HeaderBar", UIBuilderUtil.Accent, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -70f), Vector2.zero);
@@ -936,43 +1288,119 @@ namespace SafeZoneVR.Editor
         public static EndReportPanelController CreateEndReportPanel(Transform parent, Transform camera, ScenarioManager manager)
         {
             var go = UIBuilderUtil.Child(parent, "EndReportPanel");
-            UIBuilderUtil.AddLazyFollow(go, camera, new Vector3(0f, 0.02f, 1.95f), 3f);
+            UIBuilderUtil.AddLazyFollow(go, camera, new Vector3(0f, 0.02f, 2.05f), 3f);
 
-            var canvas = UIBuilderUtil.CreateWorldCanvas("Canvas", go.transform, new Vector2(860f, 760f), 0.0016f);
+            var canvas = UIBuilderUtil.CreateWorldCanvas("Canvas", go.transform, new Vector2(980f, 840f), 0.0019f);
             var panel = canvas.transform;
             UIBuilderUtil.FullPanel(panel, "Background", UIBuilderUtil.PanelColor);
-            UIBuilderUtil.Panel(panel, "HeaderBar", UIBuilderUtil.AccentGreen, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -70f), Vector2.zero);
 
             var ctrl = go.AddComponent<EndReportPanelController>();
             ctrl.scenarioManager = manager;
             ctrl.root = go;
+            ctrl.headerBar = UIBuilderUtil.Panel(panel, "HeaderBar", UIBuilderUtil.AccentGreen, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -70f), Vector2.zero);
             ctrl.titleText = UIBuilderUtil.TopText(panel, "Title", "Fase concluída!", 32f, Color.white, TextAlignmentOptions.Center, 12f, 48f, 24f, FontStyles.Bold);
 
             for (var i = 0; i < 3; i++)
             {
-                var x = 430f + (i - 1) * 70f;
+                var x = 490f + (i - 1) * 70f;
                 var star = UIBuilderUtil.Panel(panel, "Star" + (i + 1), new Color(0.35f, 0.35f, 0.4f),
                     new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(x - 22f, -134f), new Vector2(x + 22f, -90f));
                 star.rectTransform.localRotation = Quaternion.Euler(0f, 0f, 45f);
                 ctrl.starImages.Add(star);
             }
 
-            ctrl.summaryText = UIBuilderUtil.TopText(panel, "Summary", "", 20f, Color.white, TextAlignmentOptions.Center, 148f, 60f, 24f, FontStyles.Bold);
-            ctrl.detailsText = UIBuilderUtil.TopText(panel, "Details", "", 18f, UIBuilderUtil.TextColor, TextAlignmentOptions.TopLeft, 214f, 170f, 32f);
+            ctrl.summaryText = UIBuilderUtil.TopText(panel, "Summary", "", 22f, Color.white, TextAlignmentOptions.Center, 146f, 74f, 24f, FontStyles.Bold);
 
-            UIBuilderUtil.Panel(panel, "CardBackground", UIBuilderUtil.PanelLight, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(24f, -610f), new Vector2(-24f, -392f));
-            UIBuilderUtil.TopText(panel, "CardHeader", "Orientações oficiais", 15f, UIBuilderUtil.MutedText, TextAlignmentOptions.Left, 398f, 22f, 40f);
-            ctrl.cardTitleText = UIBuilderUtil.TopText(panel, "CardTitle", "", 22f, UIBuilderUtil.AccentGreen, TextAlignmentOptions.Left, 422f, 34f, 40f, FontStyles.Bold);
-            ctrl.cardBodyText = UIBuilderUtil.TopText(panel, "CardBody", "", 18f, Color.white, TextAlignmentOptions.TopLeft, 458f, 108f, 40f);
-            ctrl.cardCounterText = UIBuilderUtil.TopText(panel, "CardCounter", "", 15f, UIBuilderUtil.MutedText, TextAlignmentOptions.Center, 572f, 24f, 40f);
+            UIBuilderUtil.Panel(panel, "HitsBackground", UIBuilderUtil.PanelLight, new Vector2(0f, 1f), new Vector2(0.5f, 1f), new Vector2(24f, -524f), new Vector2(-8f, -226f));
+            UIBuilderUtil.Panel(panel, "MistakesBackground", UIBuilderUtil.PanelLight, new Vector2(0.5f, 1f), new Vector2(1f, 1f), new Vector2(8f, -524f), new Vector2(-24f, -226f));
+            ctrl.hitsText = UIBuilderUtil.Text(panel, "Hits", "", 20f, UIBuilderUtil.AccentGreen, TextAlignmentOptions.TopLeft,
+                new Vector2(0f, 1f), new Vector2(0.5f, 1f), new Vector2(36f, -516f), new Vector2(-20f, -236f));
+            ctrl.mistakesText = UIBuilderUtil.Text(panel, "Mistakes", "", 20f, UIBuilderUtil.TextColor, TextAlignmentOptions.TopLeft,
+                new Vector2(0.5f, 1f), new Vector2(1f, 1f), new Vector2(20f, -516f), new Vector2(-36f, -236f));
+            AutoShrink(ctrl.hitsText, 15f, 20f);
+            AutoShrink(ctrl.mistakesText, 15f, 20f);
+
+            UIBuilderUtil.Panel(panel, "CardBackground", UIBuilderUtil.PanelLight, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(24f, -736f), new Vector2(-24f, -538f));
+            UIBuilderUtil.TopText(panel, "CardHeader", "Orientações oficiais", 16f, UIBuilderUtil.MutedText, TextAlignmentOptions.Left, 544f, 22f, 40f);
+            ctrl.cardTitleText = UIBuilderUtil.TopText(panel, "CardTitle", "", 22f, UIBuilderUtil.AccentGreen, TextAlignmentOptions.Left, 566f, 30f, 40f, FontStyles.Bold);
+            ctrl.cardBodyText = UIBuilderUtil.TopText(panel, "CardBody", "", 19f, Color.white, TextAlignmentOptions.TopLeft, 598f, 100f, 40f);
+            ctrl.cardCounterText = UIBuilderUtil.TopText(panel, "CardCounter", "", 16f, UIBuilderUtil.MutedText, TextAlignmentOptions.Center, 702f, 24f, 40f);
             ctrl.prevCardButton = UIBuilderUtil.Button(panel, "PrevCard", "<", 24f, UIBuilderUtil.Accent, Color.white,
-                new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(36f, -596f), new Vector2(92f, -548f), out _);
+                new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(36f, -726f), new Vector2(92f, -678f), out _);
             ctrl.nextCardButton = UIBuilderUtil.Button(panel, "NextCard", ">", 24f, UIBuilderUtil.Accent, Color.white,
-                new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-92f, -596f), new Vector2(-36f, -548f), out _);
+                new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-92f, -726f), new Vector2(-36f, -678f), out _);
 
-            ctrl.replayButton = UIBuilderUtil.BottomButton(panel, "Replay", "Jogar de novo", 22f, UIBuilderUtil.AccentGreen, 24f, 60f, 0.06f, 0.48f, 8f, out _);
-            ctrl.menuButton = UIBuilderUtil.BottomButton(panel, "Menu", "Menu principal", 22f, UIBuilderUtil.Accent, 24f, 60f, 0.52f, 0.94f, 8f, out _);
+            ctrl.replayButton = UIBuilderUtil.BottomButton(panel, "Replay", "Jogar de novo", 22f, UIBuilderUtil.AccentGreen, 20f, 60f, 0.06f, 0.48f, 8f, out _);
+            ctrl.menuButton = UIBuilderUtil.BottomButton(panel, "Menu", "Menu principal", 22f, UIBuilderUtil.Accent, 20f, 60f, 0.52f, 0.94f, 8f, out _);
             return ctrl;
+        }
+
+        public static LoadingScreen CreateLoadingPanel(Transform parent, Transform camera)
+        {
+            var go = UIBuilderUtil.Child(parent, "LoadingScreen");
+            var ctrl = go.AddComponent<LoadingScreen>();
+
+            var rootGo = UIBuilderUtil.Child(go.transform, "Root");
+            UIBuilderUtil.AddLazyFollow(rootGo, camera, new Vector3(0f, -0.05f, 1.2f), 8f);
+            var canvas = UIBuilderUtil.CreateWorldCanvas("Canvas", rootGo.transform, new Vector2(620f, 220f), 0.0012f);
+            canvas.sortingOrder = 200;
+            var panel = canvas.transform;
+            UIBuilderUtil.FullPanel(panel, "Background", new Color(0.06f, 0.08f, 0.12f, 1f));
+            ctrl.titleText = UIBuilderUtil.TopText(panel, "Title", "Carregando…", 22f, Color.white, TextAlignmentOptions.Center, 30f, 56f, 20f, FontStyles.Bold);
+
+            UIBuilderUtil.Panel(panel, "BarBack", new Color(0.2f, 0.24f, 0.3f, 1f), new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(40f, -140f), new Vector2(-40f, -112f));
+            var bar = UIBuilderUtil.Panel(panel, "BarFill", UIBuilderUtil.AccentGreen, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(40f, -140f), new Vector2(-40f, -112f));
+            bar.rectTransform.anchorMin = new Vector2(0f, 1f);
+            bar.rectTransform.anchorMax = new Vector2(0f, 1f);
+            bar.rectTransform.offsetMin = new Vector2(40f, -140f);
+            bar.rectTransform.offsetMax = new Vector2(540f, -112f);
+            ctrl.progressBar = bar.rectTransform;
+            ctrl.progressText = UIBuilderUtil.TopText(panel, "Progress", "0%", 20f, UIBuilderUtil.MutedText, TextAlignmentOptions.Center, 150f, 30f, 24f);
+
+            var front = FrontMaterial();
+            foreach (var graphic in panel.GetComponentsInChildren<UnityEngine.UI.Graphic>(true))
+            {
+                if (graphic is TextMeshProUGUI text)
+                    text.fontSharedMaterial = FrontTextMaterial();
+                else
+                    graphic.material = front;
+            }
+            ctrl.root = rootGo;
+            rootGo.SetActive(false);
+            return ctrl;
+        }
+
+        static Material FrontMaterial()
+        {
+            UIBuilderUtil.EnsureFolder(UIBuilderUtil.k_GeneratedMaterialsFolder);
+            var path = $"{UIBuilderUtil.k_GeneratedMaterialsFolder}/Mat_UI_Frente.mat";
+            var mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (mat == null)
+            {
+                mat = new Material(Shader.Find("UI/Default"));
+                AssetDatabase.CreateAsset(mat, path);
+            }
+            mat.renderQueue = 4010;
+            EditorUtility.SetDirty(mat);
+            return mat;
+        }
+
+        static Material FrontTextMaterial()
+        {
+            UIBuilderUtil.EnsureFolder(UIBuilderUtil.k_GeneratedMaterialsFolder);
+            var path = $"{UIBuilderUtil.k_GeneratedMaterialsFolder}/Mat_TMP_Frente.mat";
+            var mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (mat == null)
+            {
+                var font = UIBuilderUtil.Font;
+                if (font == null || font.material == null)
+                    return null;
+                mat = new Material(font.material);
+                AssetDatabase.CreateAsset(mat, path);
+            }
+            mat.renderQueue = 4011;
+            EditorUtility.SetDirty(mat);
+            return mat;
         }
 
         public static EmergencyCallPanel CreateCallPanel(Transform parent, Transform camera, Button openButton,
@@ -983,7 +1411,7 @@ namespace SafeZoneVR.Editor
 
             var rootGo = UIBuilderUtil.Child(go.transform, "Root");
             UIBuilderUtil.AddLazyFollow(rootGo, camera, new Vector3(0f, -0.1f, 1.1f), 4f);
-            var canvas = UIBuilderUtil.CreateWorldCanvas("Canvas", rootGo.transform, new Vector2(520f, 640f), 0.001f);
+            var canvas = UIBuilderUtil.CreateWorldCanvas("Canvas", rootGo.transform, new Vector2(520f, 640f), 0.0011f);
             var panel = canvas.transform;
             UIBuilderUtil.FullPanel(panel, "Background", UIBuilderUtil.PanelColor);
             UIBuilderUtil.Panel(panel, "HeaderBar", new Color(0.75f, 0.25f, 0.2f), new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -56f), Vector2.zero);

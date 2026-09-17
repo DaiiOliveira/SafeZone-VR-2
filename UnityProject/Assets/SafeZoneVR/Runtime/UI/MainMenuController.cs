@@ -41,6 +41,13 @@ namespace SafeZoneVR
                 m_QuitButton.onClick.AddListener(Quit);
         }
 
+        public void RefreshKiosks()
+        {
+            for (var i = 0; i < m_Kiosks.Count; i++)
+                if (m_Kiosks[i] != null)
+                    m_Kiosks[i].Refresh();
+        }
+
         void BindKiosks()
         {
             var scenarios = m_Catalog != null ? m_Catalog.scenarios : null;

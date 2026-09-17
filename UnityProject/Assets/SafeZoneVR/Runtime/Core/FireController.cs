@@ -33,6 +33,9 @@ namespace SafeZoneVR
         public float residualSmokeSeconds { get => m_ResidualSmokeSeconds; set => m_ResidualSmokeSeconds = value; }
 
         void Awake() => SetSize(m_StartSize);
+        void OnEnable() => AudioVolumes.changed += RefreshVolume;
+        void OnDisable() => AudioVolumes.changed -= RefreshVolume;
+        void RefreshVolume() { if (m_Crackle != null) m_Crackle.volume = 0.15f * (int)m_Size * AudioVolumes.Get(AudioCategory.Effects); }
 
         void Start() { if (isBurning) ScheduleGrowth(); }
 
@@ -109,7 +112,7 @@ namespace SafeZoneVR
             if (m_Light != null) { m_Light.enabled = i > 0; m_Light.intensity = m_LightIntensity[i]; }
             if (m_Crackle != null)
             {
-                m_Crackle.volume = 0.15f * i;
+                m_Crackle.volume = 0.15f * i * AudioVolumes.Get(AudioCategory.Effects);
                 if (i > 0 && !m_Crackle.isPlaying) m_Crackle.Play();
                 if (i == 0) m_Crackle.Stop();
             }

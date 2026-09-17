@@ -21,6 +21,7 @@ MonoBehaviour:
   m_IsAvailable: 1
   m_TargetTimeSeconds: 360
   m_GoodTimeSeconds: 600
+  m_TimeLimitSeconds: 600
   m_Steps:
   - {fileID: 11400000, guid: 193e928dd81339c48ac40a6da5077b72, type: 2}
   - {fileID: 11400000, guid: 53b58536cff840448ab0e7201b648192, type: 2}

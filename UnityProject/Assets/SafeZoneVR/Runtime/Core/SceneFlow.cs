@@ -24,11 +24,23 @@ namespace SafeZoneVR
 
         public static void LoadScene(string sceneName)
         {
+            LoadScene(sceneName, null);
+        }
+
+        public static void LoadScene(string sceneName, string label)
+        {
             if (string.IsNullOrEmpty(sceneName) || s_Loading)
                 return;
 
             s_Loading = true;
             PlayerLocator.Invalidate();
+
+            var loading = LoadingScreen.instance;
+            if (loading != null)
+            {
+                loading.Load(sceneName, label);
+                return;
+            }
 
             var fader = ScreenFader.instance;
             if (fader != null)
@@ -41,18 +53,21 @@ namespace SafeZoneVR
         {
             if (scenario == null || !scenario.isAvailable)
                 return;
-            LoadScene(scenario.sceneName);
+            LoadScene(scenario.sceneName, scenario.displayName);
         }
 
         public static void ReloadCurrent()
         {
-            LoadScene(SceneManager.GetActiveScene().name);
+            var scene = SceneManager.GetActiveScene();
+            var manager = ScenarioManager.instance;
+            var label = manager != null && manager.scenario != null ? manager.scenario.displayName : null;
+            LoadScene(scene.name, label);
         }
 
         public static void LoadMenu()
         {
             var catalog = ScenarioCatalogSO.Load();
-            LoadScene(catalog != null && !string.IsNullOrEmpty(catalog.menuSceneName) ? catalog.menuSceneName : k_DefaultMenuScene);
+            LoadScene(catalog != null && !string.IsNullOrEmpty(catalog.menuSceneName) ? catalog.menuSceneName : k_DefaultMenuScene, "menu");
         }
     }
 }

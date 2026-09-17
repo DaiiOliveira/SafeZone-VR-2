@@ -33,6 +33,10 @@ namespace SafeZoneVR
         float m_GoodTimeSeconds = 420f;
 
         [SerializeField]
+        [Tooltip("Tempo-limite (s) do cenário. Passar dele desconta pontos (RN04), mas não encerra a fase.")]
+        float m_TimeLimitSeconds = 420f;
+
+        [SerializeField]
         List<MissionStepSO> m_Steps = new List<MissionStepSO>();
 
         [SerializeField]
@@ -45,6 +49,7 @@ namespace SafeZoneVR
         public bool isAvailable => m_IsAvailable;
         public float targetTimeSeconds => m_TargetTimeSeconds;
         public float goodTimeSeconds => m_GoodTimeSeconds;
+        public float timeLimitSeconds => m_TimeLimitSeconds > 0f ? m_TimeLimitSeconds : m_GoodTimeSeconds;
         public IReadOnlyList<MissionStepSO> steps => m_Steps;
         public IReadOnlyList<EducationCardSO> recapCards => m_RecapCards;
 
@@ -70,6 +75,8 @@ namespace SafeZoneVR
             m_Steps = steps;
             m_RecapCards = recapCards;
         }
+
+        public void EditorSetTimeLimit(float seconds) => m_TimeLimitSeconds = seconds;
 #endif
     }
 }

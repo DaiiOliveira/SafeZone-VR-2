@@ -65,11 +65,13 @@ namespace SafeZoneVR
             var continuous = ComfortSettings.locomotion == LocomotionMode.Continuous;
             var smoothTurn = ComfortSettings.turn == TurnMode.Smooth;
 
+            var moveHandName = ComfortSettings.leftHanded ? "Right" : "Left";
             for (var i = 0; i < m_ControllerManagers.Count; i++)
             {
                 var m = m_ControllerManagers[i];
                 if (m == null) continue;
-                m.smoothMotionEnabled = continuous;
+                var isMoveHand = m.name.StartsWith(moveHandName);
+                m.smoothMotionEnabled = continuous && isMoveHand;
                 m.smoothTurnEnabled = smoothTurn;
             }
 

@@ -48,10 +48,10 @@ namespace SafeZoneVR.Editor
             var data = new AlagamentoData();
 
             data.stepValuables = Step("Step_01_ProtegerValores", "step_01_valores", 0,
-                "Proteja documentos e objetos de valor",
-                "Pegue a pasta de documentos e o porta-retrato que estão no sofá e coloque-os em cima do guarda-roupa do quarto de casal.",
+                "Proteja os objetos de valor",
+                "Pegue o porta-retrato que está no sofá e coloque-o em cima do guarda-roupa do quarto de casal.",
                 "Sala → Quarto de casal",
-                "A Defesa Civil orienta guardar documentos e objetos de valor em local alto e protegido, de fácil acesso para uma evacuação.");
+                "A Defesa Civil orienta guardar objetos de valor em local alto e protegido. Os documentos vão com você, dentro do kit.");
 
             data.stepPower = Step("Step_02_DesligarEnergia", "step_02_energia", 1,
                 "Desligue o quadro geral de energia",
@@ -67,9 +67,9 @@ namespace SafeZoneVR.Editor
 
             data.stepKit = Step("Step_04_KitEmergencia", "step_04_kit", 3,
                 "Monte o kit de emergência",
-                "Coloque na mochila da sala: água potável (bancada da cozinha), remédios (bancada do banheiro) e lanterna (cama do quarto de casal).",
-                "Cozinha, banheiro e quarto → mochila na sala",
-                "Um kit com água, remédios, roupas e lanterna permite sair rápido de casa. Não use velas: risco de incêndio.");
+                "Coloque na mochila da sala: a pasta de documentos (sofá), água potável (bancada da cozinha), remédios (bancada do banheiro) e lanterna (cama do quarto de casal).",
+                "Sala, cozinha, banheiro e quarto → mochila na sala",
+                "O kit reúne o essencial para sair rápido: documentos, água, remédios e lanterna. Não use velas: risco de incêndio.");
 
             data.stepEvacuate = Step("Step_05_Evacuar", "step_05_evacuar", 4,
                 "Vá para o ponto de encontro seguro",
@@ -104,6 +104,7 @@ namespace SafeZoneVR.Editor
                 420f,
                 new List<MissionStepSO> { data.stepValuables, data.stepPower, data.stepWater, data.stepKit, data.stepEvacuate },
                 cards);
+            data.scenario.EditorSetTimeLimit(420f);
             EditorUtility.SetDirty(data.scenario);
 
             foreach (var old in new[] { "Scenario_Deslizamento", "Scenario_Enxurrada", "Scenario_Vendaval" })
@@ -167,7 +168,7 @@ namespace SafeZoneVR.Editor
         public class IncendioData
         {
             public ScenarioSO scenario;
-            public MissionStepSO gas, tampa, ventilar, energia, sair, porta, ligar, vizinho;
+            public MissionStepSO gas, tampa, ventilar, energia, sair, porta, ligar, vizinho, encontro;
         }
 
         public static IncendioData BuildIncendio()
@@ -209,6 +210,11 @@ namespace SafeZoneVR.Editor
                 "Portão da frente",
                 "Nenhum objeto vale o risco. Não permita que ninguém entre em um local em chamas: espere os Bombeiros.");
 
+            d.encontro = StepAt(f, "Step_09_Encontro", "inc_09_encontro", 8, "Vá para o ponto de encontro",
+                "Afaste-se da casa e espere os Bombeiros na placa de ponto de encontro, na calçada.",
+                "Ponto de encontro (calçada)",
+                "O ponto de encontro combinado reúne todo mundo em local seguro e longe do fogo, e deixa a frente livre para os Bombeiros.");
+
             d.gas.EditorSetOrderGroup(1);
             d.tampa.EditorSetOrderGroup(1);
 
@@ -230,7 +236,8 @@ namespace SafeZoneVR.Editor
             d.scenario.EditorInitialize("incendio", "Incêndio em Casa",
                 "A panela pegou fogo e, depois, um benjamim sobrecarregado atrás da TV. Aprenda a apagar só o que é pequeno, sem água no óleo ou na eletricidade, e a sair abaixado, fechar a porta sem trancar e ligar 193.",
                 k_IncendioSceneName, true, 300f, 480f,
-                new List<MissionStepSO> { d.gas, d.tampa, d.ventilar, d.energia, d.sair, d.porta, d.ligar, d.vizinho }, cards);
+                new List<MissionStepSO> { d.gas, d.tampa, d.ventilar, d.energia, d.sair, d.porta, d.ligar, d.vizinho, d.encontro }, cards);
+            d.scenario.EditorSetTimeLimit(480f);
             EditorUtility.SetDirty(d.scenario);
             return d;
         }
@@ -306,6 +313,7 @@ namespace SafeZoneVR.Editor
                 "Tempestade com granizo chegando e você na praça em frente de casa. Oriente onde estacionar, ajude o Seu Joaquim, escolha um abrigo resistente e, depois, volte com cuidado e aja se o telhado ameaçar ceder.",
                 k_GranizoSceneName, true, 360f, 600f,
                 new List<MissionStepSO> { d.vaga, d.joaquim, d.abrigo, d.aguardar, d.voltar, d.forro, d.sair, d.comunicar }, cards);
+            d.scenario.EditorSetTimeLimit(600f);
             EditorUtility.SetDirty(d.scenario);
             return d;
         }

@@ -47,12 +47,13 @@ namespace SafeZoneVR
 
         readonly HashSet<string> m_CompletedStepIds = new HashSet<string>();
         readonly List<MissionStepSO> m_CompletionOrder = new List<MissionStepSO>();
-        readonly List<string> m_Mistakes = new List<string>();
+        readonly List<ActionRecord> m_Actions = new List<ActionRecord>();
         readonly List<string> m_Notes = new List<string>();
         readonly Dictionary<string, float> m_LastMistakeTime = new Dictionary<string, float>();
 
         float m_StartTime;
         float m_EndTime;
+        string m_FailureReason;
         ScenarioResult m_Result;
 
         static ScenarioManager s_Instance;
@@ -95,9 +96,19 @@ namespace SafeZoneVR
         public int totalSteps => m_Scenario != null ? m_Scenario.steps.Count : 0;
         public int outOfOrderCount { get; private set; }
         public int repeatCount { get; private set; }
-        public int mistakeCount => m_Mistakes.Count;
+        public int mistakeCount
+        {
+            get
+            {
+                var n = 0;
+                for (var i = 0; i < m_Actions.Count; i++)
+                    if (m_Actions[i].isMistake) n++;
+                return n;
+            }
+        }
         public IReadOnlyList<MissionStepSO> completionOrder => m_CompletionOrder;
-        public IReadOnlyList<string> mistakes => m_Mistakes;
+        public IReadOnlyList<ActionRecord> actions => m_Actions;
+        public bool failed { get; private set; }
         public ScenarioResult result => m_Result;
 
         public float elapsedSeconds
@@ -198,6 +209,14 @@ namespace SafeZoneVR
 
             m_CompletedStepIds.Add(step.stepId);
             m_CompletionOrder.Add(step);
+            m_Actions.Add(new ActionRecord
+            {
+                id = step.stepId,
+                label = step.title,
+                advice = step.whyItMatters,
+                time = elapsedSeconds,
+                kind = ActionKind.Acerto
+            });
             m_OnStepCompleted.Invoke(step);
 
             var nextStep = FindNextIncompleteStep(steps);
@@ -233,6 +252,11 @@ namespace SafeZoneVR
 
         public void RegisterMistake(string mistakeId, string message, float cooldownSeconds = 10f)
         {
+            RegisterMistake(mistakeId, message, cooldownSeconds, ActionKind.ErroLeve, false, null);
+        }
+
+        public void RegisterMistake(string mistakeId, string message, float cooldownSeconds, ActionKind kind, bool fatal, string advice)
+        {
             if (isComplete)
                 return;
 
@@ -246,8 +270,22 @@ namespace SafeZoneVR
             if (!hasStarted)
                 StartScenario();
 
-            m_Mistakes.Add(message);
+            if (kind == ActionKind.Acerto)
+                kind = ActionKind.ErroLeve;
+
+            m_Actions.Add(new ActionRecord
+            {
+                id = mistakeId,
+                label = message,
+                advice = advice,
+                time = elapsedSeconds,
+                kind = kind,
+                fatal = fatal
+            });
             m_OnMistake.Invoke(message);
+
+            if (fatal)
+                FailScenario(message);
         }
 
         public void AddResultNote(string note)
@@ -269,11 +307,21 @@ namespace SafeZoneVR
                 totalSteps = totalSteps,
                 outOfOrderCount = outOfOrderCount,
                 repeatCount = repeatCount,
-                mistakeCount = mistakeCount
+                success = !failed,
+                failureReason = m_FailureReason
             };
-            r.mistakes.AddRange(m_Mistakes);
+            r.actions.AddRange(m_Actions);
             r.notes.AddRange(m_Notes);
             return r;
+        }
+
+        public void FailScenario(string reason)
+        {
+            if (isComplete || !hasStarted)
+                return;
+            failed = true;
+            m_FailureReason = reason;
+            FinishScenario();
         }
 
         void FinishScenario()

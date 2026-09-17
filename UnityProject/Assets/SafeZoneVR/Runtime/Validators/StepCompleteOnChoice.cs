@@ -22,7 +22,7 @@ namespace SafeZoneVR
             if (m == null) return;
             if (!option.isCorrect)
             {
-                m.RegisterMistake(option.mistakeId, option.feedback, 10f);
+                m.RegisterMistake(option.mistakeId, option.feedback, 10f, ActionKind.ErroLeve, false, option.advice);
                 return;
             }
             if (!string.IsNullOrEmpty(option.feedback)) m.ShowInfo(option.feedback);

@@ -9,16 +9,32 @@ namespace SafeZoneVR
         public int totalSteps;
         public int outOfOrderCount;
         public int repeatCount;
-        public int mistakeCount;
-        public readonly List<string> mistakes = new List<string>();
+        public bool success = true;
+        public string failureReason;
+        public readonly List<ActionRecord> actions = new List<ActionRecord>();
         public readonly List<string> notes = new List<string>();
-        public int stars;
+
         public int score;
+        public int lightMistakes;
+        public int graveMistakes;
+        public bool overTimeLimit;
+        public string classification = "";
+        public string recommendation = "";
+        public int stars;
         public float bestTimeSeconds = -1f;
-        public int bestStars;
+        public int bestScore = -1;
         public bool isNewBest;
 
-        public int penaltyCount => outOfOrderCount + mistakeCount;
+        public int mistakeCount
+        {
+            get
+            {
+                var n = 0;
+                for (var i = 0; i < actions.Count; i++)
+                    if (actions[i].isMistake) n++;
+                return n;
+            }
+        }
 
         public static string FormatTime(float seconds)
         {

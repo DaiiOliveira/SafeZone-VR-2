@@ -10,9 +10,14 @@ namespace SafeZoneVR
         [SerializeField]
         List<XRSocketInteractor> m_Slots = new List<XRSocketInteractor>();
 
+        [SerializeField]
+        [Tooltip("Esconde o item enquanto ele está guardado, como se tivesse entrado na mochila.")]
+        bool m_HideStoredItems = true;
+
         bool m_Started;
 
         public List<XRSocketInteractor> slots => m_Slots;
+        public bool hideStoredItems { get => m_HideStoredItems; set => m_HideStoredItems = value; }
 
         void OnEnable()
         {
@@ -46,7 +51,22 @@ namespace SafeZoneVR
 
         void OnSlotChanged(BaseInteractionEventArgs args)
         {
+            if (m_HideStoredItems)
+            {
+                if (args is SelectEnterEventArgs entered)
+                    SetItemVisible(entered.interactableObject as Component, false);
+                else if (args is SelectExitEventArgs exited)
+                    SetItemVisible(exited.interactableObject as Component, true);
+            }
             Refresh();
+        }
+
+        static void SetItemVisible(Component item, bool visible)
+        {
+            if (item == null)
+                return;
+            foreach (var r in item.GetComponentsInChildren<Renderer>(true))
+                r.enabled = visible;
         }
 
         public void Refresh()

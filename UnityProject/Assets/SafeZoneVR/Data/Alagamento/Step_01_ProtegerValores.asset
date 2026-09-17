@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SafeZoneVR.MissionStepSO
   m_StepId: step_01_valores
   m_OrderIndex: 0
-  m_Title: Proteja documentos e objetos de valor
-  m_InstructionText: "Pegue a pasta de documentos e o porta-retrato que est\xE3o
-    no sof\xE1 e coloque-os em cima do guarda-roupa do quarto de casal."
+  m_Title: Proteja os objetos de valor
+  m_InstructionText: "Pegue o porta-retrato que est\xE1 no sof\xE1 e coloque-o em
+    cima do guarda-roupa do quarto de casal."
   m_LocationHint: "Sala \u2192 Quarto de casal"
-  m_WhyItMatters: "A Defesa Civil orienta guardar documentos e objetos de valor em
-    local alto e protegido, de f\xE1cil acesso para uma evacua\xE7\xE3o."
+  m_WhyItMatters: "A Defesa Civil orienta guardar objetos de valor em local alto
+    e protegido. Os documentos v\xE3o com voc\xEA, dentro do kit."
   m_OrderGroup: 0

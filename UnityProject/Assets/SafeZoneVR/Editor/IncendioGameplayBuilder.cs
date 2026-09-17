@@ -75,19 +75,19 @@ namespace SafeZoneVR.Editor
             var kitchen = UIBuilderUtil.Child(root.transform, "Cozinha");
             var stove = ScenarioSceneKit.PartBounds(ScenarioSceneKit.ModelPart(house, "DC_CASA_Fogao"));
 
-            var panPos = ScenarioSceneKit.OnSurface(k_PanXZ.x, k_PanXZ.y, 1.5f, 0.03f);
+            var panBase = ScenarioSceneKit.OnSurface(k_PanXZ.x, k_PanXZ.y, 1.5f, 0.002f);
             var stoveKnobPos = new Vector3(stove.center.x + 0.2f, stove.max.y - 0.12f, stove.min.z - 0.01f);
-            var pan = UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "Panela", kitchen.transform, panPos, Vector3.zero, new Vector3(0.28f, 0.06f, 0.28f), matPan);
-            UIBuilderUtil.Primitive(PrimitiveType.Cube, "Cabo", pan.transform, panPos + new Vector3(0.22f, 0.02f, 0f), Vector3.zero, new Vector3(0.18f, 0.02f, 0.03f), ScenarioSceneKit.MatFlashlight, false);
-            var panFire = CreateFire(kitchen.transform, "Fogo_Panela", panPos + new Vector3(0f, 0.08f, 0f), FireController.Size.Small, new float[0], false, 20f);
+            var pan = ScenarioSceneKit.CreateModelVisual(kitchen.transform, "Panela", $"{ScenarioSceneKit.k_ItemsFolder}/Panela.fbx", panBase, new Vector3(0f, 180f, 0f));
+            ScenarioSceneKit.AddFittedBox(pan, Vector3.zero);
+            var panFire = CreateFire(kitchen.transform, "Fogo_Panela", panBase + new Vector3(0f, 0.07f, 0f), FireController.Size.Small, new float[0], false, 20f);
 
-            var lidSocket = ScenarioSceneKit.CreateSocket(pan.transform, "Socket_Tampa", panPos + new Vector3(0f, 0.09f, 0f), new List<string> { "tampa_panela" }, 0.16f);
+            var lidSocket = ScenarioSceneKit.CreateSocket(pan.transform, "Socket_Tampa", panBase + new Vector3(0f, 0.105f, 0f), new List<string> { "tampa_panela" }, 0.16f);
             var lidCooldown = lidSocket.gameObject.AddComponent<LidCooldown>();
             lidCooldown.lidSocket = lidSocket;
             lidCooldown.panFire = panFire;
             lidCooldown.coolSeconds = 45f;
 
-            ScenarioSceneKit.CreateItem(kitchen.transform, "Item_Tampa", PrimitiveType.Cylinder, ScenarioSceneKit.OnSurface(k_LidXZ.x, k_LidXZ.y, 2.5f, 0.02f), Vector3.zero, new Vector3(0.30f, 0.012f, 0.30f), matPan,
+            ScenarioSceneKit.CreateModelItem(kitchen.transform, "Item_Tampa", ScenarioSceneKit.OnSurface(k_LidXZ.x, k_LidXZ.y, 2.5f, 0.004f), Vector3.zero,
                 "tampa_panela", "Tampa da panela", data.tampa);
 
             var stoveKnob = ScenarioSceneKit.CreateKnob(kitchen.transform, "Botao_Fogao", stoveKnobPos, Quaternion.Euler(-90f, 0f, 0f), 0.03f, 0.02f,
@@ -98,26 +98,31 @@ namespace SafeZoneVR.Editor
                 UIBuilderUtil.GetOrCreateMaterial("Mat_RegistroGas", new Color(0.95f, 0.75f, 0.1f), false, false, 0.4f),
                 "REGISTRO DO GÁS\n<size=70%>gire para fechar</size>", new Vector3(0f, 0.25f, -0.25f), Vector3.zero, data.gas);
 
-            var jugPos = ScenarioSceneKit.OnSurface(k_JugXZ.x, k_JugXZ.y, 2.0f, 0.11f);
-            var jug = UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "Jarra_Agua", kitchen.transform, jugPos, Vector3.zero, new Vector3(0.12f, 0.11f, 0.12f), ScenarioSceneKit.MatBottle);
+            var jugPos = ScenarioSceneKit.OnSurface(k_JugXZ.x, k_JugXZ.y, 2.0f, 0.002f);
+            var jug = ScenarioSceneKit.CreateModelVisual(kitchen.transform, "Jarra_Agua", $"{ScenarioSceneKit.k_ItemsFolder}/Jarra_Agua.fbx", jugPos, Vector3.zero);
+            ScenarioSceneKit.AddFittedBox(jug, new Vector3(0.05f, 0.05f, 0.05f));
             jug.AddComponent<XRSimpleInteractable>();
             var jugWrong = jug.AddComponent<WrongActionInteractable>();
             jugWrong.mistakeId = "agua_no_oleo";
             jugWrong.message = "Nunca jogue água em óleo quente: a água vira vapor na hora e espalha o óleo em chamas. Abafe com a tampa.";
+            jugWrong.kind = ActionKind.ErroGrave;
+            jugWrong.advice = "Feche o gás e abafe a panela com a tampa ou um pano úmido bem torcido.";
             jug.AddComponent<FlareOnSelect>().fire = panFire;
             UIBuilderUtil.WorldText(kitchen.transform, "Jarra_Label", "Jogar água?", 0.6f, new Color(1f, 0.75f, 0.35f),
-                jugPos + new Vector3(0f, 0.3f, 0f), Vector3.zero, new Vector2(1f, 0.2f)).gameObject.AddComponent<FacePlayer>().yawOnly = true;
+                jugPos + new Vector3(0f, 0.42f, 0f), Vector3.zero, new Vector2(1f, 0.2f)).gameObject.AddComponent<FacePlayer>().yawOnly = true;
 
             var window = CreateWindow(house, kitchen.transform, data.ventilar);
 
             var living = UIBuilderUtil.Child(root.transform, "Sala");
             CreatePowerStrip(living.transform);
             var rackFire = CreateFire(living.transform, "Fogo_Rack", k_RackFire, FireController.Size.Out, new[] { 20f, 25f }, true, 0f);
-            var notebook = ScenarioSceneKit.CreateWrongInteractable(living.transform, "Notebook", ScenarioSceneKit.OnSurface(k_NotebookXZ.x, k_NotebookXZ.y, 1.5f, 0.02f), new Vector3(0.32f, 0.02f, 0.22f), ScenarioSceneKit.MatFlashlight,
-                "salvar_objetos", "Não perca tempo tentando salvar objetos. Sua vida vale mais: saia de casa.", "Salvar o notebook?");
+            var notebook = ScenarioSceneKit.CreateWrongInteractableModel(living.transform, "Notebook", ScenarioSceneKit.OnSurface(k_NotebookXZ.x, k_NotebookXZ.y, 1.5f, 0.002f), new Vector3(0f, 90f, 0f),
+                "salvar_objetos", "Não perca tempo tentando salvar objetos. Sua vida vale mais: saia de casa.", "Salvar o notebook?",
+                ActionKind.ErroLeve, "Deixe os objetos: saia de casa e ligue 193.");
             var tvWrong = CreateTvWrongAction(house, living.transform);
-            var blanket = ScenarioSceneKit.CreateWrongInteractable(living.transform, "Cobertor", ScenarioSceneKit.OnSurface(k_BlanketXZ.x, k_BlanketXZ.y, 1.5f, 0.05f), new Vector3(0.45f, 0.08f, 0.35f), ScenarioSceneKit.MatCloth,
-                "combater_sozinho", "Não tente combater sozinho um incêndio que já cresceu. Saia de casa e ligue 193.", "Abafar o fogo da TV?");
+            var blanket = ScenarioSceneKit.CreateWrongInteractableModel(living.transform, "Cobertor", ScenarioSceneKit.OnSurface(k_BlanketXZ.x, k_BlanketXZ.y, 1.5f, 0.002f), new Vector3(0f, 90f, 0f),
+                "combater_sozinho", "Não tente combater sozinho um incêndio que já cresceu. Saia de casa e ligue 193.", "Abafar o fogo da TV?",
+                ActionKind.ErroGrave, "Só se combate princípio de incêndio. Com o fogo crescido, saia abaixado e ligue 193.");
             blanket.gameObject.SetActive(false);
             var blanketLabel = living.transform.Find("Cobertor_Label");
             if (blanketLabel != null) blanketLabel.SetParent(blanket.transform, true);
@@ -136,7 +141,8 @@ namespace SafeZoneVR.Editor
             var neighbor = CreateNeighbor(outside.transform, data.vizinho, out var neighborInteractable);
 
             var insideZone = ScenarioSceneKit.CreateWrongZone(outside.transform, "Zona_VoltarParaDentro", new Vector3(-5.5f, 1.2f, -5.3f), new Vector3(10.6f, 2.4f, 10.0f),
-                "voltar_para_dentro", "Não volte para dentro de uma casa em chamas. Espere os Bombeiros.");
+                "voltar_para_dentro", "Não volte para dentro de uma casa em chamas. Espere os Bombeiros.",
+                ActionKind.ErroGrave, "Depois de sair, fique no ponto de encontro e espere os Bombeiros. Nada lá dentro vale o risco.");
             insideZone.gameObject.SetActive(false);
 
             var validators = UIBuilderUtil.Child(root.transform, "Validators");
@@ -174,6 +180,12 @@ namespace SafeZoneVR.Editor
             var v8 = UIBuilderUtil.Child(validators.transform, "Validator_08_Vizinho").AddComponent<StepCompleteOnInteractCount>();
             v8.scenarioManager = manager; v8.step = data.vizinho;
             v8.interactables.Add(neighborInteractable); v8.requiredCount = 1;
+
+            var meetingZone = ScenarioSceneKit.CreateTriggerZone(env.transform, "Zona_PontoDeEncontro", k_MeetingSign + new Vector3(0.6f, 1.2f, 0f), new Vector3(3.4f, 2.4f, 2.6f));
+            var v9 = meetingZone.AddComponent<StepCompleteOnTriggerZone>();
+            v9.scenarioManager = manager; v9.step = data.encontro;
+            var meetingTarget = meetingZone.AddComponent<ObjectiveTarget>();
+            meetingTarget.step = data.encontro; meetingTarget.markerHeightOffset = 0.6f;
 
             var phases = UIBuilderUtil.Child(root.transform, "Phases");
             var caption = ScenarioSceneKit.CreatePhaseCaption(camera);
@@ -214,6 +226,7 @@ namespace SafeZoneVR.Editor
                 "SAMU: se alguém estiver passando mal, estamos à disposição. Para o incêndio, ligue 193.",
                 "193");
             UnityEventTools.AddPersistentListener(callPanel.onAcceptedCall, v7.OnButtonPressed);
+            ScenarioSceneKit.CreateLoadingPanel(ui.transform, camera);
             ScenarioSceneKit.CreateIntroPanel(ui.transform, camera, manager, "Incêndio em Casa", k_IntroText);
             ScenarioSceneKit.CreateEndReportPanel(ui.transform, camera, manager);
 
@@ -264,7 +277,7 @@ namespace SafeZoneVR.Editor
             var src = audioGo.AddComponent<AudioSource>();
             src.spatialBlend = 1f; src.minDistance = 0.5f; src.maxDistance = 12f; src.loop = true; src.playOnAwake = false;
             var loop = audioGo.AddComponent<SimpleLoopSound>();
-            loop.source = src; loop.kind = SimpleLoopSound.ClipKind.Crackle;
+            loop.source = src; loop.kind = SimpleLoopSound.ClipKind.Crackle; loop.manageVolume = false;
             fire.crackle = src;
 
             fire.startSize = start;
@@ -334,7 +347,7 @@ namespace SafeZoneVR.Editor
             var target = hinge.gameObject.AddComponent<ObjectiveTarget>();
             target.step = step; target.markerHeightOffset = 0.3f;
 
-            UIBuilderUtil.WorldText(parent, "Janela_Label", "JANELA\n<size=70%>aponte e aperte para abrir</size>", 0.5f, Color.white,
+            UIBuilderUtil.WorldText(parent, "Janela_Label", "JANELA\n<size=70%>puxe ou aponte e aperte para abrir</size>", 0.5f, Color.white,
                 new Vector3(gb.center.x + 0.15f, gb.max.y + 0.2f, gb.center.z), new Vector3(0f, -90f, 0f), new Vector2(0.9f, 0.2f));
             return toggle;
         }
@@ -361,6 +374,7 @@ namespace SafeZoneVR.Editor
             var wrong = go.AddComponent<WrongActionInteractable>();
             wrong.mistakeId = "salvar_objetos";
             wrong.message = "Não perca tempo tentando salvar objetos. Sua vida vale mais: saia de casa.";
+            wrong.advice = "Deixe os objetos: saia de casa e ligue 193.";
             UIBuilderUtil.WorldText(go.transform, "Label", "Tirar a TV?", 0.7f, new Color(1f, 0.75f, 0.35f),
                 pos + new Vector3(0.3f, 0.75f, 0f), Vector3.zero, new Vector2(1.2f, 0.2f)).gameObject.AddComponent<FacePlayer>().yawOnly = true;
             return wrong;
@@ -415,31 +429,24 @@ namespace SafeZoneVR.Editor
                 throw new System.Exception("Porta da frente (DC_CASA_Porta_NichoFundo0) não encontrada na casa.");
             hinge.name = "PortaFrente_Operavel";
             var leaf = hinge.GetChild(0);
-            var leafCollider = leaf.GetComponent<Collider>();
-            if (leafCollider == null)
-                leafCollider = leaf.gameObject.AddComponent<BoxCollider>();
-
-            var doorInteractable = hinge.gameObject.AddComponent<XRSimpleInteractable>();
-            doorInteractable.colliders.Add(leafCollider);
-            var toggle = hinge.gameObject.AddComponent<ToggleOpening>();
-            toggle.hinge = hinge;
-            toggle.axis = Vector3.up;
-            toggle.openAngle = ScenarioSceneKit.SwingAngle(hinge, Vector3.back, 95f);
-            toggle.startsOpen = false;
-
             var lb = ScenarioSceneKit.PartBounds(leaf);
-            var keyPos = new Vector3(lb.min.x + 0.12f, 0.88f, lb.min.z - 0.03f);
-            var key = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Chave", hinge, keyPos, Vector3.zero, new Vector3(0.02f, 0.05f, 0.04f), ScenarioSceneKit.MatMarker);
+            var toggle = ScenarioSceneKit.MakeDoorOperable(hinge, ScenarioSceneKit.SwingAngle(hinge, Vector3.back, 95f), false);
+
+            var keyPos = new Vector3(lb.min.x + 0.1f, 0.68f, lb.min.z);
+            var key = ScenarioSceneKit.CreateModelVisual(hinge, "Chave", $"{ScenarioSceneKit.k_ItemsFolder}/Chave.fbx", keyPos, Vector3.zero);
+            var keyBox = key.AddComponent<BoxCollider>();
+            keyBox.center = new Vector3(0f, 0f, -0.03f);
+            keyBox.size = new Vector3(0.035f, 0.05f, 0.07f);
             key.AddComponent<XRSimpleInteractable>();
             var wrong = key.AddComponent<WrongActionInteractable>();
             wrong.mistakeId = "trancar_porta";
             wrong.message = "Não tranque a porta: os Bombeiros e outras pessoas podem precisar passar.";
+            wrong.advice = "Feche a porta atrás de você, mas sem trancar.";
             UIBuilderUtil.WorldText(key.transform, "Label", "Trancar?", 0.5f, new Color(1f, 0.75f, 0.35f),
-                keyPos + new Vector3(0f, -0.16f, -0.06f), Vector3.zero, new Vector2(0.6f, 0.15f)).gameObject.AddComponent<FacePlayer>().yawOnly = true;
-            key.transform.GetChild(0).localScale = new Vector3(50f, 20f, 25f);
+                keyPos + new Vector3(0f, -0.14f, -0.08f), Vector3.zero, new Vector2(0.6f, 0.15f)).gameObject.AddComponent<FacePlayer>().yawOnly = true;
 
-            UIBuilderUtil.WorldText(labelParent, "PortaFrente_Label", "PORTA DA FRENTE\n<size=70%>aponte e aperte para abrir/fechar</size>", 0.5f, Color.white,
-                new Vector3(lb.center.x, 2.25f, -0.45f), new Vector3(0f, 180f, 0f), new Vector2(1.2f, 0.2f));
+            UIBuilderUtil.WorldText(labelParent, "PortaFrente_Label", "PORTA DA FRENTE\n<size=70%>puxe pela maçaneta ou aponte e aperte</size>", 0.5f, Color.white,
+                new Vector3(lb.center.x, 2.25f, -0.45f), new Vector3(0f, 180f, 0f), new Vector2(1.4f, 0.2f));
             return toggle;
         }
 

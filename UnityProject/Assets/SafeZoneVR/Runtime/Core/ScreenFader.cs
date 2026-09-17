@@ -68,6 +68,15 @@ namespace SafeZoneVR
                 Destroy(m_Instance);
         }
 
+        public bool isBusy => m_Routine != null;
+
+        public void SetOverlay(float alpha)
+        {
+            if (m_Routine != null)
+                return;
+            SetAlpha(alpha);
+        }
+
         public void FadeTo(float alpha)
         {
             if (m_Routine != null)

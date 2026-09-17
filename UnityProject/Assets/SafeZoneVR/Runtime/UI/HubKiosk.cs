@@ -74,7 +74,7 @@ namespace SafeZoneVR
                 m_PlayLabel.text = available ? "Jogar" : "Em breve";
 
             if (m_PlayButton != null)
-                m_PlayButton.interactable = available;
+                m_PlayButton.interactable = available && SafetyNoticePanel.hasAccepted;
 
             if (m_BoardLabel != null)
             {
@@ -95,8 +95,8 @@ namespace SafeZoneVR
                 return "Cenário ainda não disponível";
 
             var steps = m_Scenario.steps != null ? m_Scenario.steps.Count : 0;
-            var best = PerformanceEvaluator.GetBestStars(m_Scenario);
-            var score = best > 0 ? $"Melhor: {best} de 3 estrelas" : "Ainda não jogado";
+            var best = PerformanceEvaluator.GetBestScore(m_Scenario);
+            var score = best >= 0 ? $"Melhor: {best} pontos ({PerformanceEvaluator.Classify(best)})" : "Ainda não jogado";
             return steps > 0 ? $"{score}  ·  {steps} passos" : score;
         }
 
