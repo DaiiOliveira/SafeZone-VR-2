@@ -30,6 +30,7 @@ namespace SafeZoneVR
 
         Collider m_Zone;
         float m_NextCheck;
+        bool m_Armed;
 
         public string mistakeId { get => m_MistakeId; set => m_MistakeId = value; }
         public string message { get => m_Message; set => m_Message = value; }
@@ -43,19 +44,30 @@ namespace SafeZoneVR
             m_Zone.isTrigger = true;
         }
 
+        void OnEnable()
+        {
+            m_Armed = false;
+            m_NextCheck = 0f;
+        }
+
         void Update()
         {
             if (Time.time < m_NextCheck)
                 return;
             m_NextCheck = Time.time + m_CheckInterval;
 
-            if (PlayerLocator.TryGetHeadPosition(out var head) && m_Zone.bounds.Contains(head))
+            if (!PlayerLocator.TryGetHeadPosition(out var head))
+                return;
+
+            if (!m_Zone.bounds.Contains(head))
+                m_Armed = true;
+            else if (m_Armed)
                 Register();
         }
 
         void OnTriggerEnter(Collider other)
         {
-            if (PlayerLocator.IsPlayerCollider(other))
+            if (m_Armed && PlayerLocator.IsPlayerCollider(other))
                 Register();
         }
 

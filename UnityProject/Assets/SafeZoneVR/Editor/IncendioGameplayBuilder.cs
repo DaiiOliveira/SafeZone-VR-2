@@ -140,7 +140,7 @@ namespace SafeZoneVR.Editor
             var outside = UIBuilderUtil.Child(root.transform, "Exterior");
             var neighbor = CreateNeighbor(outside.transform, data.vizinho, out var neighborInteractable);
 
-            var insideZone = ScenarioSceneKit.CreateWrongZone(outside.transform, "Zona_VoltarParaDentro", new Vector3(-5.5f, 1.2f, -5.3f), new Vector3(10.6f, 2.4f, 10.0f),
+            var insideZone = ScenarioSceneKit.CreateWrongZone(outside.transform, "Zona_VoltarParaDentro", new Vector3(-5.5f, 1.2f, -5.55f), new Vector3(10.6f, 2.4f, 9.5f),
                 "voltar_para_dentro", "Não volte para dentro de uma casa em chamas. Espere os Bombeiros.",
                 ActionKind.ErroGrave, "Depois de sair, fique no ponto de encontro e espere os Bombeiros. Nada lá dentro vale o risco.");
             insideZone.gameObject.SetActive(false);
