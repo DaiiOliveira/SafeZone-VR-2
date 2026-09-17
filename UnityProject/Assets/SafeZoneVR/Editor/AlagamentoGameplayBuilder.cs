@@ -234,23 +234,8 @@ namespace SafeZoneVR.Editor
             var group = UIBuilderUtil.Child(parent, "PontoDeEncontro");
             var size = new Vector3(3f, 0.44f, 1.8f);
 
-            var platform = ScenarioSceneKit.CreateModelVisual(group.transform, "Plataforma",
-                $"{ScenarioSceneKit.k_ItemsFolder}/Plataforma.fbx", new Vector3(k_MeetingPoint.x, k_MeetingPoint.y - size.y * 0.5f, k_MeetingPoint.z), Vector3.zero);
-
-            foreach (var mf in platform.GetComponentsInChildren<MeshFilter>(true))
-            {
-                if (mf.sharedMesh == null) continue;
-                var mc = mf.gameObject.AddComponent<MeshCollider>();
-                mc.sharedMesh = mf.sharedMesh;
-                if (mf.name != "Placa" && mf.name != "Poste")
-                    ScenarioSceneKit.AddTeleportArea(mf.gameObject);
-                UIBuilderUtil.MarkStatic(mf.gameObject);
-            }
-
-            var board = ScenarioSceneKit.ModelPart(platform, "Placa");
-            var boardBounds = ScenarioSceneKit.PartBounds(board);
-            UIBuilderUtil.WorldText(board, "Texto", "PONTO DE ENCONTRO\n<size=60%>local alto e seguro</size>", 1.6f, Color.white,
-                new Vector3(boardBounds.center.x, boardBounds.center.y, boardBounds.min.z - 0.02f), Vector3.zero, new Vector2(1.05f, 0.5f));
+            ScenarioSceneKit.CreateMeetingPlatform(group.transform,
+                new Vector3(k_MeetingPoint.x, k_MeetingPoint.y - size.y * 0.5f, k_MeetingPoint.z));
 
             var zone = UIBuilderUtil.Child(group.transform, "EvacuationZone");
             zone.transform.position = k_MeetingPoint + new Vector3(0f, 1.2f, 0f);

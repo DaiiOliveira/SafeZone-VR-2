@@ -457,11 +457,8 @@ namespace SafeZoneVR.Editor
         static void CreateMeetingSign(Transform parent)
         {
             var group = UIBuilderUtil.Child(parent, "PontoDeEncontro");
-            UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "Poste", group.transform, k_MeetingSign + new Vector3(0f, 0.9f, 0f), Vector3.zero, new Vector3(0.06f, 0.9f, 0.06f), ScenarioSceneKit.MatFlashlight);
-            var board = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Placa", group.transform, k_MeetingSign + new Vector3(0f, 1.95f, 0f), Vector3.zero, new Vector3(1.1f, 0.5f, 0.04f), ScenarioSceneKit.MatSign);
-            UIBuilderUtil.WorldText(board.transform, "Texto", "PONTO DE ENCONTRO\n<size=60%>espere os Bombeiros aqui</size>", 1.6f, Color.white,
-                k_MeetingSign + new Vector3(0f, 1.95f, -0.03f), Vector3.zero, new Vector2(1.05f, 0.5f));
-            UIBuilderUtil.MarkStatic(group);
+            var center = k_MeetingSign + new Vector3(0.6f, 0f, 0f);
+            ScenarioSceneKit.CreateMeetingPlatform(group.transform, ScenarioSceneKit.OnSurface(center.x, center.z, 2f, 0.01f));
         }
 
         static GameObject CreateFireTruck(Transform parent)
@@ -511,7 +508,7 @@ namespace SafeZoneVR.Editor
         {
             var routes = UIBuilderUtil.Child(parent, "Rotas_Vizinho");
             var toGate = ScenarioSceneKit.CreateWaypoints(routes.transform, "AoPortao", new Vector3(10f, 0f, 6.3f), new Vector3(-4.9f, 0f, 6.3f));
-            var toMeeting = ScenarioSceneKit.CreateWaypoints(routes.transform, "AoEncontro", new Vector3(-7.0f, 0f, 6.4f), new Vector3(-8.3f, 0f, 6.4f));
+            var toMeeting = ScenarioSceneKit.CreateWaypoints(routes.transform, "AoEncontro", new Vector3(-7.0f, 0f, 6.4f), new Vector3(-7.6f, 0f, 6.9f));
 
             interactable = ScenarioSceneKit.CreateNpc(parent, "Vizinho", new Vector3(10f, 0f, 6.3f), -90f, new Color(0.55f, 0.3f, 0.2f), false, "", out var speech);
             var npc = interactable.gameObject;

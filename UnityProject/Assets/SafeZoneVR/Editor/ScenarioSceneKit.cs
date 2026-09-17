@@ -872,6 +872,21 @@ namespace SafeZoneVR.Editor
             return knob;
         }
 
+        public static GameObject CreateMeetingPlatform(Transform parent, Vector3 basePos)
+        {
+            var platform = CreateModelVisual(parent, "Plataforma", $"{k_ItemsFolder}/Plataforma.fbx", basePos, Vector3.zero);
+            foreach (var mf in platform.GetComponentsInChildren<MeshFilter>(true))
+            {
+                if (mf.sharedMesh == null) continue;
+                var mc = mf.gameObject.AddComponent<MeshCollider>();
+                mc.sharedMesh = mf.sharedMesh;
+                if (mf.name != "Placa" && mf.name != "Poste")
+                    AddTeleportArea(mf.gameObject);
+                UIBuilderUtil.MarkStatic(mf.gameObject);
+            }
+            return platform;
+        }
+
         public static XRKnob ModelKnob(GameObject root, Transform wheel, float colliderRadius,
             string label, Vector3 labelOffset, Vector3 labelEuler, MissionStepSO step)
         {
