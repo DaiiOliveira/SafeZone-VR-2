@@ -28,6 +28,7 @@ namespace SafeZoneVR.Editor
         static readonly Vector3 k_FrontYardSize = new Vector3(3.0f, 2.4f, 3.6f);
         static readonly Vector3 k_MeetingSign = new Vector3(-9.0f, 0f, 6.3f);
         static readonly Vector3 k_Truck = new Vector3(-13.0f, -0.06f, 9.7f);
+        const float k_TruckApproach = -26f;
 
         const string k_IntroText =
             "Fim de tarde. Você esquentou óleo para fritar e foi até a sala por um instante. Ao voltar, a panela <b>pegou fogo</b>. " +
@@ -69,7 +70,6 @@ namespace SafeZoneVR.Editor
             var truck = CreateFireTruck(env.transform);
             var siren = CreateSiren(env.transform);
 
-            var matGas = UIBuilderUtil.GetOrCreateMaterial("Mat_Botijao", new Color(0.93f, 0.93f, 0.9f), false, false, 0.5f);
             var matPan = ScenarioSceneKit.MatMetal;
 
             var kitchen = UIBuilderUtil.Child(root.transform, "Cozinha");
@@ -93,10 +93,13 @@ namespace SafeZoneVR.Editor
             var stoveKnob = ScenarioSceneKit.CreateKnob(kitchen.transform, "Botao_Fogao", stoveKnobPos, Quaternion.Euler(-90f, 0f, 0f), 0.03f, 0.02f,
                 ScenarioSceneKit.MatFlashlight, "BOTÃO DO FOGÃO\n<size=70%>gire para desligar</size>", new Vector3(0f, 0.2f, -0.05f), Vector3.zero, data.gas);
 
-            UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "Botijao", kitchen.transform, k_GasCylinder, Vector3.zero, new Vector3(0.30f, 0.27f, 0.30f), matGas);
-            var gasKnob = ScenarioSceneKit.CreateKnob(kitchen.transform, "Registro_Botijao", k_GasCylinder + new Vector3(0f, 0.32f, 0f), Quaternion.identity, 0.05f, 0.02f,
-                UIBuilderUtil.GetOrCreateMaterial("Mat_RegistroGas", new Color(0.95f, 0.75f, 0.1f), false, false, 0.4f),
-                "REGISTRO DO GÁS\n<size=70%>gire para fechar</size>", new Vector3(0f, 0.25f, -0.25f), Vector3.zero, data.gas);
+            var botijao = ScenarioSceneKit.CreateModelVisual(kitchen.transform, "Botijao",
+                $"{ScenarioSceneKit.k_ItemsFolder}/Botijao.fbx",
+                ScenarioSceneKit.OnSurface(k_GasCylinder.x, k_GasCylinder.z, 1.5f, 0.002f), Vector3.zero);
+            ScenarioSceneKit.AddFittedBox(botijao, new Vector3(0.3f, 0.3f, 0.3f));
+            var gasWheel = ScenarioSceneKit.ModelPart(botijao, "Registro_Botijao");
+            var gasKnob = ScenarioSceneKit.ModelKnob(botijao, gasWheel, 0.07f,
+                "REGISTRO DO GÁS\n<size=70%>gire para fechar</size>", new Vector3(0f, 0.22f, -0.25f), Vector3.zero, data.gas);
 
             var jugPos = ScenarioSceneKit.OnSurface(k_JugXZ.x, k_JugXZ.y, 2.0f, 0.002f);
             var jug = ScenarioSceneKit.CreateModelVisual(kitchen.transform, "Jarra_Agua", $"{ScenarioSceneKit.k_ItemsFolder}/Jarra_Agua.fbx", jugPos, Vector3.zero);
@@ -212,7 +215,7 @@ namespace SafeZoneVR.Editor
 
             AddActivate(phases.transform, "Ativar_ZonaVoltar", data.sair, insideZone.gameObject);
             AddActivate(phases.transform, "Ativar_Vizinho", data.ligar, neighbor, siren);
-            AddActivate(phases.transform, "Ativar_Caminhao", data.vizinho, truck);
+            AddActivate(phases.transform, "Ativar_Caminhao", data.vizinho, truck).deactivate.Add(siren);
 
             UnityEventTools.AddFloatPersistentListener(lidCooldown.onCovered, detector.StopAfter, 20f);
 
@@ -236,12 +239,13 @@ namespace SafeZoneVR.Editor
             Debug.Log("[SafeZone VR] Gameplay do Incêndio montado e cena salva.");
         }
 
-        static void AddActivate(Transform parent, string name, MissionStepSO step, params GameObject[] activate)
+        static ActivateOnStepCompleted AddActivate(Transform parent, string name, MissionStepSO step, params GameObject[] activate)
         {
             var a = UIBuilderUtil.Child(parent, name).AddComponent<ActivateOnStepCompleted>();
             a.step = step;
             a.activate.AddRange(activate);
             foreach (var go in activate) if (go != null) go.SetActive(false);
+            return a;
         }
 
         public static FireController CreateFire(Transform parent, string name, Vector3 pos, FireController.Size start, float[] growSteps, bool sparks, float residualSmoke)
@@ -462,16 +466,31 @@ namespace SafeZoneVR.Editor
 
         static GameObject CreateFireTruck(Transform parent)
         {
-            var truck = UIBuilderUtil.Child(parent, "Caminhao_Bombeiros");
-            var red = UIBuilderUtil.GetOrCreateMaterial("Mat_Caminhao", new Color(0.8f, 0.1f, 0.08f), false, false, 0.5f);
-            UIBuilderUtil.Primitive(PrimitiveType.Cube, "Carroceria", truck.transform, k_Truck + new Vector3(-1.2f, 1.2f, 0f), Vector3.zero, new Vector3(4.5f, 2.2f, 2.2f), red);
-            UIBuilderUtil.Primitive(PrimitiveType.Cube, "Cabine", truck.transform, k_Truck + new Vector3(2.0f, 1.0f, 0f), Vector3.zero, new Vector3(1.8f, 1.8f, 2.2f), red);
-            UIBuilderUtil.Primitive(PrimitiveType.Cube, "Vidro", truck.transform, k_Truck + new Vector3(2.95f, 1.3f, 0f), Vector3.zero, new Vector3(0.1f, 0.8f, 2.0f), ScenarioSceneKit.MatGlass, false);
-            UIBuilderUtil.Primitive(PrimitiveType.Cube, "Giroflex", truck.transform, k_Truck + new Vector3(2.0f, 2.0f, 0f), Vector3.zero, new Vector3(0.6f, 0.2f, 0.3f), ScenarioSceneKit.MatMarker, false);
-            for (var i = 0; i < 4; i++)
-                UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "Roda" + i, truck.transform, k_Truck + new Vector3(i < 2 ? -2.2f : 2.0f, 0.45f, i % 2 == 0 ? -1.1f : 1.1f), new Vector3(90f, 0f, 0f),
-                    new Vector3(0.9f, 0.15f, 0.9f), ScenarioSceneKit.MatFlashlight, false);
-            UIBuilderUtil.WorldText(truck.transform, "Texto", "BOMBEIROS 193", 1.2f, Color.white, k_Truck + new Vector3(-1.2f, 1.3f, -1.12f), Vector3.zero, new Vector2(3f, 0.5f));
+            var truck = ScenarioSceneKit.CreateModelVisual(parent, "Caminhao_Bombeiros",
+                $"{ScenarioSceneKit.k_ItemsFolder}/Caminhao_Bombeiros.fbx",
+                ScenarioSceneKit.OnSurface(k_Truck.x, k_Truck.z, 2.5f, 0.01f), new Vector3(0f, 90f, 0f));
+
+            foreach (var mf in truck.GetComponentsInChildren<MeshFilter>(true))
+            {
+                if (mf.sharedMesh == null || mf.name.StartsWith("Vidro")) continue;
+                var mc = mf.gameObject.AddComponent<MeshCollider>();
+                mc.sharedMesh = mf.sharedMesh;
+            }
+
+            var arrival = UIBuilderUtil.Child(parent, "Caminhao_Chegada");
+            arrival.transform.SetPositionAndRotation(truck.transform.position, truck.transform.rotation);
+            truck.transform.position += new Vector3(k_TruckApproach, 0f, 0f);
+
+            var mover = truck.AddComponent<SimpleMover>();
+            mover.target = arrival.transform;
+            mover.seconds = 9f;
+            mover.moveOnEnable = true;
+
+            var src = truck.AddComponent<AudioSource>();
+            src.spatialBlend = 1f; src.minDistance = 6f; src.maxDistance = 80f; src.volume = 0.5f;
+            var loop = truck.AddComponent<SimpleLoopSound>();
+            loop.source = src; loop.kind = SimpleLoopSound.ClipKind.DistantSiren; loop.playOnStart = true;
+
             truck.SetActive(false);
             return truck;
         }

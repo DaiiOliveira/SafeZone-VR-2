@@ -234,18 +234,23 @@ namespace SafeZoneVR.Editor
             var group = UIBuilderUtil.Child(parent, "PontoDeEncontro");
             var size = new Vector3(3f, 0.44f, 1.8f);
 
-            var platform = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Plataforma", group.transform, k_MeetingPoint, Vector3.zero, size, ScenarioSceneKit.MatPlatform);
-            ScenarioSceneKit.AddTeleportArea(platform);
-            UIBuilderUtil.MarkStatic(platform);
+            var platform = ScenarioSceneKit.CreateModelVisual(group.transform, "Plataforma",
+                $"{ScenarioSceneKit.k_ItemsFolder}/Plataforma.fbx", new Vector3(k_MeetingPoint.x, k_MeetingPoint.y - size.y * 0.5f, k_MeetingPoint.z), Vector3.zero);
 
-            var signPos = new Vector3(k_MeetingPoint.x - 1.8f, 0f, k_MeetingPoint.z);
-            UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "Poste", group.transform, signPos + new Vector3(0f, 0.9f, 0f), Vector3.zero,
-                new Vector3(0.06f, 0.9f, 0.06f), ScenarioSceneKit.MatFlashlight);
-            var board = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Placa", group.transform, signPos + new Vector3(0f, 1.95f, 0f), Vector3.zero,
-                new Vector3(1.1f, 0.55f, 0.04f), ScenarioSceneKit.MatSign);
+            foreach (var mf in platform.GetComponentsInChildren<MeshFilter>(true))
+            {
+                if (mf.sharedMesh == null) continue;
+                var mc = mf.gameObject.AddComponent<MeshCollider>();
+                mc.sharedMesh = mf.sharedMesh;
+                if (mf.name != "Placa" && mf.name != "Poste")
+                    ScenarioSceneKit.AddTeleportArea(mf.gameObject);
+                UIBuilderUtil.MarkStatic(mf.gameObject);
+            }
 
-            UIBuilderUtil.WorldText(board.transform, "Texto", "PONTO DE ENCONTRO\n<size=60%>local alto e seguro</size>", 1.6f, Color.white,
-                signPos + new Vector3(0f, 1.95f, -0.03f), Vector3.zero, new Vector2(1.05f, 0.5f));
+            var board = ScenarioSceneKit.ModelPart(platform, "Placa");
+            var boardBounds = ScenarioSceneKit.PartBounds(board);
+            UIBuilderUtil.WorldText(board, "Texto", "PONTO DE ENCONTRO\n<size=60%>local alto e seguro</size>", 1.6f, Color.white,
+                new Vector3(boardBounds.center.x, boardBounds.center.y, boardBounds.min.z - 0.02f), Vector3.zero, new Vector2(1.05f, 0.5f));
 
             var zone = UIBuilderUtil.Child(group.transform, "EvacuationZone");
             zone.transform.position = k_MeetingPoint + new Vector3(0f, 1.2f, 0f);
@@ -273,27 +278,12 @@ namespace SafeZoneVR.Editor
 
         static XRKnob SetupValve(Transform parent, MissionStepSO step)
         {
-            var knobGo = UIBuilderUtil.Child(parent, "Registro_Knob");
+            var knobGo = ScenarioSceneKit.CreateModelVisual(parent, "Registro_Knob",
+                $"{ScenarioSceneKit.k_ItemsFolder}/Registro_Knob.fbx", k_ValveCenter, new Vector3(0f, 0f, -90f));
+            var wheel = ScenarioSceneKit.ModelPart(knobGo, "Volante");
+            knobGo.transform.position += k_ValveCenter - wheel.position;
 
-            knobGo.transform.SetPositionAndRotation(k_ValveCenter, Quaternion.Euler(0f, 0f, -90f));
-            var handle = UIBuilderUtil.Child(knobGo.transform, "Handle");
-            handle.transform.localPosition = Vector3.zero;
-            handle.transform.localRotation = Quaternion.identity;
-
-            UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "Cano", knobGo.transform, k_ValveCenter + new Vector3(-0.03f, 0f, 0f), new Vector3(0f, 0f, 90f),
-                new Vector3(0.05f, 0.05f, 0.05f), ScenarioSceneKit.MatMetal, false);
-            UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "Volante", handle.transform, k_ValveCenter, new Vector3(0f, 0f, 90f),
-                new Vector3(0.2f, 0.02f, 0.2f), ScenarioSceneKit.MatLever);
-
-            var sphere = handle.AddComponent<SphereCollider>();
-            sphere.radius = 0.14f;
-
-            var knob = knobGo.AddComponent<XRKnob>();
-            knob.handle = handle.transform;
-            knob.clampedMotion = true;
-            knob.minAngle = -180f;
-            knob.maxAngle = 180f;
-            knob.value = 0.5f;
+            var knob = ScenarioSceneKit.ModelKnob(knobGo, wheel, 0.14f, null, Vector3.zero, Vector3.zero, null);
 
             UIBuilderUtil.WorldText(knobGo.transform, "Label", "REGISTRO DE ÁGUA\n<size=70%>gire para fechar</size>", 0.6f, Color.white,
                 k_ValveCenter + new Vector3(0.05f, 0.42f, 0f), new Vector3(0f, -90f, 0f), new Vector2(0.7f, 0.2f));

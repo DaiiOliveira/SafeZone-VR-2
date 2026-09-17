@@ -7,9 +7,16 @@ namespace SafeZoneVR
     {
         [SerializeField] Transform m_Target;
         [SerializeField] float m_Seconds = 6f;
+        [SerializeField] bool m_MoveOnEnable;
 
         public Transform target { get => m_Target; set => m_Target = value; }
         public float seconds { get => m_Seconds; set => m_Seconds = value; }
+        public bool moveOnEnable { get => m_MoveOnEnable; set => m_MoveOnEnable = value; }
+
+        void OnEnable()
+        {
+            if (m_MoveOnEnable) MoveToTarget();
+        }
 
         public void MoveToTarget() => StartCoroutine(Move());
 

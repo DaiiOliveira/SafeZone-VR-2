@@ -349,6 +349,138 @@
         "DC_M_Itens_Atlas"
       ],
       "fbx": "Cobertor.fbx"
+    },
+    {
+      "objeto": "Botijao",
+      "medida_unity_m": [
+        0.304,
+        0.593,
+        0.315
+      ],
+      "alvo_unity_m": [
+        0.3,
+        0.54,
+        0.3
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "o regulador e a mangueira passam da altura de 0,54 (a tabela mede so o corpo)",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.0,
+      "triangulos": 1552,
+      "arestas_abertas": 0,
+      "filhos": [
+        "Registro_Botijao"
+      ],
+      "materiais": [
+        "DC_M_Itens_Atlas"
+      ],
+      "fbx": "Botijao.fbx"
+    },
+    {
+      "objeto": "Registro_Knob",
+      "medida_unity_m": [
+        0.156,
+        0.432,
+        0.1748
+      ],
+      "alvo_unity_m": [
+        0.16,
+        0.46,
+        0.16
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "a tabela da so o O 0,16 do volante; o cano sobe ate 0,42",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.0,
+      "triangulos": 932,
+      "arestas_abertas": 0,
+      "filhos": [
+        "Cano",
+        "Volante"
+      ],
+      "materiais": [
+        "DC_M_Itens_Atlas"
+      ],
+      "fbx": "Registro_Knob.fbx"
+    },
+    {
+      "objeto": "Caminhao_Bombeiros",
+      "medida_unity_m": [
+        2.76,
+        2.725,
+        7.64
+      ],
+      "alvo_unity_m": [
+        2.5,
+        2.85,
+        7.7
+      ],
+      "fora_da_tolerancia": [
+        "X 2.760 (alvo 2.50)"
+      ],
+      "excecao": "medida definida aqui (a tabela nao da): caminhao urbano de combate a incendio",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.0,
+      "triangulos": 3276,
+      "arestas_abertas": 0,
+      "filhos": [
+        "Cabine",
+        "Carroceria",
+        "Giroflex",
+        "Roda0",
+        "Roda1",
+        "Roda2",
+        "Roda3",
+        "Vidro"
+      ],
+      "materiais": [
+        "DC_M_Itens_Atlas",
+        "DC_M_Itens_Translucido"
+      ],
+      "fbx": "Caminhao_Bombeiros.fbx"
+    },
+    {
+      "objeto": "Plataforma",
+      "medida_unity_m": [
+        2.64,
+        2.47,
+        2.64
+      ],
+      "alvo_unity_m": [
+        2.7,
+        2.6,
+        2.7
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "medida definida aqui (a tabela nao da): a altura e do conjunto com poste e placa",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.0,
+      "triangulos": 496,
+      "arestas_abertas": 0,
+      "filhos": [
+        "Placa",
+        "Poste"
+      ],
+      "materiais": [
+        "DC_M_Itens_Atlas"
+      ],
+      "fbx": "Plataforma.fbx"
     }
   ]
 }

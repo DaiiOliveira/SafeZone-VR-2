@@ -872,6 +872,41 @@ namespace SafeZoneVR.Editor
             return knob;
         }
 
+        public static XRKnob ModelKnob(GameObject root, Transform wheel, float colliderRadius,
+            string label, Vector3 labelOffset, Vector3 labelEuler, MissionStepSO step)
+        {
+            var instance = PrefabUtility.GetOutermostPrefabInstanceRoot(wheel.gameObject);
+            if (instance != null)
+                PrefabUtility.UnpackPrefabInstance(instance, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
+
+            var handle = UIBuilderUtil.Child(root.transform, "Handle");
+            handle.transform.position = wheel.position;
+            handle.transform.rotation = root.transform.rotation;
+            wheel.SetParent(handle.transform, true);
+
+            var sphere = handle.AddComponent<SphereCollider>();
+            sphere.radius = colliderRadius;
+
+            var knob = root.AddComponent<XRKnob>();
+            knob.handle = handle.transform;
+            knob.clampedMotion = true;
+            knob.minAngle = -180f;
+            knob.maxAngle = 180f;
+            knob.value = 0.5f;
+
+            if (!string.IsNullOrEmpty(label))
+                UIBuilderUtil.WorldText(root.transform, "Label", label, 0.5f, Color.white,
+                    wheel.position + labelOffset, labelEuler, new Vector2(0.7f, 0.2f));
+
+            if (step != null)
+            {
+                var target = root.AddComponent<ObjectiveTarget>();
+                target.step = step;
+                target.markerHeightOffset = 0.2f;
+            }
+            return knob;
+        }
+
         public static GameObject CreateItem(Transform parent, string name, PrimitiveType type, Vector3 pos, Vector3 euler, Vector3 scale, Material mat,
             string itemId, string displayName, MissionStepSO step)
         {

@@ -52,7 +52,25 @@ o builder deve pôr o modelo na altura da superfície em vez de `+ meia altura`.
 | `Notebook` | 0,34 × 0,02 × 0,24 | 384 | fechado, dobradiça em −Z, portas no lado −X |
 | `Cobertor` | 0,42 × 0,18 × 0,31 | 872 | quatro dobras em xadrez |
 
-Todos abaixo do orçamento de item de mão (1,5k tris). Nenhum FBX tem collider.
+### P2/P3 — cenário e objetos que o jogador aciona
+
+| Objeto | Medida | Tris | Notas |
+|---|---|---:|---|
+| `Botijao` | 0,30 × 0,59 × 0,32 | 1552 | P13 com alça, válvula, regulador e mangueira saindo para **−Z** (frente) |
+| └ `Registro_Botijao` | filho | — | manopla vermelha; **pivô no eixo do regulador** (y ≈ 0,56 do pivô do botijão), gira em torno do eixo vertical |
+| `Registro_Knob` | 0,16 × 0,43 × 0,18 | 932 | registro geral de água |
+| ├ `Cano` | filho | — | prumada até a válvula e o trecho que entra na parede (+Z) |
+| └ `Volante` | filho | — | roda Ø 0,14; **pivô no eixo**, gira em torno do eixo vertical |
+| `Caminhao_Bombeiros` | 2,76 × 2,73 × 7,64 | 3276 | frente para **−Z**; raiz = chassi e para-choques |
+| ├ `Cabine` / `Vidro` / `Giroflex` | filhos | — | vidro no material translúcido; giroflex com 6 lentes |
+| ├ `Carroceria` | filho | — | armários, corrimão, carretel e a faixa "CORPO DE BOMBEIROS 193" |
+| └ `Roda0..3` | filhos | — | pivô no centro de cada roda (dianteiras 0/1, traseiras 2/3) — dá para girar |
+| `Plataforma` | 2,64 × 2,47 × 2,64 | 496 | ponto de encontro: laje com faixa amarela |
+| ├ `Poste` | filho | — | tubo Ø 0,10, base na laje |
+| └ `Placa` | filho | — | 1,00 × 0,75, face verde para **−Z**; o canvas do jogo entra por cima dela |
+
+Todos os itens de mão estão abaixo do orçamento (1,5k tris); o caminhão (3,3k)
+está dentro do orçamento de construção (8k). Nenhum FBX tem collider.
 
 ## Fora da caixa de propósito
 
@@ -63,7 +81,13 @@ Todos abaixo do orçamento de item de mão (1,5k tris). Nenhum FBX tem collider.
 
 `Panela` (+ o filho `Cabo`, que some), `Item_Tampa`, `Jarra_Agua`,
 `Item_Documentos`, `Item_PortaRetrato`, `Item_Remedios`, `Item_Lanterna`,
-`Item_Agua`, `Mochila_Kit` + `Abertura`, `Chave`, `Notebook`, `Cobertor`.
+`Item_Agua`, `Mochila_Kit` + `Abertura`, `Chave`, `Notebook`, `Cobertor`,
+`Botijao` + `Registro_Botijao`, `Registro_Knob` (`Volante` + `Cano`),
+`Caminhao_Bombeiros` (`Carroceria`, `Cabine`, `Vidro`, `Giroflex`, `Roda0..3`)
+e `Plataforma` + `Poste` + `Placa`.
+
+O nome do caminhão segue o placeholder do builder: **`Caminhao_Bombeiros`**, no
+plural.
 
 Com a `Panela` nova, `DC_CASA_PanelaChaleira` pode continuar escondida
 (`IncendioGameplayBuilder.cs:61`): as duas ocupariam o fogão.
