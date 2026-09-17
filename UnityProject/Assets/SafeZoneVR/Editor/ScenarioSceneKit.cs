@@ -981,9 +981,9 @@ namespace SafeZoneVR.Editor
                 var chevron = UIBuilderUtil.Child(parent, "Seta_" + (i + 1));
                 chevron.transform.SetPositionAndRotation(points[i], Quaternion.Euler(0f, yaw, 0f));
                 var l = UIBuilderUtil.Primitive(PrimitiveType.Cube, "L", chevron.transform, Vector3.zero, Vector3.zero, new Vector3(0.06f, 0.01f, 0.36f), MatChevron, false);
-                l.transform.localPosition = new Vector3(-0.12f, 0f, -0.1f); l.transform.localRotation = Quaternion.Euler(0f, -45f, 0f);
+                l.transform.localPosition = new Vector3(-0.12f, 0f, 0.1f); l.transform.localRotation = Quaternion.Euler(0f, 45f, 0f);
                 var r = UIBuilderUtil.Primitive(PrimitiveType.Cube, "R", chevron.transform, Vector3.zero, Vector3.zero, new Vector3(0.06f, 0.01f, 0.36f), MatChevron, false);
-                r.transform.localPosition = new Vector3(0.12f, 0f, -0.1f); r.transform.localRotation = Quaternion.Euler(0f, 45f, 0f);
+                r.transform.localPosition = new Vector3(0.12f, 0f, 0.1f); r.transform.localRotation = Quaternion.Euler(0f, -45f, 0f);
             }
             parent.gameObject.SetActive(false);
         }

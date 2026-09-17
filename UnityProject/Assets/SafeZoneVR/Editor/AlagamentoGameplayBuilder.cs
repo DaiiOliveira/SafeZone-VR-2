@@ -18,7 +18,7 @@ namespace SafeZoneVR.Editor
 
         static readonly Vector3 k_PlayerStart = new Vector3(-2.6f, 0f, -2.4f);
         static readonly Quaternion k_PlayerRot = Quaternion.Euler(0f, 90f, 0f);
-        static readonly Vector2 k_SofaDocs = new Vector2(-0.80f, -1.60f);
+        static readonly Vector2 k_SofaDocs = new Vector2(-0.98f, -1.30f);
         static readonly Vector2 k_SofaPhoto = new Vector2(-0.80f, -2.40f);
         static readonly Vector2 k_KitchenWater = new Vector2(-10.40f, -3.05f);
         static readonly Vector2 k_BathroomMeds = new Vector2(-10.55f, -6.95f);
