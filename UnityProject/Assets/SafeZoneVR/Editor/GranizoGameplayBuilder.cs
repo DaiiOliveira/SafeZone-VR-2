@@ -20,7 +20,7 @@ namespace SafeZoneVR.Editor
         static readonly Vector3 k_UbsSize = new Vector3(8f, 3f, 8.4f);
         const float k_UbsDoorZ = 16f;
         const float k_UbsFloorY = 0.15f;
-        static readonly Vector3 k_BusStop = new Vector3(-12f, 0f, 6.3f);
+        static readonly Vector3 k_BusStop = new Vector3(-10f, 0f, 6.3f);
         static readonly Vector3 k_Shack = new Vector3(-22.4f, 0.12f, 20f);
         const float k_StreetLaneZ = 10.9f;
         static readonly Vector3 k_CarStart = new Vector3(-36f, -0.06f, k_StreetLaneZ);
@@ -449,7 +449,7 @@ namespace SafeZoneVR.Editor
             Block("CoberturaPonto", new Vector3(bus.center.x, bus.max.y - 0.5f, bus.center.z), new Vector3(bus.size.x, 1f, bus.size.z));
             Block("TelhadoBarraca", shackRoof.transform.position + new Vector3(0f, -0.4f, 0f), new Vector3(3.2f, 1.2f, 3.2f));
 
-            Block("TelhadoCasa", new Vector3(-5.5f, 3.3f, -5.3f), new Vector3(12.5f, 1.6f, 12.1f));
+            Block("TelhadoCasa", new Vector3(-5.5f, 3.6f, -5.3f), new Vector3(12.5f, 1.6f, 12.1f));
             Block("CoberturaGaragem", new Vector3(1.73f, 2.2f, -2.58f), new Vector3(3.7f, 0.6f, 5.3f));
         }
 
@@ -590,16 +590,23 @@ namespace SafeZoneVR.Editor
 
         static InspectableSign CreateDamagedCeiling(Transform parent, MissionStepSO step, out XRSimpleInteractable interactable)
         {
-            var g = UIBuilderUtil.Child(parent, "ForroCedendo");
-            var forroMat = UIBuilderUtil.GetOrCreateMaterial("Mat_ForroDanificado", new Color(0.72f, 0.66f, 0.55f), false, false, 0.05f);
+            var g = ScenarioSceneKit.CreateModelVisual(parent, "ForroCedendo",
+                $"{ScenarioSceneKit.k_ItemsFolder}/Forro.fbx", k_Ceiling, Vector3.zero);
 
-            var sag = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Barriga", g.transform, k_Ceiling + new Vector3(0f, -0.08f, 0f), new Vector3(4f, 0f, 3f), new Vector3(1.8f, 0.05f, 1.3f), forroMat);
-            UIBuilderUtil.Primitive(PrimitiveType.Cube, "Trinca", sag.transform, k_Ceiling + new Vector3(0.2f, -0.115f, 0.1f), new Vector3(0f, 25f, 0f), new Vector3(0.9f, 0.005f, 0.02f), ScenarioSceneKit.MatFlashlight, false);
+            var sag = ScenarioSceneKit.ModelPart(g, "Barriga").gameObject;
+            var sagLocal = sag.GetComponent<MeshFilter>().sharedMesh.bounds;
+            var sagBox = sag.AddComponent<BoxCollider>();
+            sagBox.center = sagLocal.center;
+            sagBox.size = sagLocal.size;
+
+            var sagCenter = sag.transform.TransformPoint(sagLocal.center);
+            var sagBottom = sagCenter.y - sagLocal.extents.y;
+
             interactable = sag.AddComponent<XRSimpleInteractable>();
             var sign = sag.AddComponent<InspectableSign>();
             sign.explanation = "Forro cedendo e goteira: o telhado pode estar comprometido. Saia do quarto.";
             sign.highlight = sag.GetComponent<Renderer>();
-            var label = UIBuilderUtil.WorldText(g.transform, "Etiqueta", "", 0.6f, new Color(1f, 0.8f, 0.4f), k_Ceiling + new Vector3(0f, -0.5f, 0f), Vector3.zero, new Vector2(1.8f, 0.5f));
+            var label = UIBuilderUtil.WorldText(g.transform, "Etiqueta", "", 0.6f, new Color(1f, 0.8f, 0.4f), new Vector3(sagCenter.x, sagBottom - 0.32f, sagCenter.z), Vector3.zero, new Vector2(1.8f, 0.5f));
             label.gameObject.AddComponent<FacePlayer>().yawOnly = true;
             label.gameObject.SetActive(false);
             sign.label = label;
@@ -607,7 +614,7 @@ namespace SafeZoneVR.Editor
             target.step = step; target.markerHeightOffset = -0.6f;
 
             var dripGo = UIBuilderUtil.Child(g.transform, "Goteira");
-            dripGo.transform.position = k_Ceiling + new Vector3(0.3f, -0.12f, 0f);
+            dripGo.transform.position = new Vector3(sagCenter.x, sagBottom - 0.02f, sagCenter.z);
             var ps = dripGo.AddComponent<ParticleSystem>();
             var main = ps.main; main.startSize = 0.03f; main.startLifetime = 0.7f; main.startSpeed = 0f; main.gravityModifier = 1f; main.maxParticles = 20;
             main.startColor = new Color(0.6f, 0.75f, 0.95f, 0.9f); main.simulationSpace = ParticleSystemSimulationSpace.World;
@@ -616,7 +623,7 @@ namespace SafeZoneVR.Editor
             var pr = dripGo.GetComponent<ParticleSystemRenderer>();
             pr.sharedMaterial = ScenarioSceneKit.MatBottle;
             pr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "Poca", g.transform, new Vector3(k_Ceiling.x + 0.3f, 0.02f, k_Ceiling.z), Vector3.zero, new Vector3(0.6f, 0.003f, 0.5f), ScenarioSceneKit.MatWater, false);
+            UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "Poca", g.transform, new Vector3(sagCenter.x, 0.02f, sagCenter.z), Vector3.zero, new Vector3(0.6f, 0.003f, 0.5f), ScenarioSceneKit.MatWater, false);
             return sign;
         }
 
