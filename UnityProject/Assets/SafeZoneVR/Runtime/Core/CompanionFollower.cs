@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -15,8 +16,10 @@ namespace SafeZoneVR
         [SerializeField] float m_MaxLeadDistance = 3f;
         [SerializeField] TextMeshPro m_SpeechBubble;
         [SerializeField] UnityEvent m_OnStartedFollowing = new UnityEvent();
+        [SerializeField] float m_SpeechSeconds = 6f;
         int m_Index; bool m_Following;
 
+        public float speechSeconds { get => m_SpeechSeconds; set => m_SpeechSeconds = value; }
         public bool isFollowing => m_Following;
         public bool arrived => m_Following && m_Index >= m_Waypoints.Count;
         public List<Transform> waypoints => m_Waypoints;
@@ -30,11 +33,21 @@ namespace SafeZoneVR
         void OnDisable() { if (m_TalkInteractable != null) m_TalkInteractable.selectEntered.RemoveListener(OnTalk); }
         void OnTalk(SelectEnterEventArgs _) => StartFollowing();
 
+        IEnumerator HideSpeech()
+        {
+            yield return new WaitForSeconds(m_SpeechSeconds);
+            if (m_SpeechBubble != null) m_SpeechBubble.gameObject.SetActive(false);
+        }
+
         public void StartFollowing()
         {
             if (m_Following) return;
             m_Following = true;
-            if (m_SpeechBubble != null) m_SpeechBubble.gameObject.SetActive(true);
+            if (m_SpeechBubble != null)
+            {
+                m_SpeechBubble.gameObject.SetActive(true);
+                if (m_SpeechSeconds > 0f && isActiveAndEnabled) StartCoroutine(HideSpeech());
+            }
             m_OnStartedFollowing.Invoke();
         }
 

@@ -174,7 +174,7 @@ namespace SafeZoneVR.Editor
 
             var ubsZone4 = ScenarioSceneKit.CreateTriggerZone(validators.transform, "Validator_04_Aguardar", ubsZoneBounds.center, ubsZoneBounds.size);
             var v4 = ubsZone4.AddComponent<StepCompleteOnStayInZone>();
-            v4.scenarioManager = manager; v4.step = data.aguardar; v4.requiredSeconds = 30f;
+            v4.scenarioManager = manager; v4.step = data.aguardar; v4.requiredSeconds = 15f;
 
             var v5 = gateZone.AddComponent<StepCompleteOnTriggerZone>();
             v5.scenarioManager = manager; v5.step = data.voltar;
@@ -593,7 +593,9 @@ namespace SafeZoneVR.Editor
             var g = ScenarioSceneKit.CreateModelVisual(parent, "ForroCedendo",
                 $"{ScenarioSceneKit.k_ItemsFolder}/Forro.fbx", k_Ceiling, Vector3.zero);
 
-            var sag = ScenarioSceneKit.ModelPart(g, "Barriga").gameObject;
+            ScenarioSceneKit.ModelPart(g, "Barriga").gameObject.SetActive(false);
+
+            var sag = ScenarioSceneKit.ModelPart(g, "Modelo").gameObject;
             var sagLocal = sag.GetComponent<MeshFilter>().sharedMesh.bounds;
             var sagBox = sag.AddComponent<BoxCollider>();
             sagBox.center = sagLocal.center;

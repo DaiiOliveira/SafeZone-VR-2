@@ -1160,14 +1160,14 @@ namespace SafeZoneVR.Editor
 
             ctrl.progressText = UIBuilderUtil.TopText(panel, "Progress", "Passo 1 de 5", 13f, UIBuilderUtil.MutedText, TextAlignmentOptions.Left, 40f, 18f, 10f);
             ctrl.titleText = UIBuilderUtil.TopText(panel, "Title", "", 18f, Color.white, TextAlignmentOptions.Left, 58f, 44f, 10f, FontStyles.Bold);
-            ctrl.instructionText = UIBuilderUtil.TopText(panel, "Instruction", "", 13f, UIBuilderUtil.TextColor, TextAlignmentOptions.TopLeft, 102f, 62f, 10f);
-            ctrl.locationText = UIBuilderUtil.TopText(panel, "Location", "", 12f, UIBuilderUtil.AccentGreen, TextAlignmentOptions.Left, 164f, 18f, 10f);
+            ctrl.instructionText = UIBuilderUtil.TopText(panel, "Instruction", "", 13f, UIBuilderUtil.TextColor, TextAlignmentOptions.TopLeft, 102f, 78f, 10f);
+            ctrl.locationText = UIBuilderUtil.TopText(panel, "Location", "", 12f, UIBuilderUtil.AccentGreen, TextAlignmentOptions.Left, 180f, 18f, 10f);
             ctrl.subProgressText = UIBuilderUtil.Text(panel, "SubProgress", "", 13f, UIBuilderUtil.AccentGreen, TextAlignmentOptions.Right,
-                new Vector2(0.5f, 1f), new Vector2(1f, 1f), new Vector2(0f, -182f), new Vector2(-10f, -164f), FontStyles.Bold);
-            ctrl.waterText = UIBuilderUtil.TopText(panel, "Water", "", 12f, new Color(0.55f, 0.8f, 1f), TextAlignmentOptions.Left, 182f, 18f, 10f);
+                new Vector2(0.5f, 1f), new Vector2(1f, 1f), new Vector2(0f, -198f), new Vector2(-10f, -180f), FontStyles.Bold);
+            ctrl.waterText = UIBuilderUtil.TopText(panel, "Water", "", 12f, new Color(0.55f, 0.8f, 1f), TextAlignmentOptions.Left, 198f, 18f, 10f);
             ctrl.integrityText = UIBuilderUtil.Text(panel, "Integrity", "", 12f, new Color(1f, 0.8f, 0.4f), TextAlignmentOptions.Right,
-                new Vector2(0.5f, 1f), new Vector2(1f, 1f), new Vector2(0f, -200f), new Vector2(-10f, -182f), FontStyles.Bold);
-            ctrl.warningText = UIBuilderUtil.TopText(panel, "Warning", "", 12f, new Color(1f, 0.8f, 0.4f), TextAlignmentOptions.TopLeft, 200f, 22f, 10f);
+                new Vector2(0.5f, 1f), new Vector2(1f, 1f), new Vector2(0f, -216f), new Vector2(-10f, -198f), FontStyles.Bold);
+            ctrl.warningText = UIBuilderUtil.TopText(panel, "Warning", "", 12f, new Color(1f, 0.8f, 0.4f), TextAlignmentOptions.TopLeft, 216f, 22f, 10f);
 
             callButton = null;
             if (withCallButton)

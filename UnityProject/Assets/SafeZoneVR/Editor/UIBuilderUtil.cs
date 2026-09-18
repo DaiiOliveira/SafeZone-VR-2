@@ -199,6 +199,9 @@ namespace SafeZoneVR.Editor
             tmp.fontStyle = style;
             tmp.textWrappingMode = TextWrappingModes.Normal;
             tmp.overflowMode = TextOverflowModes.Truncate;
+            tmp.enableAutoSizing = true;
+            tmp.fontSizeMax = fontSize;
+            tmp.fontSizeMin = Mathf.Max(6f, fontSize * 0.55f);
             tmp.raycastTarget = false;
             return tmp;
         }
