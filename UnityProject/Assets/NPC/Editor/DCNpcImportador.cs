@@ -4,20 +4,6 @@ using UnityEngine;
 
 namespace DefesaCivil.NPC.EditorTools
 {
-    /// <summary>
-    /// Configura sozinho o import dos NPCs (pasta NPC/):
-    ///
-    /// 1) Carlos / Vizinho / SeuJoaquim: rig Humanoid com avatar do proprio
-    ///    modelo, eixo convertido no import, sem collider.
-    /// 2) Clipes: o FBX do Blender nomeia as takes "Armature|Idle"; aqui viram
-    ///    Idle, Apontar e Andar. Idle e Andar em loop; Andar e no lugar (sem
-    ///    root motion: quem move o NPC e o CompanionFollower).
-    /// 3) Andador.fbx: prop sem animacao.
-    /// 4) Material DC_M_NPC_Atlas recebe NPC/Texturas/DC_T_NPC_Atlas.png
-    ///    (paleta de cores chapadas: filtro Point).
-    ///
-    /// Depois de alterar este arquivo: selecionar os FBX > Reimport.
-    /// </summary>
     public class DCNpcImportador : AssetPostprocessor
     {
         const string PASTA = "/NPC/";

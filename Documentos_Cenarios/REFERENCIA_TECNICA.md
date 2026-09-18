@@ -117,6 +117,51 @@ quadro de energia apaga. Na fase Granizo não há quadro de energia e elas ficam
   frente do Seu Joaquim. `NpcAnimatorDriver` liga "Andando" pela velocidade real do NPC e dispara
   "Apontar" quando o balão de fala muda (desligado para quem usa andador).
 
+### O que os importadores fazem
+
+`Casa/Editor/DCCasaImportador.cs` e `Praca/Editor/DCPracaImportador.cs` configuram o import de
+`DC_Casa.fbx` e `DC_Praca.fbx` sozinhos — não é preciso mexer no Inspector, basta o FBX estar ao
+lado da pasta `Editor`.
+
+- Escala 1, sem conversão de eixo extra, **UV2 gerada** para lightmap, sem luzes nem câmeras do FBX.
+- **Luzes**: cada Empty `DC_LUZ_*` chega do Blender com propriedades customizadas (`lumens`,
+  `temperatura_k`, `alcance_m`, `unity_modo`) e vira uma Point Light. A intensidade é **declarada no
+  Blender e convertida aqui** porque não atravessa bem entre os dois. A aproximação usada para Point
+  Light em espaço linear é 1800 lm (plafon da sala) ≈ **2,6**; o ajuste fino depois do primeiro bake
+  é esse único número.
+- **Static**: tudo que tem malha entra como estático para o bake, menos o que precisa se mexer —
+  folhas de porta, portinhola do quadro e disjuntor.
+- **Maçanetas viram filhas da folha da porta**, para acompanharem a abertura.
+- Materiais de lâmpada, cúpula e tela recebem emissão no import, porque o FBX não carrega emissão
+  de forma confiável.
+
+**Propriedade `dc_interacao`**: gravada no Blender, o importador a converte no componente
+`DCInteracao`. O gameplay procura por esse componente em vez de depender do nome do objeto.
+Valores em uso: `disjuntor_geral` (alavanca do quadro, no corredor), `porta_quadro_luz` (portinhola,
+origem na dobradiça), `detector_fumaca` (teto do corredor), `painel_educativo` (sob o pergolado da
+praça), `totem_defesa_civil` (esquina da praça) e `abrigo_inadequado` (árvores da praça, no Granizo).
+
+
+`Itens/Editor/DCItensImportador.cs` e `NPC/Editor/DCNpcImportador.cs` são `AssetPostprocessor`:
+rodam sozinhos no import. **Depois de alterar um deles, selecione os FBX e mande Reimport**, senão
+o ajuste não vale para o que já está importado.
+
+- **Itens**: escala 1, sem luzes, câmeras nem animação, e **sem collider** — quem monta o collider
+  é o builder da fase. Não são estáticos (o jogador pega) e não geram UV2 de lightmap. O atlas é
+  `Itens/Texturas/DC_T_Itens_Atlas.png`, sRGB, com alpha, máximo 1024. Dois materiais recebem o
+  atlas: `DC_M_Itens_Atlas` (opaco) e `DC_M_Itens_Translucido`, que vira URP Transparent e é usado
+  no vidro, no plástico da jarra e na água.
+- **NPCs**: `Carlos`, `Vizinho` e `SeuJoaquim` entram como rig **Humanoid** com avatar do próprio
+  modelo, eixo convertido no import, sem collider. O FBX do Blender nomeia as takes como
+  `Armature|Idle`; o importador as renomeia para **Idle**, **Apontar** e **Andar**. Idle e Andar
+  ficam em loop, e Andar é **no lugar**, sem root motion — quem move o NPC é o `CompanionFollower`.
+  `Andador.fbx` é prop, sem animação. O material `DC_M_NPC_Atlas` usa `NPC/Texturas/DC_T_NPC_Atlas.png`
+  com filtro **Point**, porque a textura é uma paleta de cores chapadas.
+- **Animator** (`SafeZone VR > NPC > Criar Animator Controller`): gera `NPC/DC_NPC.controller` a
+  partir dos clipes de um dos FBX — como os três são Humanoid, o mesmo controller serve para todos.
+  Idle é o estado padrão; `Andando = true` leva a Andar e `false` volta para Idle; o trigger
+  `Apontar` sai de qualquer estado e volta para Idle ao terminar.
+
 ## Portas pela maçaneta
 
 - `OpenHouseDoors` monta as portas **fechadas** no editor; o `ToggleOpening` (`startsOpen`) as abre no

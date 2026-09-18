@@ -3,32 +3,10 @@ using UnityEngine;
 
 namespace DefesaCivil.Casa.EditorTools
 {
-    /// <summary>
-    /// Configura sozinho o import de DC_Casa.fbx. Nao precisa mexer no
-    /// Inspector: basta o arquivo estar no projeto junto desta pasta Editor.
-    ///
-    /// 1) Model: escala 1, sem conversao de eixo extra, UV2 para lightmap,
-    ///    sem luzes/cameras do FBX.
-    /// 2) Luzes: cada Empty DC_LUZ_* chega com propriedades customizadas
-    ///    (lumens, temperatura_k, alcance_m, unity_modo). Aqui ele vira uma
-    ///    Point Light assada. Intensidade de luz nao atravessa bem do Blender
-    ///    para o Unity, por isso ela e DECLARADA la e convertida aqui.
-    /// 3) Objetos de jogo: "dc_interacao" vira o componente DCInteracao.
-    /// 4) Static: tudo que tem malha fica estatico para o bake, menos o que
-    ///    precisa se mexer (folhas de porta, portinhola do quadro, disjuntor).
-    /// 5) Macanetas passam a ser filhas da folha da porta: abriu, vai junto.
-    /// 6) Materiais de lampada, cupula e tela ganham emissao (o FBX nao
-    ///    carrega a emissao de forma confiavel).
-    ///
-    /// Depois de alterar este arquivo: botao direito em DC_Casa.fbx > Reimport.
-    /// </summary>
     public class DCCasaImportador : AssetPostprocessor
     {
         const string ARQUIVO = "DC_Casa.fbx";
 
-        // lumens -> intensidade do Unity. Aproximacao para Point Light em
-        // espaco linear: 1800 lm (plafon da sala) ~ 2,6. Ajuste fino depois
-        // do primeiro bake, mudando so este numero.
         const float LUMENS_POR_UNIDADE = 700f;
 
         static readonly string[] MATERIAIS_EMISSIVOS =
@@ -53,7 +31,7 @@ namespace DefesaCivil.Casa.EditorTools
             mi.meshCompression = ModelImporterMeshCompression.Off;
             mi.isReadable = false;
             mi.addCollider = false;
-            mi.generateSecondaryUV = true;   // UV2 para o lightmap
+            mi.generateSecondaryUV = true;
             mi.materialImportMode = ModelImporterMaterialImportMode.ImportStandard;
         }
 
@@ -106,7 +84,6 @@ namespace DefesaCivil.Casa.EditorTools
 
             var todos = raiz.GetComponentsInChildren<Transform>(true);
 
-            // macaneta vira filha da folha da porta
             foreach (var t in todos)
             {
                 if (!t.name.EndsWith("_Macaneta")) continue;

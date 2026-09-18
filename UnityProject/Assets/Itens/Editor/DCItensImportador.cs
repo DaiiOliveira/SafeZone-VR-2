@@ -5,18 +5,6 @@ using UnityEngine.Rendering;
 
 namespace DefesaCivil.Itens.EditorTools
 {
-    /// <summary>
-    /// Configura sozinho o import dos itens P1 (um FBX por item, pasta Itens/).
-    /// Mesmo padrao dos importadores da casa e da praca, com duas diferencas:
-    /// os itens NAO sao estaticos (o jogador pega) e nao geram UV2 de lightmap.
-    ///
-    /// 1) Model: escala 1, sem luzes/cameras/animacao, sem collider (o builder monta).
-    /// 2) Textura: Itens/Texturas/DC_T_Itens_Atlas.png, sRGB, com alpha, max 1024.
-    /// 3) Materiais: DC_M_Itens_Atlas (opaco) e DC_M_Itens_Translucido (vidro,
-    ///    plastico da jarra, agua) recebem o atlas; o translucido vira URP Transparent.
-    ///
-    /// Depois de alterar este arquivo: selecionar os FBX > Reimport.
-    /// </summary>
     public class DCItensImportador : AssetPostprocessor
     {
         const string PASTA = "/Itens/";
@@ -87,7 +75,6 @@ namespace DefesaCivil.Itens.EditorTools
             if (m.HasProperty("_Metallic")) m.SetFloat("_Metallic", 0f);
             if (!translucido) return;
 
-            // URP Lit -> Transparent / Alpha
             m.SetFloat("_Surface", 1f);
             m.SetFloat("_Blend", 0f);
             m.SetOverrideTag("RenderType", "Transparent");

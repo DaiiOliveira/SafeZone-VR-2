@@ -3,24 +3,10 @@ using UnityEngine;
 
 namespace DefesaCivil.Praca.EditorTools
 {
-    /// <summary>
-    /// Configura sozinho o import de DC_Praca.fbx, no mesmo padrao do
-    /// importador da casa (Casa/Editor/DCCasaImportador.cs).
-    ///
-    /// 1) Model: escala 1, UV2 para lightmap, sem luzes/cameras do FBX.
-    /// 2) Objetos de jogo: "dc_interacao" vira o componente DCInteracao
-    ///    (definido em Casa/Runtime -- a pasta Casa precisa estar no projeto).
-    /// 3) Static: toda malha fica estatica para o bake.
-    /// 4) Emissao: vidro do lampiao e nuvens (o FBX nao carrega a emissao de
-    ///    forma confiavel).
-    ///
-    /// Depois de alterar este arquivo: botao direito em DC_Praca.fbx > Reimport.
-    /// </summary>
     public class DCPracaImportador : AssetPostprocessor
     {
         const string ARQUIVO = "DC_Praca.fbx";
 
-        // material -> multiplicador da emissao
         static readonly (string chave, float forca)[] MATERIAIS_EMISSIVOS =
             { ("vidro_lampiao", 1.2f), ("nuvem", 0.6f) };
 

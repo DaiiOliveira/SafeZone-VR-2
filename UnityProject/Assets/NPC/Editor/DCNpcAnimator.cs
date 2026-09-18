@@ -6,14 +6,6 @@ using UnityEngine;
 
 namespace DefesaCivil.NPC.EditorTools
 {
-    /// <summary>
-    /// Menu SafeZone VR > NPC > Criar Animator Controller.
-    /// Gera NPC/DC_NPC.controller com os clipes de um dos FBX (os tres NPCs
-    /// sao Humanoid, entao o mesmo controller serve para todos):
-    ///
-    ///   Idle (padrao, loop) --Andando=true--> Andar (loop) --Andando=false--> Idle
-    ///   Qualquer estado --Apontar (trigger)--> Apontar --fim--> Idle
-    /// </summary>
     public static class DCNpcAnimator
     {
         [MenuItem("SafeZone VR/NPC/Criar Animator Controller")]
