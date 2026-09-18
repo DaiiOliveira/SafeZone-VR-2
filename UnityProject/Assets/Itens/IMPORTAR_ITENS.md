@@ -69,8 +69,40 @@ o builder deve pôr o modelo na altura da superfície em vez de `+ meia altura`.
 | ├ `Poste` | filho | — | tubo Ø 0,10, base na laje |
 | └ `Placa` | filho | — | 1,00 × 0,75, face verde para **−Z**; o canvas do jogo entra por cima dela |
 
-Todos os itens de mão estão abaixo do orçamento (1,5k tris); o caminhão (3,3k)
-está dentro do orçamento de construção (8k). Nenhum FBX tem collider.
+### Granizo — abrigos e cenário
+
+| Objeto | Medida | Tris | Notas |
+|---|---|---:|---|
+| `PontoOnibus` | 3,44 × 2,65 × 1,73 | 920 | abrigo **errado**: aberto dos lados, telha de zinco com caimento para a frente (−Z). Raiz = calçada + banco |
+| ├ `PosteA` / `PosteB` | filhos | — | tubos azuis com sapata |
+| ├ `Fundo` | filho | — | painel de fundo (lado +Z) |
+| └ `Cobertura` | filho | — | telha ondulada; **pivô no apoio**, já inclinada 7° |
+| `UBS` | 11,12 × 3,70 × 10,80 | 3764 | abrigo **certo**: o jogador entra durante o granizo. O prédio tem 8 × 9 m; a medida inclui a calçada e a rampa. Porta na face **oeste (−X)** |
+| ├ `PisoUBS` / `Laje` / `Teto` | filhos | — | piso com faixa de entrada, laje com platibanda e forro do salão com 4 luminárias |
+| ├ `ParedeNorte/Sul/Leste/Oeste` | filhos | — | vão de porta de 1,80 × 2,40 na oeste; janelas com vidro e fundo escuro |
+| ├ `Porta` | filho | — | folha de vidro, **pivô na dobradiça**, já aberta 100° para dentro (o vão fica livre) |
+| ├ `Marquise` | filho | — | cobertura sobre a entrada: abriga o jogador na aproximação |
+| ├ `ParedeInterna` | filho | — | separa a espera (lado da porta) dos consultórios, com passagem de 1,40 |
+| ├ `BancoInterno` / `BancoInterno2` | filhos | — | dois bancos de espera, ambos do lado da porta |
+| ├ `Balcao` / `Mural` / `Bebedouro` | filhos | — | recepção, mural de avisos e bebedouro |
+| └ `Placa` | filho | — | letreiro "UBS" na platibanda, acima da marquise |
+| `Placa` (outdoor) | 6,20 × 4,90 × 0,84 | 568 | painel de 6,0 × 2,0 m a 4,8 m do chão, face para **−Z**, com o aviso de granizo e dois projetores |
+| └ `PostePlaca` | filho | — | poste central com sapata |
+| `Vaga` | 2,70 × 2,02 × 5,66 | 512 | **não é vaga pintada de rua**: é o local sugerido (2,6 × 5,2 m) onde o jogador induz o NPC a parar o carro. Cantoneiras amarelas de alvo, "P" no chão e piso de realce raso (10 mm) — dá para acender/apagar trocando o material do realce |
+| ├ `LinhaEsq` / `LinhaDir` | filhos | — | tracejado lateral (sugestão, não demarcação); se virarem decal, basta apagar os dois |
+| └ `Poste` / `Placa` | filhos | — | placa "P" virada para −Z |
+| `Forro` | 1,88 × 0,33 × 1,38 | 560 | forro de PVC, réguas com mancha de umidade; lê-se **por baixo** |
+| ├ `Barriga` | filho | — | calota da infiltração; **pivô no centro** — dá para crescer por escala conforme a água acumula |
+| └ `Trinca` | filho | — | risco logo abaixo da superfície |
+
+Todos os itens de mão estão abaixo do orçamento (1,5k tris); caminhão (3,3k) e
+UBS (3,8k) estão dentro do orçamento de construção (8k).
+
+### Nomes repetidos
+
+`Placa` e `Poste` aparecem em mais de um conjunto (`Plataforma`, `Vaga`, `UBS`
+e o outdoor). Dentro de cada FBX o nome é o do placeholder; o build resolve a
+colisão renomeando só na hora de exportar cada conjunto. Nenhum FBX tem collider.
 
 ## Fora da caixa de propósito
 
@@ -84,7 +116,10 @@ está dentro do orçamento de construção (8k). Nenhum FBX tem collider.
 `Item_Agua`, `Mochila_Kit` + `Abertura`, `Chave`, `Notebook`, `Cobertor`,
 `Botijao` + `Registro_Botijao`, `Registro_Knob` (`Volante` + `Cano`),
 `Caminhao_Bombeiros` (`Carroceria`, `Cabine`, `Vidro`, `Giroflex`, `Roda0..3`)
-e `Plataforma` + `Poste` + `Placa`.
+`Plataforma` + `Poste` + `Placa`, `PontoOnibus` (`PosteA/B`, `Cobertura`,
+`Fundo`), `UBS` (`PisoUBS`, `Paredes*`, `Laje`, `BancoInterno`, `Placa`),
+`Placa`/`PostePlaca` (outdoor), `Vaga` (`LinhaEsq/Dir`, `Placa`, `Poste`) e
+`Forro` (`Barriga` + `Trinca`).
 
 O nome do caminhão segue o placeholder do builder: **`Caminhao_Bombeiros`**, no
 plural.

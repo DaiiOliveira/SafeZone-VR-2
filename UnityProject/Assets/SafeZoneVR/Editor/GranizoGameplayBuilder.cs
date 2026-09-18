@@ -30,6 +30,9 @@ namespace SafeZoneVR.Editor
         static readonly Vector3 k_SpotC = new Vector3(-12.5f, -0.06f, k_StreetLaneZ);
         static readonly Vector3 k_Billboard = new Vector3(-30.5f, 0f, 13.3f);
         static readonly Vector3 k_Tower = new Vector3(24.5f, 0f, 16f);
+        const float k_BusStopYaw = 0f;
+        const float k_BillboardYaw = 0f;
+        const float k_SpotYaw = 90f;
         static readonly Vector3 k_Ladder = new Vector3(-10f, 0f, 1.25f);
         static readonly Vector3 k_Ceiling = new Vector3(-2.9f, 2.68f, -8.9f);
         static readonly Vector3 k_GateZone = new Vector3(-4.9f, 1.2f, 4.4f);
@@ -345,16 +348,20 @@ namespace SafeZoneVR.Editor
 
         static GameObject CreateBusStop(Transform parent)
         {
-            var g = UIBuilderUtil.Child(parent, "PontoOnibus");
-            UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "PosteA", g.transform, k_BusStop + new Vector3(-1.3f, 1.2f, 0.6f), Vector3.zero, new Vector3(0.08f, 1.2f, 0.08f), ScenarioSceneKit.MatMetal);
-            UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "PosteB", g.transform, k_BusStop + new Vector3(1.3f, 1.2f, 0.6f), Vector3.zero, new Vector3(0.08f, 1.2f, 0.08f), ScenarioSceneKit.MatMetal);
-            var roof = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Cobertura", g.transform, k_BusStop + new Vector3(0f, 2.45f, 0f), Vector3.zero, new Vector3(3f, 0.06f, 1.6f), ScenarioSceneKit.MatMetal);
-            UIBuilderUtil.Primitive(PrimitiveType.Cube, "Fundo", g.transform, k_BusStop + new Vector3(0f, 1.2f, 0.75f), Vector3.zero, new Vector3(3f, 2.4f, 0.05f), ScenarioSceneKit.MatGlass);
-            UIBuilderUtil.WorldText(g.transform, "Label", "PONTO DE ÔNIBUS\n<size=60%>cobertura metálica</size>", 0.8f, Color.white, k_BusStop + new Vector3(0f, 2.75f, -0.2f), Vector3.zero, new Vector2(2.5f, 0.4f));
+            var g = ScenarioSceneKit.CreateModelVisual(parent, "PontoOnibus",
+                $"{ScenarioSceneKit.k_ItemsFolder}/PontoOnibus.fbx",
+                ScenarioSceneKit.OnSurface(k_BusStop.x, k_BusStop.z, 2f, 0f), new Vector3(0f, k_BusStopYaw, 0f));
 
-            g.transform.RotateAround(k_BusStop, Vector3.up, 180f);
-            UIBuilderUtil.MarkStatic(g);
-            return roof;
+            GameObject roof = null;
+            foreach (var mf in g.GetComponentsInChildren<MeshFilter>(true))
+            {
+                if (mf.sharedMesh == null) continue;
+                var mc = mf.gameObject.AddComponent<MeshCollider>();
+                mc.sharedMesh = mf.sharedMesh;
+                if (mf.name.StartsWith("Cobertura")) roof = mf.gameObject;
+                UIBuilderUtil.MarkStatic(mf.gameObject);
+            }
+            return roof != null ? roof : g;
         }
 
         static GameObject CreateShack(Transform parent)
@@ -387,9 +394,15 @@ namespace SafeZoneVR.Editor
         static void CreateBillboardAndTower(Transform parent)
         {
             var g = UIBuilderUtil.Child(parent, "PlacaETorre");
-            UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "PostePlaca", g.transform, k_Billboard + new Vector3(0f, 3f, 0f), Vector3.zero, new Vector3(0.25f, 3f, 0.25f), ScenarioSceneKit.MatMetal);
-            var board = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Placa", g.transform, k_Billboard + new Vector3(0f, 7f, 0.4f), new Vector3(15f, 0f, 0f), new Vector3(6f, 2.5f, 0.1f), ScenarioSceneKit.MatSign);
-            UIBuilderUtil.WorldText(board.transform, "Texto", "PROPAGANDA", 4f, Color.white, k_Billboard + new Vector3(0f, 7f, 0.34f), new Vector3(15f, 0f, 0f), new Vector2(5.8f, 2f));
+            var billboard = ScenarioSceneKit.CreateModelVisual(g.transform, "Placa",
+                $"{ScenarioSceneKit.k_ItemsFolder}/Placa.fbx",
+                ScenarioSceneKit.OnSurface(k_Billboard.x, k_Billboard.z, 2f, 0f), new Vector3(0f, k_BillboardYaw, 0f));
+            foreach (var mf in billboard.GetComponentsInChildren<MeshFilter>(true))
+            {
+                if (mf.sharedMesh == null) continue;
+                var mc = mf.gameObject.AddComponent<MeshCollider>();
+                mc.sharedMesh = mf.sharedMesh;
+            }
 
             var tower = UIBuilderUtil.Child(g.transform, "TorreTransmissao");
             tower.transform.position = k_Tower;
@@ -405,6 +418,18 @@ namespace SafeZoneVR.Editor
             UIBuilderUtil.MarkStatic(g);
         }
 
+        static Bounds RoofBounds(GameObject roof)
+        {
+            var b = new Bounds(roof.transform.position, roof.transform.localScale);
+            var first = true;
+            foreach (var r in roof.GetComponentsInChildren<Renderer>(true))
+            {
+                if (first) { b = r.bounds; first = false; }
+                else b.Encapsulate(r.bounds);
+            }
+            return b;
+        }
+
         static void CreateHailBlockers(Transform parent, int layer, GameObject ubsRoof, GameObject busRoof, GameObject shackRoof)
         {
             var g = UIBuilderUtil.Child(parent, "HailBlockers");
@@ -418,10 +443,10 @@ namespace SafeZoneVR.Editor
             }
 
             Block("Chao", new Vector3(-5f, -0.5f, 10f), new Vector3(90f, 1f, 60f));
-            var laje = ubsRoof.transform.position; var lajeSize = ubsRoof.transform.localScale;
-            Block("LajeUBS", new Vector3(laje.x, laje.y + lajeSize.y * 0.5f - 0.6f, laje.z), new Vector3(lajeSize.x, 1.2f, lajeSize.z));
-            var bus = busRoof.transform.position; var busSize = busRoof.transform.localScale;
-            Block("CoberturaPonto", new Vector3(bus.x, bus.y + busSize.y * 0.5f - 0.5f, bus.z), new Vector3(busSize.x, 1f, busSize.z));
+            var laje = RoofBounds(ubsRoof);
+            Block("LajeUBS", new Vector3(laje.center.x, laje.max.y - 0.6f, laje.center.z), new Vector3(laje.size.x, 1.2f, laje.size.z));
+            var bus = RoofBounds(busRoof);
+            Block("CoberturaPonto", new Vector3(bus.center.x, bus.max.y - 0.5f, bus.center.z), new Vector3(bus.size.x, 1f, bus.size.z));
             Block("TelhadoBarraca", shackRoof.transform.position + new Vector3(0f, -0.4f, 0f), new Vector3(3.2f, 1.2f, 3.2f));
 
             Block("TelhadoCasa", new Vector3(-5.5f, 3.3f, -5.3f), new Vector3(12.5f, 1.6f, 12.1f));
@@ -539,14 +564,18 @@ namespace SafeZoneVR.Editor
 
         static DecisionOption CreateSpot(Transform parent, string name, Vector3 pos, bool correct, string mistakeId, string feedback, MissionStepSO step, string advice = "")
         {
-            var g = UIBuilderUtil.Child(parent, name);
-            g.transform.position = pos;
-            var mark = UIBuilderUtil.GetOrCreateMaterial("Mat_Vaga", new Color(0.95f, 0.95f, 0.9f), false, false, 0.05f);
-            UIBuilderUtil.Primitive(PrimitiveType.Cube, "LinhaEsq", g.transform, pos + new Vector3(0f, 0.01f, -1.1f), Vector3.zero, new Vector3(4.6f, 0.01f, 0.1f), mark, false);
-            UIBuilderUtil.Primitive(PrimitiveType.Cube, "LinhaDir", g.transform, pos + new Vector3(0f, 0.01f, 1.1f), Vector3.zero, new Vector3(4.6f, 0.01f, 0.1f), mark, false);
-            var sign = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Placa", g.transform, pos + new Vector3(0f, 1.3f, 0f), Vector3.zero, new Vector3(0.7f, 0.4f, 0.05f), ScenarioSceneKit.MatHint);
-            UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "Poste", g.transform, pos + new Vector3(0f, 0.55f, 0f), Vector3.zero, new Vector3(0.04f, 0.55f, 0.04f), ScenarioSceneKit.MatMetal, false);
-            UIBuilderUtil.WorldText(sign.transform, "Texto", "Aqui?", 1.6f, Color.white, pos + new Vector3(0f, 1.3f, 0f), Vector3.zero, new Vector2(0.7f, 0.4f))
+            var g = ScenarioSceneKit.CreateModelVisual(parent, name,
+                $"{ScenarioSceneKit.k_ItemsFolder}/Vaga.fbx", pos, new Vector3(0f, k_SpotYaw, 0f));
+
+            var sign = ScenarioSceneKit.ModelPart(g, "Placa").gameObject;
+            var signBounds = ScenarioSceneKit.PartBounds(sign.transform);
+            var local = sign.transform.InverseTransformVector(signBounds.size + new Vector3(0.1f, 0.1f, 0.1f));
+            var box = sign.AddComponent<BoxCollider>();
+            box.center = sign.transform.InverseTransformPoint(signBounds.center);
+            box.size = new Vector3(Mathf.Abs(local.x), Mathf.Abs(local.y), Mathf.Abs(local.z));
+
+            UIBuilderUtil.WorldText(g.transform, "Texto", "Aqui?", 1.6f, Color.white,
+                signBounds.center + new Vector3(0f, 0.3f, 0f), Vector3.zero, new Vector2(0.7f, 0.4f))
                 .gameObject.AddComponent<FacePlayer>().yawOnly = true;
             sign.AddComponent<XRSimpleInteractable>();
             var opt = sign.AddComponent<DecisionOption>();
