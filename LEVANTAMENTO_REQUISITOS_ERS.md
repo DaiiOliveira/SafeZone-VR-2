@@ -2,9 +2,9 @@
 
 | Campo | Valor |
 |---|---|
-| Documento de referência | `ERS-SafeZone-VR.md` v1.0 (rascunho, 10/09/2026, Dai Oliveira). **Ainda não foi alterado**: as decisões abaixo entram nele numa revisão futura |
+| Documento de referência | `ERS-SafeZone-VR.md` **v1.1 (19/09/2026)**. As decisões desta análise **já foram aplicadas** à ERS: 30 RF, RN09, CSU03 e 7 RNF removidos, 9 requisitos reescritos conforme o implementado, e a nova seção 10 lista o que foi entregue além do previsto |
 | Primeira análise | 16/09/2026, commit `a64c1fb` |
-| Última atualização | 17/09/2026 (3ª rodada): RF026 e RNF13 implementados; D2 e D6 decididas; D9 esclarecida; RF005, RF011, RF027, RF029, RF048, RF071, RN09 e CSU03 saíram do escopo; RF070 fica "só a melhor" |
+| Última atualização | 19/09/2026: ERS revisada para v1.1 e APK 1.0 gerado. Antes disso, 17/09/2026 (3ª rodada): RF026 e RNF13 implementados; D2 e D6 decididas; D9 esclarecida; RF005, RF011, RF027, RF029, RF048, RF071, RN09 e CSU03 saíram do escopo; RF070 fica "só a melhor" |
 | Branch | `feat/fases-incendio-granizo` (alterações ainda não commitadas) |
 | Substitui | `ANALISE_REQUISITOS_NAO_ATENDIDOS.md` (feito sobre o documento de requisitos antigo, RF01–RF05) |
 
@@ -180,7 +180,7 @@ RF001, RF005, RF006, RF007, RF011, RF027, RF028, RF029, RF031, RF033, RF035, RF0
 |---|---|---|
 | P1 | Teste completo no headset | Pendente — é a maior lacuna agora |
 | P2 | Testes automatizados e Assembly Definitions | Pendente |
-| P3 | Placeholders de primitiva | Parcial: itens e NPCs feitos; faltam botijão, benjamim, disjuntor, registro, escada, forro, telhas, UBS, caminhão, ponto de ônibus, barraca, outdoor, torre, placas e vagas |
+| P3 | Placeholders de primitiva | Parcial: itens, NPCs, botijão, registro, caminhão, plataforma, ponto de ônibus, outdoor, vagas, forro e UBS feitos; faltam benjamim, disjuntor, escada, telhas, barraca e torre |
 | P4 | Totem do hub gravado como "TERREMOTOS" | Pendente |
 | P5 | PDFs dos Bombeiros e revisão dos textos do Incêndio | Pendente |
 | P6 | README e `CONFIGURATION_GUIDE.md` desatualizados | Pendente (`ITENS_A_MODELAR.md` e `REFERENCIA_TECNICA.md` atualizados) |
@@ -188,7 +188,7 @@ RF001, RF005, RF006, RF007, RF011, RF027, RF028, RF029, RF031, RF033, RF035, RF0
 | P8 | Keystore próprio | Pendente |
 | P9 | Matriz RF × teste de aceitação | Pendente |
 | P10 | `IMPORTAR_NPC.md` diz frente +Z; o FBX olha para −Z | Contornado no builder |
-| P11 | **Alterações de 17/09 não commitadas** | Pendente de revisão e commit |
+| P11 | Alterações de 17/09 não commitadas | Resolvido: tudo commitado e enviado |
 | P12 | Editar script com o Play Mode ligado quebra o XRI | Sair do Play antes de editar |
 
 ---
@@ -219,3 +219,13 @@ RF001, RF005, RF006, RF007, RF011, RF027, RF028, RF029, RF031, RF033, RF035, RF0
 2. Ao decidir: registrar na seção 2.1 e marcar os requisitos como ➖ ou ❌.
 3. As cenas são geradas: o que vale é `Editor/*GameplayBuilder.cs`, `ScenarioSceneKit.cs` e `SafeZoneDataBuilder.cs`.
 4. Os itens 🔍 só mudam com medição no headset (APK dev pelo menu **SafeZone VR > Build > 5b**).
+
+---
+
+## 11. Fechamento (19/09/2026)
+
+- **APK de release gerado**: `UnityProject/Builds/SafeZoneVR-1.0-release.apk`, 64,8 MB, GameActivity + IL2CPP + ARM64 + Linear.
+- **ERS revisada para v1.1**, alinhada ao que existe. Os requisitos que estavam abertos foram tratados assim:
+  - **RF036** (integridade sob granizo) e os itens não entregues dos parciais foram **removidos** da ERS, por decisão registrada nesta data. O jogo continua registrando erro grave ao ficar na praça aberta durante a precipitação, sem consequência física.
+  - **RF032, RF034, RF037, RF047 e RF050** foram **reescritos** para descrever o que o jogo faz.
+- **Continua valendo o que esta análise sempre disse:** nada foi validado no headset. Os critérios de desempenho e conforto (RNF01, RNF02, RNF04, RNF07–RNF09) seguem sem medição no dispositivo, e é a maior lacuna da entrega.
