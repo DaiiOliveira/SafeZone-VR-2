@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: beeb8aec705d34b4784b1bf9739b672b, type: 3}
+  m_Name: Scenario_Granizo
+  m_EditorClassIdentifier: Assembly-CSharp::SafeZoneVR.ScenarioSO
+  m_ScenarioId: granizo
+  m_DisplayName: Granizo
+  m_Description: "Tempestade com granizo chegando e voc\xEA na pra\xE7a em frente
+    de casa. Oriente onde estacionar, ajude o Seu Joaquim, escolha um abrigo resistente
+    e, depois, volte com cuidado e aja se o telhado amea\xE7ar ceder."
+  m_SceneName: Granizo_Praca
+  m_IsAvailable: 1
+  m_TargetTimeSeconds: 360
+  m_GoodTimeSeconds: 600
+  m_TimeLimitSeconds: 600
+  m_Steps:
+  - {fileID: 11400000, guid: 193e928dd81339c48ac40a6da5077b72, type: 2}
+  - {fileID: 11400000, guid: 53b58536cff840448ab0e7201b648192, type: 2}
+  - {fileID: 11400000, guid: 97232ce3b532bee4fb8cb3734cfc851c, type: 2}
+  - {fileID: 11400000, guid: 7bd9e6a8e52d0a94193d79052987d091, type: 2}
+  - {fileID: 11400000, guid: d0fa04d3eb9541c4881fe3e1dd076de1, type: 2}
+  - {fileID: 11400000, guid: 0b06c49acbae80f41879db81fc786958, type: 2}
+  - {fileID: 11400000, guid: 064f9b5bccf7d2841bb1bde6c353cf2d, type: 2}
+  - {fileID: 11400000, guid: d60568681d33af64fa1ec69bd50d092c, type: 2}
+  m_RecapCards:
+  - {fileID: 11400000, guid: 468b4fe73fd5aba48b2ff52dd3de3fcf, type: 2}
+  - {fileID: 11400000, guid: 98c59ad9dff11da4db21a855817dc316, type: 2}
+  - {fileID: 11400000, guid: 3e61a4961051bdc40b1bc4cf6e344a72, type: 2}
+  - {fileID: 11400000, guid: 64289c6baaec3ae4584d36e7d1e8ef37, type: 2}
+  - {fileID: 11400000, guid: b5575d61578ca5348931fbea1f0eef59, type: 2}
+  - {fileID: 11400000, guid: 3339d8f8d45b03746bbbf45aca1296ec, type: 2}
+  - {fileID: 11400000, guid: 44ed089ff46419f469b30fb757d1e120, type: 2}
+  - {fileID: 11400000, guid: c30d32b9dcfba224ab1a1032cbf722b7, type: 2}
+  - {fileID: 11400000, guid: 5ce56ce9ed1f70b4faf1daaf57a84ee7, type: 2}

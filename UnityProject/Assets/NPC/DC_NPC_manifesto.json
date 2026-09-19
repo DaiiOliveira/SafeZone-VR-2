@@ -1,0 +1,200 @@
+{
+  "gerado_por": "blender/scripts/npc/build_npc.py",
+  "textura": "Texturas/DC_T_NPC_Atlas.png",
+  "material": "DC_M_NPC_Atlas",
+  "fps": 30,
+  "andador_posicao_local_unity": [
+    0,
+    0,
+    0.25
+  ],
+  "itens": [
+    {
+      "arquivo": "Carlos.fbx",
+      "medida_m": [
+        1.807,
+        0.302,
+        1.775
+      ],
+      "base_z": -0.0,
+      "triangulos": 2132,
+      "malhas": [
+        "Carlos_Corpo"
+      ],
+      "ossos": [
+        "Hips",
+        "Spine",
+        "Chest",
+        "Neck",
+        "Head",
+        "LeftShoulder",
+        "LeftUpperArm",
+        "LeftLowerArm",
+        "LeftHand",
+        "LeftIndexProximal",
+        "LeftMiddleProximal",
+        "LeftThumbProximal",
+        "RightShoulder",
+        "RightUpperArm",
+        "RightLowerArm",
+        "RightHand",
+        "RightIndexProximal",
+        "RightMiddleProximal",
+        "RightThumbProximal",
+        "LeftUpperLeg",
+        "LeftLowerLeg",
+        "LeftFoot",
+        "LeftToes",
+        "RightUpperLeg",
+        "RightLowerLeg",
+        "RightFoot",
+        "RightToes"
+      ],
+      "grupos_de_vertices": 27,
+      "clipes": {
+        "Armature|Armature|Andar": [
+          1,
+          31
+        ],
+        "Armature|Armature|Apontar": [
+          1,
+          67
+        ],
+        "Armature|Armature|Idle": [
+          1,
+          91
+        ]
+      }
+    },
+    {
+      "arquivo": "Vizinho.fbx",
+      "medida_m": [
+        1.764,
+        0.326,
+        1.705
+      ],
+      "base_z": -0.0,
+      "triangulos": 2020,
+      "malhas": [
+        "Vizinho_Corpo"
+      ],
+      "ossos": [
+        "Hips",
+        "Spine",
+        "Chest",
+        "Neck",
+        "Head",
+        "LeftShoulder",
+        "LeftUpperArm",
+        "LeftLowerArm",
+        "LeftHand",
+        "LeftIndexProximal",
+        "LeftMiddleProximal",
+        "LeftThumbProximal",
+        "RightShoulder",
+        "RightUpperArm",
+        "RightLowerArm",
+        "RightHand",
+        "RightIndexProximal",
+        "RightMiddleProximal",
+        "RightThumbProximal",
+        "LeftUpperLeg",
+        "LeftLowerLeg",
+        "LeftFoot",
+        "LeftToes",
+        "RightUpperLeg",
+        "RightLowerLeg",
+        "RightFoot",
+        "RightToes"
+      ],
+      "grupos_de_vertices": 27,
+      "clipes": {
+        "Armature|Armature|Andar": [
+          1,
+          31
+        ],
+        "Armature|Armature|Apontar": [
+          1,
+          67
+        ],
+        "Armature|Armature|Idle": [
+          1,
+          91
+        ]
+      }
+    },
+    {
+      "arquivo": "SeuJoaquim.fbx",
+      "medida_m": [
+        1.705,
+        0.309,
+        1.72
+      ],
+      "base_z": -0.0,
+      "triangulos": 2472,
+      "malhas": [
+        "SeuJoaquim_Corpo"
+      ],
+      "ossos": [
+        "Hips",
+        "Spine",
+        "Chest",
+        "Neck",
+        "Head",
+        "LeftShoulder",
+        "LeftUpperArm",
+        "LeftLowerArm",
+        "LeftHand",
+        "LeftIndexProximal",
+        "LeftMiddleProximal",
+        "LeftThumbProximal",
+        "RightShoulder",
+        "RightUpperArm",
+        "RightLowerArm",
+        "RightHand",
+        "RightIndexProximal",
+        "RightMiddleProximal",
+        "RightThumbProximal",
+        "LeftUpperLeg",
+        "LeftLowerLeg",
+        "LeftFoot",
+        "LeftToes",
+        "RightUpperLeg",
+        "RightLowerLeg",
+        "RightFoot",
+        "RightToes"
+      ],
+      "grupos_de_vertices": 27,
+      "clipes": {
+        "Armature|Armature|Andar": [
+          1,
+          41
+        ],
+        "Armature|Armature|Apontar": [
+          1,
+          67
+        ],
+        "Armature|Armature|Idle": [
+          1,
+          91
+        ]
+      }
+    },
+    {
+      "arquivo": "Andador.fbx",
+      "medida_m": [
+        0.53,
+        0.46,
+        0.884
+      ],
+      "base_z": -0.0,
+      "triangulos": 448,
+      "malhas": [
+        "Andador"
+      ],
+      "ossos": [],
+      "grupos_de_vertices": 0,
+      "clipes": {}
+    }
+  ]
+}

@@ -15,6 +15,5 @@ MonoBehaviour:
   m_MenuSceneName: MainMenu
   m_Scenarios:
   - {fileID: 11400000, guid: 1a1e2594c3b23224694700874cf71c57, type: 2}
-  - {fileID: 11400000, guid: b55d7d40bc2f2bf4cacac9afacdf8a50, type: 2}
-  - {fileID: 11400000, guid: 2703afcc094026847a6449356133023c, type: 2}
-  - {fileID: 11400000, guid: 5b5918eb9cc36b446ad9bffd66db5cd0, type: 2}
+  - {fileID: 11400000, guid: 23f4d1d40d3dd7a418058c96a71dbcad, type: 2}
+  - {fileID: 11400000, guid: 7a96df8141f492f4ba7e398eaf2daaf3, type: 2}

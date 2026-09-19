@@ -5,19 +5,19 @@ using UnityEngine.XR.Interaction.Toolkit.Interactors;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Mochila fácil de encher: vários sockets compartilham uma área de captura grande (a mochila inteira
-    /// com folga) e apenas o primeiro espaço vazio fica ativo. Assim basta soltar ou jogar o item perto da
-    /// mochila para ele ser guardado, sem mirar em um encaixe pequeno, e só aparece um "fantasma" por vez.
-    /// </summary>
     public class BackpackStorage : MonoBehaviour
     {
         [SerializeField]
         List<XRSocketInteractor> m_Slots = new List<XRSocketInteractor>();
 
+        [SerializeField]
+        [Tooltip("Esconde o item enquanto ele está guardado, como se tivesse entrado na mochila.")]
+        bool m_HideStoredItems = true;
+
         bool m_Started;
 
         public List<XRSocketInteractor> slots => m_Slots;
+        public bool hideStoredItems { get => m_HideStoredItems; set => m_HideStoredItems = value; }
 
         void OnEnable()
         {
@@ -32,7 +32,6 @@ namespace SafeZoneVR
                 Refresh();
         }
 
-        // Primeira atualização só depois do Awake de todos os sockets da cena.
         void Start()
         {
             m_Started = true;
@@ -52,10 +51,24 @@ namespace SafeZoneVR
 
         void OnSlotChanged(BaseInteractionEventArgs args)
         {
+            if (m_HideStoredItems)
+            {
+                if (args is SelectEnterEventArgs entered)
+                    SetItemVisible(entered.interactableObject as Component, false);
+                else if (args is SelectExitEventArgs exited)
+                    SetItemVisible(exited.interactableObject as Component, true);
+            }
             Refresh();
         }
 
-        /// <summary>Espaços ocupados continuam ativos (seguram o item); dos vazios, só o primeiro aceita itens.</summary>
+        static void SetItemVisible(Component item, bool visible)
+        {
+            if (item == null)
+                return;
+            foreach (var r in item.GetComponentsInChildren<Renderer>(true))
+                r.enabled = visible;
+        }
+
         public void Refresh()
         {
             var emptyActivated = false;

@@ -7,10 +7,6 @@ using UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Aplica <see cref="ComfortSettings"/> ao XR Origin dos Starter Assets:
-    /// teleporte x movimento contínuo, giro em passos x suave, vinheta de túnel e modo sentado.
-    /// </summary>
     public class ComfortSettingsApplier : MonoBehaviour
     {
         [SerializeField]
@@ -69,11 +65,13 @@ namespace SafeZoneVR
             var continuous = ComfortSettings.locomotion == LocomotionMode.Continuous;
             var smoothTurn = ComfortSettings.turn == TurnMode.Smooth;
 
+            var moveHandName = ComfortSettings.leftHanded ? "Right" : "Left";
             for (var i = 0; i < m_ControllerManagers.Count; i++)
             {
                 var m = m_ControllerManagers[i];
                 if (m == null) continue;
-                m.smoothMotionEnabled = continuous;
+                var isMoveHand = m.name.StartsWith(moveHandName);
+                m.smoothMotionEnabled = continuous && isMoveHand;
                 m.smoothTurnEnabled = smoothTurn;
             }
 
@@ -100,7 +98,6 @@ namespace SafeZoneVR
             }
         }
 
-        /// <summary>Recentra a visão (útil para quem joga sentado).</summary>
         public static void Recenter()
         {
             var subsystems = new List<XRInputSubsystem>();

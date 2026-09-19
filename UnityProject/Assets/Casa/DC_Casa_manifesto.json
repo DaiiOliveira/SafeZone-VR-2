@@ -1,0 +1,504 @@
+{
+  "arquivo": "DC_Casa.fbx",
+  "unidade": "metro",
+  "eixo_cima": "Y",
+  "objetos": 358,
+  "triangulos": 37472,
+  "materiais": 132,
+  "casca_tamanho_m_larg_alt_prof": [
+    15.35,
+    2.95,
+    12.44
+  ],
+  "por_colecao": {
+    "DC_CASA_Quartos": {
+      "objetos": 33,
+      "triangulos": 7636
+    },
+    "DC_CASA_Sala": {
+      "objetos": 20,
+      "triangulos": 4432
+    },
+    "DC_CASA_Banheiro": {
+      "objetos": 23,
+      "triangulos": 3212
+    },
+    "DC_CASA_Cozinha": {
+      "objetos": 32,
+      "triangulos": 6996
+    },
+    "DC_CASA_Corredor": {
+      "objetos": 23,
+      "triangulos": 2100
+    },
+    "DC_CASA_Externos": {
+      "objetos": 48,
+      "triangulos": 2368
+    },
+    "DC_CASA_Quintal": {
+      "objetos": 50,
+      "triangulos": 3988
+    },
+    "DC_CASA_Garagem": {
+      "objetos": 10,
+      "triangulos": 2492
+    },
+    "DC_CASA_Terreno": {
+      "objetos": 27,
+      "triangulos": 1292
+    },
+    "DC_CASA_Casca": {
+      "objetos": 31,
+      "triangulos": 1268
+    },
+    "DC_CASA_Esquadrias": {
+      "objetos": 56,
+      "triangulos": 1596
+    },
+    "DC_CASA_Telhado": {
+      "objetos": 5,
+      "triangulos": 92
+    }
+  },
+  "luzes": [
+    {
+      "nome": "DC_LUZ_Abajur1A",
+      "posicao_blender_xyz": [
+        0.56,
+        7.4,
+        0.9
+      ],
+      "lumens": 250.0,
+      "temperatura_k": 2700,
+      "alcance_m": 2.0,
+      "modo": "Baked"
+    },
+    {
+      "nome": "DC_LUZ_Abajur1B",
+      "posicao_blender_xyz": [
+        0.56,
+        9.4,
+        0.9
+      ],
+      "lumens": 250.0,
+      "temperatura_k": 2700,
+      "alcance_m": 2.0,
+      "modo": "Baked"
+    },
+    {
+      "nome": "DC_LUZ_Abajur2",
+      "posicao_blender_xyz": [
+        7.64,
+        7.3,
+        0.9
+      ],
+      "lumens": 250.0,
+      "temperatura_k": 2700,
+      "alcance_m": 2.0,
+      "modo": "Baked"
+    },
+    {
+      "nome": "DC_LUZ_Banheiro_Espelho",
+      "posicao_blender_xyz": [
+        10.708,
+        7.45,
+        2.22
+      ],
+      "lumens": 450.0,
+      "temperatura_k": 3000,
+      "alcance_m": 2.0,
+      "modo": "Baked"
+    },
+    {
+      "nome": "DC_LUZ_Banheiro_Plafon",
+      "posicao_blender_xyz": [
+        9.46,
+        8.12,
+        2.63
+      ],
+      "lumens": 1200.0,
+      "temperatura_k": 2700,
+      "alcance_m": 4.0,
+      "modo": "Baked"
+    },
+    {
+      "nome": "DC_LUZ_Corredor_0",
+      "posicao_blender_xyz": [
+        1.9,
+        5.67,
+        2.63
+      ],
+      "lumens": 700.0,
+      "temperatura_k": 3000,
+      "alcance_m": 3.0,
+      "modo": "Baked"
+    },
+    {
+      "nome": "DC_LUZ_Corredor_1",
+      "posicao_blender_xyz": [
+        5.0,
+        5.67,
+        2.63
+      ],
+      "lumens": 700.0,
+      "temperatura_k": 3000,
+      "alcance_m": 3.0,
+      "modo": "Baked"
+    },
+    {
+      "nome": "DC_LUZ_Corredor_2",
+      "posicao_blender_xyz": [
+        9.1,
+        5.67,
+        2.63
+      ],
+      "lumens": 700.0,
+      "temperatura_k": 3000,
+      "alcance_m": 3.0,
+      "modo": "Baked"
+    },
+    {
+      "nome": "DC_LUZ_Cozinha_Coifa",
+      "posicao_blender_xyz": [
+        9.18,
+        0.5,
+        1.6
+      ],
+      "lumens": 200.0,
+      "temperatura_k": 3000,
+      "alcance_m": 1.2,
+      "modo": "Baked"
+    },
+    {
+      "nome": "DC_LUZ_Cozinha_LedAereo",
+      "posicao_blender_xyz": [
+        10.025,
+        0.5,
+        1.52
+      ],
+      "lumens": 300.0,
+      "temperatura_k": 3000,
+      "alcance_m": 1.5,
+      "modo": "Baked"
+    },
+    {
+      "nome": "DC_LUZ_Cozinha_Pendente",
+      "posicao_blender_xyz": [
+        7.9,
+        2.75,
+        1.72
+      ],
+      "lumens": 600.0,
+      "temperatura_k": 2700,
+      "alcance_m": 2.5,
+      "modo": "Baked"
+    },
+    {
+      "nome": "DC_LUZ_Cozinha_Plafon",
+      "posicao_blender_xyz": [
+        9.3,
+        1.9,
+        2.62
+      ],
+      "lumens": 1800.0,
+      "temperatura_k": 3000,
+      "alcance_m": 5.0,
+      "modo": "Baked"
+    },
+    {
+      "nome": "DC_LUZ_Garagem_Calha",
+      "posicao_blender_xyz": [
+        -1.42,
+        2.6,
+        2.2
+      ],
+      "lumens": 1500.0,
+      "temperatura_k": 4000,
+      "alcance_m": 4.0,
+      "modo": "Baked"
+    },
+    {
+      "nome": "DC_LUZ_Q1Mesa",
+      "posicao_blender_xyz": [
+        2.76,
+        10.05,
+        0.99
+      ],
+      "lumens": 300.0,
+      "temperatura_k": 2700,
+      "alcance_m": 1.5,
+      "modo": "Baked"
+    },
+    {
+      "nome": "DC_LUZ_Q2Mesa",
+      "posicao_blender_xyz": [
+        6.27,
+        10.05,
+        0.99
+      ],
+      "lumens": 300.0,
+      "temperatura_k": 2700,
+      "alcance_m": 1.5,
+      "modo": "Baked"
+    },
+    {
+      "nome": "DC_LUZ_Quarto1_Plafon",
+      "posicao_blender_xyz": [
+        2.2,
+        8.47,
+        2.62
+      ],
+      "lumens": 1400.0,
+      "temperatura_k": 2700,
+      "alcance_m": 4.5,
+      "modo": "Baked"
+    },
+    {
+      "nome": "DC_LUZ_Quarto2_Plafon",
+      "posicao_blender_xyz": [
+        6.16,
+        8.47,
+        2.62
+      ],
+      "lumens": 1200.0,
+      "temperatura_k": 2700,
+      "alcance_m": 4.0,
+      "modo": "Baked"
+    },
+    {
+      "nome": "DC_LUZ_Quintal_Arandela",
+      "posicao_blender_xyz": [
+        11.15,
+        4.75,
+        2.0
+      ],
+      "lumens": 400.0,
+      "temperatura_k": 2700,
+      "alcance_m": 4.0,
+      "modo": "Baked"
+    },
+    {
+      "nome": "DC_LUZ_Quintal_PosteJardim",
+      "posicao_blender_xyz": [
+        11.7,
+        7.25,
+        1.27
+      ],
+      "lumens": 350.0,
+      "temperatura_k": 2700,
+      "alcance_m": 4.0,
+      "modo": "Baked"
+    },
+    {
+      "nome": "DC_LUZ_Sala_Abajur",
+      "posicao_blender_xyz": [
+        0.46,
+        3.36,
+        0.89
+      ],
+      "lumens": 250.0,
+      "temperatura_k": 3000,
+      "alcance_m": 2.0,
+      "modo": "Baked"
+    },
+    {
+      "nome": "DC_LUZ_Sala_LuminariaChao",
+      "posicao_blender_xyz": [
+        3.12,
+        0.78,
+        1.5
+      ],
+      "lumens": 450.0,
+      "temperatura_k": 2700,
+      "alcance_m": 3.0,
+      "modo": "Baked"
+    },
+    {
+      "nome": "DC_LUZ_Sala_Plafon",
+      "posicao_blender_xyz": [
+        2.8,
+        2.4,
+        2.62
+      ],
+      "lumens": 1800.0,
+      "temperatura_k": 4000,
+      "alcance_m": 5.0,
+      "modo": "Baked"
+    }
+  ],
+  "objetos_de_jogo": [
+    {
+      "nome": "DC_CASA_DetectorFumaca",
+      "interacao": "detector_fumaca",
+      "estado": "",
+      "posicao_blender_xyz": [
+        7.3,
+        5.67,
+        2.682
+      ]
+    },
+    {
+      "nome": "DC_CASA_QDL_DisjuntorGeral",
+      "interacao": "disjuntor_geral",
+      "estado": "ligado",
+      "posicao_blender_xyz": [
+        4.285,
+        5.058,
+        1.655
+      ]
+    },
+    {
+      "nome": "DC_CASA_QDL_Porta",
+      "interacao": "porta_quadro_luz",
+      "estado": "",
+      "posicao_blender_xyz": [
+        4.22,
+        5.016,
+        1.37
+      ]
+    }
+  ],
+  "folhas_de_porta": [
+    "DC_CASA_Porta_CorredorFundo0",
+    "DC_CASA_Porta_CorredorFundo1",
+    "DC_CASA_Porta_CorredorFundo2",
+    "DC_CASA_Porta_Direita1",
+    "DC_CASA_Porta_FrenteCorredor0",
+    "DC_CASA_Porta_FrenteCorredor1",
+    "DC_CASA_Porta_NichoFundo0"
+  ],
+  "lista_materiais": [
+    "DC_M_CasaAcoCinza",
+    "DC_M_CasaAlavancaVermelha",
+    "DC_M_CasaAlmofadaCreme",
+    "DC_M_CasaArmarioBranco",
+    "DC_M_CasaArteMostarda",
+    "DC_M_CasaAsfalto",
+    "DC_M_CasaAvisoAmarelo",
+    "DC_M_CasaAzulejoBanho",
+    "DC_M_CasaAzulejoBox",
+    "DC_M_CasaAzulejoCozinha",
+    "DC_M_CasaBegeEntrada",
+    "DC_M_CasaBojoPia",
+    "DC_M_CasaBordaCanteiro",
+    "DC_M_CasaCarroPintura",
+    "DC_M_CasaCarroVidro",
+    "DC_M_CasaCinzaMedio",
+    "DC_M_CasaConcreto",
+    "DC_M_CasaCopa",
+    "DC_M_CasaCopa2",
+    "DC_M_CasaCortina",
+    "DC_M_CasaCupula",
+    "DC_M_CasaCupulaMorna",
+    "DC_M_CasaCupulaQuente",
+    "DC_M_CasaDeck",
+    "DC_M_CasaDeckBase",
+    "DC_M_CasaDetergente",
+    "DC_M_CasaEdredom",
+    "DC_M_CasaEscuro",
+    "DC_M_CasaEsmalteVermelho",
+    "DC_M_CasaEspelho",
+    "DC_M_CasaEsquadria",
+    "DC_M_CasaEstofadoCabeceira",
+    "DC_M_CasaFaixa",
+    "DC_M_CasaFarol",
+    "DC_M_CasaFio",
+    "DC_M_CasaFlorAmarela",
+    "DC_M_CasaFlorBranca",
+    "DC_M_CasaFlorRosa",
+    "DC_M_CasaFolhaEspada",
+    "DC_M_CasaForro",
+    "DC_M_CasaFrascoAmbar",
+    "DC_M_CasaFrutaAmarela",
+    "DC_M_CasaFrutaLaranja",
+    "DC_M_CasaFrutaVerde",
+    "DC_M_CasaGalaoVermelho",
+    "DC_M_CasaGalvanizado",
+    "DC_M_CasaGrama",
+    "DC_M_CasaGramaVizinho",
+    "DC_M_CasaInox",
+    "DC_M_CasaJeans",
+    "DC_M_CasaKitEmergencia",
+    "DC_M_CasaLanterna",
+    "DC_M_CasaLedVerde",
+    "DC_M_CasaLedVermelho",
+    "DC_M_CasaLivroAmarelo",
+    "DC_M_CasaLivroAzul",
+    "DC_M_CasaLivroVermelho",
+    "DC_M_CasaLoucaBranca",
+    "DC_M_CasaLuminaria",
+    "DC_M_CasaLuzExterna",
+    "DC_M_CasaLuzNeutra",
+    "DC_M_CasaLuzQuente",
+    "DC_M_CasaMadeiraClara",
+    "DC_M_CasaMadeiraMedia",
+    "DC_M_CasaMangueira",
+    "DC_M_CasaMantaMostarda",
+    "DC_M_CasaMetal",
+    "DC_M_CasaMetalEscuro",
+    "DC_M_CasaMetalPolido",
+    "DC_M_CasaMolduraBranca",
+    "DC_M_CasaMuroBase",
+    "DC_M_CasaMuroCimalha",
+    "DC_M_CasaNotebook",
+    "DC_M_CasaOmbrelone",
+    "DC_M_CasaPVC",
+    "DC_M_CasaPainelFerramentas",
+    "DC_M_CasaPainelFundo",
+    "DC_M_CasaPainelRipado",
+    "DC_M_CasaPanoAzul",
+    "DC_M_CasaPapelao",
+    "DC_M_CasaParede",
+    "DC_M_CasaPassadeira",
+    "DC_M_CasaPassadeiraBorda",
+    "DC_M_CasaPedraCaminho",
+    "DC_M_CasaPiscaLaranja",
+    "DC_M_CasaPiso",
+    "DC_M_CasaPisoBanho",
+    "DC_M_CasaPisoCorredor",
+    "DC_M_CasaPisoCozinha",
+    "DC_M_CasaPisoGaragem",
+    "DC_M_CasaPisoQuarto",
+    "DC_M_CasaPisoSala",
+    "DC_M_CasaPlaca",
+    "DC_M_CasaPlacaAzul",
+    "DC_M_CasaPlanta",
+    "DC_M_CasaPlasticoBranco",
+    "DC_M_CasaPneu",
+    "DC_M_CasaPortaMadeira",
+    "DC_M_CasaPosteMadeira",
+    "DC_M_CasaPrendedorCortina",
+    "DC_M_CasaPreto",
+    "DC_M_CasaQuadro0",
+    "DC_M_CasaQuadro1",
+    "DC_M_CasaQuadroLuz",
+    "DC_M_CasaQuadroLuzFundo",
+    "DC_M_CasaQuadroPaisagem",
+    "DC_M_CasaRodape",
+    "DC_M_CasaRoupaCama",
+    "DC_M_CasaSofaTerracota",
+    "DC_M_CasaSoleira",
+    "DC_M_CasaTampoEscuro",
+    "DC_M_CasaTampoPedra",
+    "DC_M_CasaTapeteBanho",
+    "DC_M_CasaTapeteCozinha",
+    "DC_M_CasaTapeteQuarto",
+    "DC_M_CasaTapeteSala",
+    "DC_M_CasaTelaNotebook",
+    "DC_M_CasaTelha",
+    "DC_M_CasaTerra",
+    "DC_M_CasaToalhaAzul",
+    "DC_M_CasaToalhaVerde",
+    "DC_M_CasaTronco",
+    "DC_M_CasaVaso",
+    "DC_M_CasaVestidoRosa",
+    "DC_M_CasaVidro",
+    "DC_M_CasaVidroBox",
+    "DC_M_CasaVidroCafe",
+    "DC_M_CasaVidroPreto",
+    "DC_M_CasaViga",
+    "DC_M_CasaVisorVerde",
+    "DC_M_CasaVizinho",
+    "DC_M_CasaVizinhoTelha"
+  ]
+}

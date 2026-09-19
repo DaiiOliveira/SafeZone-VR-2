@@ -15,7 +15,8 @@ MonoBehaviour:
   m_StepId: step_02_energia
   m_OrderIndex: 1
   m_Title: Desligue o quadro geral de energia
-  m_InstructionText: Abaixe a alavanca do quadro de energia na parede do quarto.
-  m_LocationHint: Quarto
+  m_InstructionText: Abaixe a alavanca do quadro de energia na parede do corredor.
+  m_LocationHint: Corredor
   m_WhyItMatters: "\xC1gua e eletricidade juntas causam choque e curto-circuito.
     Desligar o quadro geral evita acidentes."
+  m_OrderGroup: 0

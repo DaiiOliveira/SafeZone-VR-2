@@ -3,9 +3,6 @@ using UnityEngine;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Acesso barato à posição do jogador (câmera do XR Origin) sem Find() em Update.
-    /// </summary>
     public static class PlayerLocator
     {
         static XROrigin s_Origin;
@@ -46,7 +43,6 @@ namespace SafeZoneVR
             return true;
         }
 
-        /// <summary>Posição dos pés: XZ da cabeça, Y do XR Origin.</summary>
         public static bool TryGetFeetPosition(out Vector3 position)
         {
             if (!TryGetHeadPosition(out position))
@@ -66,6 +62,25 @@ namespace SafeZoneVR
             if (other.GetComponent<CharacterController>() != null)
                 return true;
             return other.GetComponentInParent<XROrigin>() != null;
+        }
+
+        public static Transform GetController(bool left)
+        {
+            var o = origin;
+            return o != null ? FindChild(o.transform, left ? "Left Controller" : "Right Controller") : null;
+        }
+
+        public static Transform GetNonDominantController() => GetController(!ComfortSettings.leftHanded);
+
+        static Transform FindChild(Transform root, string name)
+        {
+            if (root.name == name) return root;
+            foreach (Transform c in root)
+            {
+                var r = FindChild(c, name);
+                if (r != null) return r;
+            }
+            return null;
         }
 
         public static void Invalidate()

@@ -14,11 +14,6 @@ namespace SafeZoneVR
     [Serializable]
     public class StringEvent : UnityEvent<string> { }
 
-    /// <summary>
-    /// Coração da fase (RF02): mantém o passo atual, registra conclusões, erros e tempo, e dispara
-    /// eventos consumidos pela UI de pulso, pelos guias visuais e pelo relatório final.
-    /// Passos fora de ordem são aceitos (o jogador aprende fazendo), mas contam como "fora de ordem".
-    /// </summary>
     public class ScenarioManager : MonoBehaviour
     {
         [SerializeField]
@@ -45,21 +40,24 @@ namespace SafeZoneVR
         StringEvent m_OnMistake = new StringEvent();
 
         [SerializeField]
+        StringEvent m_OnInfo = new StringEvent();
+
+        [SerializeField]
         UnityEvent m_OnScenarioComplete = new UnityEvent();
 
         readonly HashSet<string> m_CompletedStepIds = new HashSet<string>();
         readonly List<MissionStepSO> m_CompletionOrder = new List<MissionStepSO>();
-        readonly List<string> m_Mistakes = new List<string>();
+        readonly List<ActionRecord> m_Actions = new List<ActionRecord>();
         readonly List<string> m_Notes = new List<string>();
         readonly Dictionary<string, float> m_LastMistakeTime = new Dictionary<string, float>();
 
         float m_StartTime;
         float m_EndTime;
+        string m_FailureReason;
         ScenarioResult m_Result;
 
         static ScenarioManager s_Instance;
 
-        /// <summary>Instância da cena atual (busca uma vez se ainda não registrada, ex.: após recarga de domínio).</summary>
         public static ScenarioManager instance
         {
             get
@@ -88,6 +86,7 @@ namespace SafeZoneVR
         public MissionStepEvent onStepCompleted => m_OnStepCompleted;
         public MissionStepProgressEvent onStepProgress => m_OnStepProgress;
         public StringEvent onMistake => m_OnMistake;
+        public StringEvent onInfo => m_OnInfo;
         public UnityEvent onScenarioComplete => m_OnScenarioComplete;
 
         public MissionStepSO currentStep { get; private set; }
@@ -97,9 +96,19 @@ namespace SafeZoneVR
         public int totalSteps => m_Scenario != null ? m_Scenario.steps.Count : 0;
         public int outOfOrderCount { get; private set; }
         public int repeatCount { get; private set; }
-        public int mistakeCount => m_Mistakes.Count;
+        public int mistakeCount
+        {
+            get
+            {
+                var n = 0;
+                for (var i = 0; i < m_Actions.Count; i++)
+                    if (m_Actions[i].isMistake) n++;
+                return n;
+            }
+        }
         public IReadOnlyList<MissionStepSO> completionOrder => m_CompletionOrder;
-        public IReadOnlyList<string> mistakes => m_Mistakes;
+        public IReadOnlyList<ActionRecord> actions => m_Actions;
+        public bool failed { get; private set; }
         public ScenarioResult result => m_Result;
 
         public float elapsedSeconds
@@ -139,7 +148,6 @@ namespace SafeZoneVR
                 return;
             }
 
-            // O passo atual já é conhecido antes do início, para a UI mostrar o que vem pela frente.
             currentStep = m_Scenario.steps[0];
             m_OnStepChanged.Invoke(currentStep);
 
@@ -147,7 +155,6 @@ namespace SafeZoneVR
                 StartScenario();
         }
 
-        /// <summary>Inicia o cronômetro. Chamado pelo painel de briefing ou automaticamente.</summary>
         public void StartScenario()
         {
             if (hasStarted || m_Scenario == null)
@@ -168,7 +175,6 @@ namespace SafeZoneVR
             return step != null && currentStep == step;
         }
 
-        /// <summary>Progresso parcial de um passo (ex.: 2 de 3 itens do kit) para feedback imediato.</summary>
         public void ReportStepProgress(MissionStepSO step, int done, int total)
         {
             if (step == null || isComplete)
@@ -191,7 +197,6 @@ namespace SafeZoneVR
             }
 
             var steps = m_Scenario.steps;
-            var expectedIndex = m_CompletedStepIds.Count;
             var actualIndex = IndexOfStep(steps, step);
             if (actualIndex < 0)
             {
@@ -199,11 +204,19 @@ namespace SafeZoneVR
                 return;
             }
 
-            if (actualIndex != expectedIndex)
+            if (!IsInOrder(steps, actualIndex))
                 outOfOrderCount++;
 
             m_CompletedStepIds.Add(step.stepId);
             m_CompletionOrder.Add(step);
+            m_Actions.Add(new ActionRecord
+            {
+                id = step.stepId,
+                label = step.title,
+                advice = step.whyItMatters,
+                time = elapsedSeconds,
+                kind = ActionKind.Acerto
+            });
             m_OnStepCompleted.Invoke(step);
 
             var nextStep = FindNextIncompleteStep(steps);
@@ -218,11 +231,31 @@ namespace SafeZoneVR
             }
         }
 
-        /// <summary>
-        /// Registra uma decisão insegura (ex.: tentar sair de carro). Não encerra a fase: o jogo ensina,
-        /// não pune. O mesmo id só conta uma vez a cada <paramref name="cooldownSeconds"/>.
-        /// </summary>
+        bool IsInOrder(IReadOnlyList<MissionStepSO> steps, int index)
+        {
+            var group = steps[index].orderGroup;
+            for (var i = 0; i < index; i++)
+            {
+                var s = steps[i];
+                if (m_CompletedStepIds.Contains(s.stepId)) continue;
+                if (group != 0 && s.orderGroup == group) continue;
+                return false;
+            }
+            return true;
+        }
+
+        public void ShowInfo(string message)
+        {
+            if (!string.IsNullOrEmpty(message))
+                m_OnInfo.Invoke(message);
+        }
+
         public void RegisterMistake(string mistakeId, string message, float cooldownSeconds = 10f)
+        {
+            RegisterMistake(mistakeId, message, cooldownSeconds, ActionKind.ErroLeve, false, null);
+        }
+
+        public void RegisterMistake(string mistakeId, string message, float cooldownSeconds, ActionKind kind, bool fatal, string advice)
         {
             if (isComplete)
                 return;
@@ -237,17 +270,30 @@ namespace SafeZoneVR
             if (!hasStarted)
                 StartScenario();
 
-            m_Mistakes.Add(message);
+            if (kind == ActionKind.Acerto)
+                kind = ActionKind.ErroLeve;
+
+            m_Actions.Add(new ActionRecord
+            {
+                id = mistakeId,
+                label = message,
+                advice = advice,
+                time = elapsedSeconds,
+                kind = kind,
+                fatal = fatal
+            });
             m_OnMistake.Invoke(message);
+
+            if (fatal)
+                FailScenario(message);
         }
 
-        /// <summary>Observação livre incluída no relatório (ex.: nível da água ao concluir).</summary>
         public void AddResultNote(string note)
         {
             if (string.IsNullOrEmpty(note))
                 return;
             m_Notes.Add(note);
-            // Ouvintes de onScenarioComplete podem adicionar notas depois que o resultado foi montado.
+
             if (m_Result != null)
                 m_Result.notes.Add(note);
         }
@@ -261,11 +307,21 @@ namespace SafeZoneVR
                 totalSteps = totalSteps,
                 outOfOrderCount = outOfOrderCount,
                 repeatCount = repeatCount,
-                mistakeCount = mistakeCount
+                success = !failed,
+                failureReason = m_FailureReason
             };
-            r.mistakes.AddRange(m_Mistakes);
+            r.actions.AddRange(m_Actions);
             r.notes.AddRange(m_Notes);
             return r;
+        }
+
+        public void FailScenario(string reason)
+        {
+            if (isComplete || !hasStarted)
+                return;
+            failed = true;
+            m_FailureReason = reason;
+            FinishScenario();
         }
 
         void FinishScenario()

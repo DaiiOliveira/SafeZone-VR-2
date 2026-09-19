@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21c9f0aa890208543bb8852f8216881b, type: 3}
+  m_Name: Step_01_Vaga
+  m_EditorClassIdentifier: Assembly-CSharp::SafeZoneVR.MissionStepSO
+  m_StepId: gran_01_vaga
+  m_OrderIndex: 0
+  m_Title: Oriente o motorista
+  m_InstructionText: O Carlos quer deixar o carro antes do granizo. Aponte para a
+    vaga mais segura e aperte o gatilho.
+  m_LocationHint: "Rua em frente \xE0 pra\xE7a"
+  m_WhyItMatters: "Torres de transmiss\xE3o e placas de propaganda podem cair com
+    o vento e o granizo. Estacione longe delas."
+  m_OrderGroup: 1

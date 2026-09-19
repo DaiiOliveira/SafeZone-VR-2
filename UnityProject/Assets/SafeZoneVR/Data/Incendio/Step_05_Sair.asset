@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21c9f0aa890208543bb8852f8216881b, type: 3}
+  m_Name: Step_05_Sair
+  m_EditorClassIdentifier: Assembly-CSharp::SafeZoneVR.MissionStepSO
+  m_StepId: inc_05_sair
+  m_OrderIndex: 4
+  m_Title: Saia abaixado
+  m_InstructionText: "O fogo cresceu: n\xE3o tente apagar sozinho. Abaixe-se por
+    baixo da fuma\xE7a e saia pela porta da frente."
+  m_LocationHint: "Corredor \u2192 porta da frente"
+  m_WhyItMatters: "A fuma\xE7a t\xF3xica sobe e fica no alto; perto do ch\xE3o o
+    ar \xE9 mais limpo. Se n\xE3o conseguir apagar, saia rapidamente."
+  m_OrderGroup: 0

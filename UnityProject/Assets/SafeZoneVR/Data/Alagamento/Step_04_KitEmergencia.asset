@@ -15,8 +15,10 @@ MonoBehaviour:
   m_StepId: step_04_kit
   m_OrderIndex: 3
   m_Title: "Monte o kit de emerg\xEAncia"
-  m_InstructionText: "Coloque na mochila ao lado da porta: \xE1gua pot\xE1vel (cozinha),
-    rem\xE9dios (banheiro) e lanterna (quarto)."
-  m_LocationHint: "Cozinha, banheiro e quarto \u2192 mochila na entrada"
-  m_WhyItMatters: "Um kit com \xE1gua, rem\xE9dios, roupas e lanterna permite sair
-    r\xE1pido de casa. N\xE3o use velas: risco de inc\xEAndio."
+  m_InstructionText: "Coloque na mochila da sala: a pasta de documentos (sof\xE1),
+    \xE1gua pot\xE1vel (bancada da cozinha), rem\xE9dios (bancada do banheiro) e
+    lanterna (cama do quarto de casal)."
+  m_LocationHint: "Sala, cozinha, banheiro e quarto \u2192 mochila na sala"
+  m_WhyItMatters: "O kit re\xFAne o essencial para sair r\xE1pido: documentos, \xE1gua,
+    rem\xE9dios e lanterna. N\xE3o use velas: risco de inc\xEAndio."
+  m_OrderGroup: 0

@@ -8,7 +8,6 @@ using UnityEngine.XR.Interaction.Toolkit.UI;
 
 namespace SafeZoneVR.Editor
 {
-    /// <summary>Helpers para montar UI world-space (uGUI + TMP) e materiais URP a partir de scripts de Editor.</summary>
     public static class UIBuilderUtil
     {
         public const string k_GeneratedMaterialsFolder = "Assets/SafeZoneVR/Materials/Generated";
@@ -30,8 +29,6 @@ namespace SafeZoneVR.Editor
                 return f;
             }
         }
-
-        // ---------------------------------------------------------------- Materials
 
         public static Material GetOrCreateMaterial(string name, Color color, bool transparent = false, bool unlit = false, float smoothness = 0.35f, int renderQueue = -1)
         {
@@ -99,8 +96,6 @@ namespace SafeZoneVR.Editor
             AssetDatabase.CreateFolder(parent, leaf);
         }
 
-        // ---------------------------------------------------------------- Scene objects
-
         public static GameObject Child(Transform parent, string name)
         {
             var go = new GameObject(name);
@@ -142,8 +137,6 @@ namespace SafeZoneVR.Editor
             return tmp;
         }
 
-        // ---------------------------------------------------------------- Canvas
-
         public static Canvas CreateWorldCanvas(string name, Transform parent, Vector2 sizePx, float metersPerPixel)
         {
             var go = Child(parent, name);
@@ -156,7 +149,7 @@ namespace SafeZoneVR.Editor
             var scaler = go.AddComponent<CanvasScaler>();
             scaler.dynamicPixelsPerUnit = 2f;
             go.AddComponent<TrackedDeviceGraphicRaycaster>();
-            // Mouse / "apontar e clicar" do simulador (o raycaster acima só atende controles rastreados).
+
             go.AddComponent<ScreenPointGraphicRaycaster>();
             go.AddComponent<CanvasCameraBinder>();
             return canvas;
@@ -206,11 +199,13 @@ namespace SafeZoneVR.Editor
             tmp.fontStyle = style;
             tmp.textWrappingMode = TextWrappingModes.Normal;
             tmp.overflowMode = TextOverflowModes.Truncate;
+            tmp.enableAutoSizing = true;
+            tmp.fontSizeMax = fontSize;
+            tmp.fontSizeMin = Mathf.Max(6f, fontSize * 0.55f);
             tmp.raycastTarget = false;
             return tmp;
         }
 
-        /// <summary>Texto ancorado no topo com altura fixa (layout "de cima para baixo").</summary>
         public static TextMeshProUGUI TopText(Transform parent, string name, string text, float fontSize, Color color, TextAlignmentOptions align,
             float top, float height, float sideMargin = 24f, FontStyles style = FontStyles.Normal)
         {
@@ -244,7 +239,6 @@ namespace SafeZoneVR.Editor
             return button;
         }
 
-        /// <summary>Botão ancorado no topo (layout de cima para baixo).</summary>
         public static Button TopButton(Transform parent, string name, string label, float fontSize, Color background,
             float top, float height, float sideMargin, out TextMeshProUGUI labelText)
         {

@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 751fd6a59db87bd42b6dcbd69034fe2d, type: 3}
+  m_Name: Card_08_PrevencaoEletrica
+  m_EditorClassIdentifier: Assembly-CSharp::SafeZoneVR.EducationCardSO
+  m_Title: "Preven\xE7\xE3o: eletricidade"
+  m_TipText: "Evite benjamins e \"T\", n\xE3o ligue v\xE1rios aparelhos na mesma
+    tomada e n\xE3o fa\xE7a gambiarras. Desligue os aparelhos ao sair de casa e tire
+    o ferro de passar da tomada. N\xE3o use notebook sobre cama ou sof\xE1."
+  m_Source: "Corpo de Bombeiros Militar de Santa Catarina \u2014 Inc\xEAndio em Edifica\xE7\xE3o"

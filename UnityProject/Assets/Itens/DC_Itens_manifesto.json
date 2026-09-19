@@ -1,0 +1,675 @@
+{
+  "gerado_por": "blender/scripts/itens/build_itens.py",
+  "textura": "Texturas/DC_T_Itens_Atlas.png",
+  "materiais": [
+    "DC_M_Itens_Atlas",
+    "DC_M_Itens_Translucido"
+  ],
+  "itens": [
+    {
+      "objeto": "Panela",
+      "medida_unity_m": [
+        0.4695,
+        0.12,
+        0.28
+      ],
+      "alvo_unity_m": [
+        0.28,
+        0.12,
+        0.28
+      ],
+      "fora_da_tolerancia": [
+        "X 0.470 (alvo 0.28)"
+      ],
+      "excecao": "o cabo passa da caixa de O 0,28 (o placeholder tambem tem cabo fora do cilindro)",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.0,
+      "triangulos": 1012,
+      "arestas_abertas": 0,
+      "filhos": [],
+      "materiais": [
+        "DC_M_Itens_Atlas"
+      ],
+      "fbx": "Panela.fbx"
+    },
+    {
+      "objeto": "Item_Tampa",
+      "medida_unity_m": [
+        0.3,
+        0.044,
+        0.3
+      ],
+      "alvo_unity_m": [
+        0.3,
+        0.04,
+        0.3
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.0,
+      "triangulos": 768,
+      "arestas_abertas": 0,
+      "filhos": [],
+      "materiais": [
+        "DC_M_Itens_Atlas"
+      ],
+      "fbx": "Item_Tampa.fbx"
+    },
+    {
+      "objeto": "Jarra_Agua",
+      "medida_unity_m": [
+        0.148,
+        0.226,
+        0.114
+      ],
+      "alvo_unity_m": [
+        0.14,
+        0.22,
+        0.14
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.0,
+      "triangulos": 564,
+      "arestas_abertas": 0,
+      "filhos": [],
+      "materiais": [
+        "DC_M_Itens_Atlas",
+        "DC_M_Itens_Translucido"
+      ],
+      "fbx": "Jarra_Agua.fbx"
+    },
+    {
+      "objeto": "Item_Documentos",
+      "medida_unity_m": [
+        0.2272,
+        0.0231,
+        0.301
+      ],
+      "alvo_unity_m": [
+        0.22,
+        0.03,
+        0.3
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": -0.0003,
+      "triangulos": 188,
+      "arestas_abertas": 0,
+      "filhos": [],
+      "materiais": [
+        "DC_M_Itens_Atlas"
+      ],
+      "fbx": "Item_Documentos.fbx"
+    },
+    {
+      "objeto": "Item_PortaRetrato",
+      "medida_unity_m": [
+        0.18,
+        0.02,
+        0.22
+      ],
+      "alvo_unity_m": [
+        0.18,
+        0.02,
+        0.22
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.0,
+      "triangulos": 316,
+      "arestas_abertas": 0,
+      "filhos": [],
+      "materiais": [
+        "DC_M_Itens_Atlas",
+        "DC_M_Itens_Translucido"
+      ],
+      "fbx": "Item_PortaRetrato.fbx"
+    },
+    {
+      "objeto": "Item_Remedios",
+      "medida_unity_m": [
+        0.1463,
+        0.0843,
+        0.1
+      ],
+      "alvo_unity_m": [
+        0.14,
+        0.08,
+        0.1
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.0,
+      "triangulos": 736,
+      "arestas_abertas": 0,
+      "filhos": [],
+      "materiais": [
+        "DC_M_Itens_Atlas"
+      ],
+      "fbx": "Item_Remedios.fbx"
+    },
+    {
+      "objeto": "Item_Lanterna",
+      "medida_unity_m": [
+        0.1923,
+        0.06,
+        0.06
+      ],
+      "alvo_unity_m": [
+        0.18,
+        0.06,
+        0.06
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.0,
+      "triangulos": 844,
+      "arestas_abertas": 0,
+      "filhos": [],
+      "materiais": [
+        "DC_M_Itens_Atlas"
+      ],
+      "fbx": "Item_Lanterna.fbx"
+    },
+    {
+      "objeto": "Item_Agua",
+      "medida_unity_m": [
+        0.1,
+        0.26,
+        0.1
+      ],
+      "alvo_unity_m": [
+        0.1,
+        0.26,
+        0.1
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.0,
+      "triangulos": 960,
+      "arestas_abertas": 0,
+      "filhos": [],
+      "materiais": [
+        "DC_M_Itens_Atlas"
+      ],
+      "fbx": "Item_Agua.fbx"
+    },
+    {
+      "objeto": "Mochila_Kit",
+      "medida_unity_m": [
+        0.3295,
+        0.448,
+        0.203
+      ],
+      "alvo_unity_m": [
+        0.34,
+        0.44,
+        0.2
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.0,
+      "triangulos": 648,
+      "arestas_abertas": 0,
+      "filhos": [
+        "Abertura"
+      ],
+      "materiais": [
+        "DC_M_Itens_Atlas"
+      ],
+      "fbx": "Mochila_Kit.fbx"
+    },
+    {
+      "objeto": "Chave",
+      "medida_unity_m": [
+        0.0044,
+        0.0265,
+        0.0648
+      ],
+      "alvo_unity_m": [
+        0.02,
+        0.05,
+        0.04
+      ],
+      "fora_da_tolerancia": [
+        "Z 0.065 (alvo 0.04)"
+      ],
+      "excecao": "0,04 e so a parte para fora da porta; a lamina (0,025) fica dentro da fechadura",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": -0.0132,
+      "triangulos": 212,
+      "arestas_abertas": 0,
+      "filhos": [],
+      "materiais": [
+        "DC_M_Itens_Atlas"
+      ],
+      "fbx": "Chave.fbx"
+    },
+    {
+      "objeto": "Notebook",
+      "medida_unity_m": [
+        0.3406,
+        0.024,
+        0.2441
+      ],
+      "alvo_unity_m": [
+        0.34,
+        0.03,
+        0.24
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.0,
+      "triangulos": 384,
+      "arestas_abertas": 0,
+      "filhos": [],
+      "materiais": [
+        "DC_M_Itens_Atlas"
+      ],
+      "fbx": "Notebook.fbx"
+    },
+    {
+      "objeto": "Cobertor",
+      "medida_unity_m": [
+        0.4188,
+        0.179,
+        0.3094
+      ],
+      "alvo_unity_m": [
+        0.4,
+        0.18,
+        0.3
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.001,
+      "triangulos": 872,
+      "arestas_abertas": 0,
+      "filhos": [],
+      "materiais": [
+        "DC_M_Itens_Atlas"
+      ],
+      "fbx": "Cobertor.fbx"
+    },
+    {
+      "objeto": "Botijao",
+      "medida_unity_m": [
+        0.304,
+        0.593,
+        0.315
+      ],
+      "alvo_unity_m": [
+        0.3,
+        0.54,
+        0.3
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "o regulador e a mangueira passam da altura de 0,54 (a tabela mede so o corpo)",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.0,
+      "triangulos": 1552,
+      "arestas_abertas": 0,
+      "filhos": [
+        "Registro_Botijao"
+      ],
+      "materiais": [
+        "DC_M_Itens_Atlas"
+      ],
+      "fbx": "Botijao.fbx"
+    },
+    {
+      "objeto": "Registro_Knob",
+      "medida_unity_m": [
+        0.156,
+        0.432,
+        0.1748
+      ],
+      "alvo_unity_m": [
+        0.16,
+        0.46,
+        0.16
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "a tabela da so o O 0,16 do volante; o cano sobe ate 0,42",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.0,
+      "triangulos": 932,
+      "arestas_abertas": 0,
+      "filhos": [
+        "Cano",
+        "Volante"
+      ],
+      "materiais": [
+        "DC_M_Itens_Atlas"
+      ],
+      "fbx": "Registro_Knob.fbx"
+    },
+    {
+      "objeto": "Caminhao_Bombeiros",
+      "medida_unity_m": [
+        2.76,
+        2.725,
+        7.64
+      ],
+      "alvo_unity_m": [
+        2.5,
+        2.85,
+        7.7
+      ],
+      "fora_da_tolerancia": [
+        "X 2.760 (alvo 2.50)"
+      ],
+      "excecao": "medida definida aqui (a tabela nao da): caminhao urbano de combate a incendio",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.0,
+      "triangulos": 3276,
+      "arestas_abertas": 0,
+      "filhos": [
+        "Cabine",
+        "Carroceria",
+        "Giroflex",
+        "Roda0",
+        "Roda1",
+        "Roda2",
+        "Roda3",
+        "Vidro"
+      ],
+      "materiais": [
+        "DC_M_Itens_Atlas",
+        "DC_M_Itens_Translucido"
+      ],
+      "fbx": "Caminhao_Bombeiros.fbx"
+    },
+    {
+      "objeto": "Plataforma",
+      "medida_unity_m": [
+        2.64,
+        2.47,
+        2.64
+      ],
+      "alvo_unity_m": [
+        2.7,
+        2.6,
+        2.7
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "medida definida aqui (a tabela nao da): a altura e do conjunto com poste e placa",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.0,
+      "triangulos": 496,
+      "arestas_abertas": 0,
+      "filhos": [
+        "Placa",
+        "Poste"
+      ],
+      "materiais": [
+        "DC_M_Itens_Atlas"
+      ],
+      "fbx": "Plataforma.fbx"
+    },
+    {
+      "objeto": "PontoOnibus",
+      "medida_unity_m": [
+        3.44,
+        2.6451,
+        1.7269
+      ],
+      "alvo_unity_m": [
+        3.4,
+        2.7,
+        1.7
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "medida definida aqui (a tabela nao da): abrigo de 3,2 m com cobertura de zinco",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.0,
+      "triangulos": 920,
+      "arestas_abertas": 0,
+      "filhos": [
+        "Cobertura",
+        "Fundo",
+        "PosteA",
+        "PosteB"
+      ],
+      "materiais": [
+        "DC_M_Itens_Atlas"
+      ],
+      "fbx": "PontoOnibus.fbx"
+    },
+    {
+      "objeto": "Placa",
+      "medida_unity_m": [
+        6.2,
+        4.9,
+        0.84
+      ],
+      "alvo_unity_m": [
+        6.4,
+        5.4,
+        0.8
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "a tabela nao da medida: outdoor de 6,0 x 2,0 m a 4,8 m do chao",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.0,
+      "triangulos": 568,
+      "arestas_abertas": 0,
+      "filhos": [
+        "PostePlaca"
+      ],
+      "materiais": [
+        "DC_M_Itens_Atlas"
+      ],
+      "fbx": "Placa.fbx"
+    },
+    {
+      "objeto": "Vaga",
+      "medida_unity_m": [
+        2.7,
+        2.02,
+        5.66
+      ],
+      "alvo_unity_m": [
+        2.9,
+        2.1,
+        5.7
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "nao e vaga pintada: e o local sugerido (2,6 x 5,2 m) onde o jogador manda o NPC parar",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.0,
+      "triangulos": 512,
+      "arestas_abertas": 0,
+      "filhos": [
+        "LinhaDir",
+        "LinhaEsq",
+        "Placa",
+        "Poste"
+      ],
+      "materiais": [
+        "DC_M_Itens_Atlas"
+      ],
+      "fbx": "Vaga.fbx"
+    },
+    {
+      "objeto": "Forro",
+      "medida_unity_m": [
+        1.88,
+        0.326,
+        1.38
+      ],
+      "alvo_unity_m": [
+        1.9,
+        0.4,
+        1.4
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "a tabela pede 1,8 x 1,3; a altura e a barriga da infiltracao",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": -0.326,
+      "triangulos": 560,
+      "arestas_abertas": 0,
+      "filhos": [
+        "Barriga",
+        "Trinca"
+      ],
+      "materiais": [
+        "DC_M_Itens_Atlas"
+      ],
+      "fbx": "Forro.fbx"
+    },
+    {
+      "objeto": "UBS",
+      "medida_unity_m": [
+        18.6,
+        4.0,
+        13.2
+      ],
+      "alvo_unity_m": [
+        17.6,
+        4.2,
+        13.2
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "o predio tem 14,0 x 10,0 m (a tabela pedia ~8 x 9); a medida inclui calcada, rampa e marquise",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.0,
+      "triangulos": 23372,
+      "arestas_abertas": 0,
+      "filhos": [
+        "Balcao",
+        "BancoInterno",
+        "Consultorio1",
+        "Consultorio2",
+        "Corredor",
+        "DC_LUZ_UBS_Entrada",
+        "DC_LUZ_UBS_Forro0",
+        "DC_LUZ_UBS_Forro1",
+        "DC_LUZ_UBS_Forro2",
+        "DC_LUZ_UBS_Forro3",
+        "DC_LUZ_UBS_Forro4",
+        "DC_LUZ_UBS_Forro5",
+        "DC_LUZ_UBS_Forro6",
+        "DC_LUZ_UBS_Forro7",
+        "DC_LUZ_UBS_Forro8",
+        "DC_LUZ_UBS_Marquise",
+        "Laje",
+        "Marquise",
+        "PainelRecepcao",
+        "ParedeCorredorNorte",
+        "ParedeCorredorSul",
+        "ParedeInterna",
+        "ParedeLeste",
+        "ParedeNorte",
+        "ParedeOeste",
+        "ParedeSul",
+        "PisoUBS",
+        "Placa",
+        "Porta",
+        "PortaB",
+        "SalaEspera",
+        "Teto"
+      ],
+      "materiais": [
+        "DC_M_Itens_Atlas",
+        "DC_M_Itens_Translucido"
+      ],
+      "fbx": "UBS.fbx"
+    }
+  ]
+}

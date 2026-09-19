@@ -4,12 +4,6 @@ using UnityEngine;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Ponto de início seguro da cena. Ao carregar, posiciona a CABEÇA do jogador (não só o XR Origin) sobre este
-    /// ponto, olhando para a frente dele: o deslocamento da cabeça dentro do rig (quarto real no Quest, ou WASD do
-    /// XR Interaction Simulator, que sobrevive à troca de cena) não deixa o jogador fora do chão. Se ainda assim ele
-    /// cair para fora do mundo, volta para cá.
-    /// </summary>
     public class PlayerSpawnPoint : MonoBehaviour
     {
         [SerializeField]
@@ -30,12 +24,10 @@ namespace SafeZoneVR
             if (m_Origin == null)
                 yield break;
 
-            // O rastreamento posiciona a câmera nos primeiros quadros.
             yield return null;
             yield return null;
             Respawn();
 
-            // No headset a pose da cabeça pode chegar um pouco depois: realinha uma vez quando chegar.
             var cam = m_Origin.Camera.transform;
             var waited = 0f;
             while (waited < 1f && cam.localPosition.sqrMagnitude <= 0.0001f)
@@ -57,7 +49,6 @@ namespace SafeZoneVR
                 Respawn();
         }
 
-        /// <summary>Coloca os pés do jogador na altura deste ponto, com a cabeça sobre ele, olhando para a frente do ponto.</summary>
         public void Respawn()
         {
             if (m_Origin == null)
@@ -77,7 +68,6 @@ namespace SafeZoneVR
             var target = transform.position;
             originTransform.position += new Vector3(target.x - camPos.x, target.y - originTransform.position.y, target.z - camPos.z);
 
-            // O CharacterController do rig guarda a própria posição: sincroniza para a física enxergar o novo lugar.
             Physics.SyncTransforms();
         }
     }

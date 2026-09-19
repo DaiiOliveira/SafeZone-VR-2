@@ -2,7 +2,6 @@ using UnityEngine;
 
 namespace SafeZoneVR
 {
-    /// <summary>Card educativo exibido no relatório final (texto extraído das cartilhas da Defesa Civil).</summary>
     [CreateAssetMenu(fileName = "EducationCard", menuName = "SafeZone VR/Education Card", order = 20)]
     public class EducationCardSO : ScriptableObject
     {

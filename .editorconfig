@@ -1,0 +1,60 @@
+root = true
+
+[*.cs]
+indent_style = space
+indent_size = 4
+end_of_line = crlf
+charset = utf-8-bom
+insert_final_newline = true
+csharp_new_line_before_open_brace = all
+
+dotnet_naming_rule.campos_privados.severity = suggestion
+dotnet_naming_rule.campos_privados.symbols = campo_privado
+dotnet_naming_rule.campos_privados.style = prefixo_m
+dotnet_naming_symbols.campo_privado.applicable_kinds = field
+dotnet_naming_symbols.campo_privado.applicable_accessibilities = private
+dotnet_naming_symbols.campo_privado.required_modifiers =
+dotnet_naming_style.prefixo_m.required_prefix = m_
+dotnet_naming_style.prefixo_m.capitalization = pascal_case
+
+dotnet_naming_rule.constantes.severity = suggestion
+dotnet_naming_rule.constantes.symbols = constante
+dotnet_naming_rule.constantes.style = prefixo_k
+dotnet_naming_symbols.constante.applicable_kinds = field
+dotnet_naming_symbols.constante.applicable_accessibilities = *
+dotnet_naming_symbols.constante.required_modifiers = const
+dotnet_naming_style.prefixo_k.required_prefix = k_
+dotnet_naming_style.prefixo_k.capitalization = pascal_case
+
+dotnet_naming_rule.estaticos.severity = suggestion
+dotnet_naming_rule.estaticos.symbols = estatico_privado
+dotnet_naming_rule.estaticos.style = prefixo_s
+dotnet_naming_symbols.estatico_privado.applicable_kinds = field
+dotnet_naming_symbols.estatico_privado.applicable_accessibilities = private
+dotnet_naming_symbols.estatico_privado.required_modifiers = static
+dotnet_naming_style.prefixo_s.required_prefix = s_
+dotnet_naming_style.prefixo_s.capitalization = pascal_case
+
+dotnet_diagnostic.UNT0006.severity = error
+dotnet_diagnostic.UNT0007.severity = error
+dotnet_diagnostic.UNT0008.severity = error
+dotnet_diagnostic.UNT0023.severity = error
+dotnet_diagnostic.UNT0010.severity = error
+dotnet_diagnostic.UNT0011.severity = error
+dotnet_diagnostic.UNT0014.severity = error
+dotnet_diagnostic.UNT0030.severity = error
+
+dotnet_diagnostic.UNT0002.severity = warning
+dotnet_diagnostic.UNT0018.severity = warning
+dotnet_diagnostic.UNT0022.severity = warning
+dotnet_diagnostic.UNT0026.severity = warning
+dotnet_diagnostic.UNT0028.severity = warning
+dotnet_diagnostic.UNT0017.severity = warning
+
+dotnet_diagnostic.UNT0001.severity = warning
+dotnet_diagnostic.UNT0003.severity = warning
+dotnet_diagnostic.UNT0004.severity = warning
+dotnet_diagnostic.UNT0005.severity = warning
+
+dotnet_diagnostic.CS0649.severity = none
+dotnet_diagnostic.IDE0051.severity = none

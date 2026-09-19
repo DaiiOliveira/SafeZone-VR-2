@@ -2,9 +2,6 @@ using UnityEngine;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Conclui o passo por chamada externa (UnityEvent de um botão XR, poke, etc.) ou por trigger físico.
-    /// </summary>
     public class StepCompleteOnButtonPress : StepValidatorBase
     {
         [SerializeField]

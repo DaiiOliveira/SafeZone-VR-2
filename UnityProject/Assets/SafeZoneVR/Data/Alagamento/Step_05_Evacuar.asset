@@ -15,8 +15,9 @@ MonoBehaviour:
   m_StepId: step_05_evacuar
   m_OrderIndex: 4
   m_Title: "V\xE1 para o ponto de encontro seguro"
-  m_InstructionText: "Saia pela porta da frente, siga as setas verdes at\xE9 o port\xE3o
-    e suba no ponto de encontro. Nunca use o carro."
-  m_LocationHint: "Rua, em frente \xE0 casa"
+  m_InstructionText: "Saia pela porta da frente, siga as setas verdes pelo port\xE3o
+    e suba no ponto de encontro na cal\xE7ada. Nunca use o carro."
+  m_LocationHint: "Cal\xE7ada, em frente \xE0 casa"
   m_WhyItMatters: "Procure um local alto e espere a \xE1gua baixar. Nunca atravesse
     ruas alagadas, nem mesmo de carro."
+  m_OrderGroup: 0

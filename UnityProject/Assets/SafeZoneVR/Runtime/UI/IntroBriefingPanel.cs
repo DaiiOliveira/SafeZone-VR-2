@@ -4,10 +4,6 @@ using UnityEngine.UI;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Briefing inicial: contexto da situação (alerta da Defesa Civil) e lista de missões.
-    /// O cronômetro só começa quando o jogador aperta "Começar".
-    /// </summary>
     public class IntroBriefingPanel : MonoBehaviour
     {
         [SerializeField]
@@ -68,7 +64,6 @@ namespace SafeZoneVR
                     m_BodyText.text = sb.ToString();
                 }
 
-                // Se o jogador já agiu antes de ler, o painel some sozinho.
                 m_ScenarioManager.onScenarioStarted.AddListener(HideRoot);
             }
         }

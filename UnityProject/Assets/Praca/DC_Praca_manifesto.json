@@ -1,0 +1,157 @@
+{
+  "arquivo": "DC_Praca.fbx",
+  "unidade": "metro",
+  "eixo_cima": "Y",
+  "referencial": "o mesmo da DC_Casa.fbx: as duas na origem ja se encaixam",
+  "objetos": 127,
+  "triangulos": 33360,
+  "materiais": 37,
+  "piso_tamanho_m_larg_prof": [
+    22.0,
+    15.7
+  ],
+  "por_colecao": {
+    "DC_PRACA_Vegetacao": {
+      "objetos": 12,
+      "triangulos": 6664
+    },
+    "DC_PRACA_Chao": {
+      "objetos": 26,
+      "triangulos": 3016
+    },
+    "DC_PRACA_Mobiliario": {
+      "objetos": 27,
+      "triangulos": 11828
+    },
+    "DC_PRACA_Estruturas": {
+      "objetos": 18,
+      "triangulos": 9772
+    },
+    "DC_PRACA_Entorno": {
+      "objetos": 44,
+      "triangulos": 2080
+    }
+  },
+  "objetos_de_jogo": [
+    {
+      "nome": "DC_PRACA_ArvoreEixoDir",
+      "interacao": "abrigo_inadequado",
+      "posicao_blender_xyz": [
+        0.7,
+        -17.5,
+        0.1
+      ]
+    },
+    {
+      "nome": "DC_PRACA_ArvoreEixoEsq",
+      "interacao": "abrigo_inadequado",
+      "posicao_blender_xyz": [
+        9.1,
+        -18.0,
+        0.1
+      ]
+    },
+    {
+      "nome": "DC_PRACA_ArvoreInfDir",
+      "interacao": "abrigo_inadequado",
+      "posicao_blender_xyz": [
+        -3.5,
+        -16.0,
+        0.1
+      ]
+    },
+    {
+      "nome": "DC_PRACA_ArvoreInfEsq",
+      "interacao": "abrigo_inadequado",
+      "posicao_blender_xyz": [
+        13.5,
+        -17.8,
+        0.1
+      ]
+    },
+    {
+      "nome": "DC_PRACA_ArvoreSupDir",
+      "interacao": "abrigo_inadequado",
+      "posicao_blender_xyz": [
+        1.3,
+        -25.4,
+        0.1
+      ]
+    },
+    {
+      "nome": "DC_PRACA_ArvoreSupEsq",
+      "interacao": "abrigo_inadequado",
+      "posicao_blender_xyz": [
+        13.3,
+        -24.6,
+        0.1
+      ]
+    },
+    {
+      "nome": "DC_PRACA_ArvoreSupMeio",
+      "interacao": "abrigo_inadequado",
+      "posicao_blender_xyz": [
+        8.1,
+        -25.4,
+        0.1
+      ]
+    },
+    {
+      "nome": "DC_PRACA_PainelEducativo",
+      "interacao": "painel_educativo",
+      "posicao_blender_xyz": [
+        4.13,
+        -22.15,
+        -0.02
+      ]
+    },
+    {
+      "nome": "DC_PRACA_TotemDefesaCivil",
+      "interacao": "totem_defesa_civil",
+      "posicao_blender_xyz": [
+        13.5,
+        -13.05,
+        -0.02
+      ]
+    }
+  ],
+  "lista_materiais": [
+    "DC_M_DC_PRACA_PainelLogo",
+    "DC_M_DC_PRACA_TotemLogo",
+    "DC_M_Praca_amarelo",
+    "DC_M_Praca_asfalto",
+    "DC_M_Praca_azul",
+    "DC_M_Praca_borda",
+    "DC_M_Praca_branco",
+    "DC_M_Praca_concreto",
+    "DC_M_Praca_emborrachado",
+    "DC_M_Praca_faixa",
+    "DC_M_Praca_flor_branca",
+    "DC_M_Praca_flor_rosa",
+    "DC_M_Praca_folha",
+    "DC_M_Praca_folha_clara",
+    "DC_M_Praca_galvanizado",
+    "DC_M_Praca_grama",
+    "DC_M_Praca_junta",
+    "DC_M_Praca_madeira",
+    "DC_M_Praca_madeira_clara",
+    "DC_M_Praca_marinho",
+    "DC_M_Praca_metal",
+    "DC_M_Praca_montanha",
+    "DC_M_Praca_montanha2",
+    "DC_M_Praca_montanha_longe",
+    "DC_M_Praca_muro",
+    "DC_M_Praca_nuvem",
+    "DC_M_Praca_telha",
+    "DC_M_Praca_terra",
+    "DC_M_Praca_tronco",
+    "DC_M_Praca_vermelho",
+    "DC_M_Praca_vidro_lampiao",
+    "DC_M_Praca_vizinho_#D9D3CB",
+    "DC_M_Praca_vizinho_#DCCFBF",
+    "DC_M_Praca_vizinho_#DED6CC",
+    "DC_M_Praca_vizinho_#E3DCD2",
+    "DC_M_Praca_vizinho_#E6D6C2",
+    "DC_M_Praca_vizinho_#E8DDCB"
+  ]
+}

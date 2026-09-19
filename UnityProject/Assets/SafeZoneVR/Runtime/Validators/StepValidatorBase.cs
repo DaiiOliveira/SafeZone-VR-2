@@ -2,10 +2,6 @@ using UnityEngine;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Base dos validadores (RF05): guarda o passo e o gerenciador, evita conclusão dupla e
-    /// encontra o gerenciador automaticamente quando não foi ligado no Inspector.
-    /// </summary>
     public abstract class StepValidatorBase : MonoBehaviour
     {
         [SerializeField]
@@ -46,7 +42,6 @@ namespace SafeZoneVR
                 Debug.LogWarning($"{GetType().Name} em '{name}' sem MissionStep atribuído.", this);
         }
 
-        /// <summary>Marca o passo como concluído (apenas uma vez).</summary>
         protected void Complete()
         {
             if (m_Completed)

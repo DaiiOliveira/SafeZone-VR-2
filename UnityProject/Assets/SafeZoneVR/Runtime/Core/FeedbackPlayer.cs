@@ -5,10 +5,6 @@ using UnityEngine.XR.Interaction.Toolkit.Inputs.Haptics;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Feedback positivo imediato (RF03): som + vibração ao concluir passo, ao errar e ao terminar a fase,
-    /// além de chuva ambiente para contextualizar a urgência sem assustar.
-    /// </summary>
     [RequireComponent(typeof(AudioSource))]
     public class FeedbackPlayer : MonoBehaviour
     {
@@ -24,6 +20,7 @@ namespace SafeZoneVR
 
         AudioSource m_Sfx;
         AudioSource m_Ambience;
+        bool m_Faded;
         AudioClip m_StepClip;
         AudioClip m_ProgressClip;
         AudioClip m_MistakeClip;
@@ -52,7 +49,7 @@ namespace SafeZoneVR
                 m_Ambience.clip = ProceduralAudio.CreateRainLoop("sz_rain");
                 m_Ambience.loop = true;
                 m_Ambience.spatialBlend = 0f;
-                m_Ambience.volume = m_RainVolume;
+                m_Ambience.volume = m_RainVolume * AudioVolumes.Get(AudioCategory.Ambient);
                 m_Ambience.playOnAwake = false;
             }
         }
@@ -78,6 +75,27 @@ namespace SafeZoneVR
                 m_Ambience.Play();
         }
 
+        void OnEnable() => AudioVolumes.changed += OnVolumesChanged;
+        void OnDisable() => AudioVolumes.changed -= OnVolumesChanged;
+
+        void OnVolumesChanged()
+        {
+            if (m_Ambience != null && !m_Faded)
+                m_Ambience.volume = m_RainVolume * AudioVolumes.Get(AudioCategory.Ambient);
+        }
+
+        public void PlayHurt()
+        {
+            PlaySfx(m_MistakeClip, 0.9f);
+            Pulse(0.7f, 0.35f);
+        }
+
+        public void PlayHint()
+        {
+            PlaySfx(m_ProgressClip, 0.7f);
+            Pulse(0.25f, 0.08f);
+        }
+
         void OnDestroy()
         {
             if (m_ScenarioManager != null)
@@ -92,6 +110,17 @@ namespace SafeZoneVR
         public void PlayUiClick()
         {
             PlaySfx(m_ProgressClip, 0.5f);
+        }
+
+        public void SetRainVolume(float volume)
+        {
+            m_RainVolume = Mathf.Clamp01(volume);
+            if (m_Ambience != null)
+            {
+                m_Ambience.volume = m_RainVolume * AudioVolumes.Get(AudioCategory.Ambient);
+                if (m_RainVolume > 0f && !m_Ambience.isPlaying)
+                    m_Ambience.Play();
+            }
         }
 
         void OnStepCompleted(MissionStepSO step)
@@ -117,14 +146,16 @@ namespace SafeZoneVR
 
         void OnScenarioComplete()
         {
-            PlaySfx(m_CompleteClip);
-            Pulse(0.8f, 0.3f);
+            var failed = m_ScenarioManager != null && m_ScenarioManager.failed;
+            PlaySfx(failed ? m_MistakeClip : m_CompleteClip);
+            Pulse(failed ? 0.9f : 0.8f, failed ? 0.45f : 0.3f);
             if (m_Ambience != null)
                 StartCoroutine(FadeOutAmbience());
         }
 
         IEnumerator FadeOutAmbience()
         {
+            m_Faded = true;
             var start = m_Ambience.volume;
             var t = 0f;
             while (t < 3f)
@@ -135,11 +166,10 @@ namespace SafeZoneVR
             }
         }
 
-        // Eventos podem chegar durante o descarregamento da cena (sockets soltando itens no OnDisable).
         void PlaySfx(AudioClip clip, float volume = 1f)
         {
             if (clip != null && m_Sfx != null && m_Sfx.isActiveAndEnabled)
-                m_Sfx.PlayOneShot(clip, volume);
+                m_Sfx.PlayOneShot(clip, volume * AudioVolumes.Get(AudioCategory.Effects));
         }
 
         void Pulse(float amplitude, float duration)

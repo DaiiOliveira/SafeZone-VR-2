@@ -3,10 +3,6 @@ using UnityEngine;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Marca um objeto do mundo como alvo de um passo. O <see cref="ObjectiveBeaconSystem"/> usa isso para
-    /// posicionar marcadores diegéticos e ligar/desligar sinalizações (setas de rota, placas) do passo atual (RF04).
-    /// </summary>
     public class ObjectiveTarget : MonoBehaviour
     {
         [SerializeField]
@@ -43,7 +39,6 @@ namespace SafeZoneVR
 
         public List<GameObject> showWhileActive => m_ShowWhileActive;
 
-        /// <summary>Quando verdadeiro (ex.: item já colocado), o marcador deste alvo é ocultado.</summary>
         public bool isSatisfied { get; private set; }
 
         public void SetSatisfied(bool satisfied)

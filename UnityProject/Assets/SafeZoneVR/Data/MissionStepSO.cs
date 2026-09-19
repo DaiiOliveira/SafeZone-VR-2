@@ -2,10 +2,6 @@ using UnityEngine;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Um passo (missão) dentro de um cenário. Conteúdo puro: o que o jogador deve fazer e por quê,
-    /// segundo as orientações da Defesa Civil. A validação fica nos componentes de cena (Validators).
-    /// </summary>
     [CreateAssetMenu(fileName = "MissionStep", menuName = "SafeZone VR/Mission Step", order = 10)]
     public class MissionStepSO : ScriptableObject
     {
@@ -31,8 +27,13 @@ namespace SafeZoneVR
         [Tooltip("Por que este passo importa, segundo a Defesa Civil. Exibido ao concluir o passo e no relatório.")]
         string m_WhyItMatters = "";
 
+        [SerializeField]
+        [Tooltip("0 = ordem fixa. Passos com o mesmo número podem ser feitos em qualquer ordem entre si.")]
+        int m_OrderGroup = 0;
+
         public string stepId => m_StepId;
         public int orderIndex => m_OrderIndex;
+        public int orderGroup => m_OrderGroup;
         public string title => m_Title;
         public string instructionText => m_InstructionText;
         public string locationHint => m_LocationHint;
@@ -48,7 +49,10 @@ namespace SafeZoneVR
             m_InstructionText = instructionText;
             m_LocationHint = locationHint;
             m_WhyItMatters = whyItMatters;
+            m_OrderGroup = 0;
         }
+
+        public void EditorSetOrderGroup(int group) => m_OrderGroup = group;
 #endif
     }
 }

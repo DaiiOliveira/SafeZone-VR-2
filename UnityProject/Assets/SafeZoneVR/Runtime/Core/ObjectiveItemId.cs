@@ -2,7 +2,6 @@ using UnityEngine;
 
 namespace SafeZoneVR
 {
-    /// <summary>Identifica um item de objetivo (ex.: "agua", "documentos") para validadores e filtros de socket.</summary>
     public class ObjectiveItemId : MonoBehaviour
     {
         [SerializeField]

@@ -2,7 +2,6 @@ using UnityEngine;
 
 namespace SafeZoneVR
 {
-    /// <summary>Conclui o passo quando a alavanca do quadro de energia (<see cref="BreakerLever"/>) é desligada.</summary>
     public class StepCompleteOnBreaker : StepValidatorBase
     {
         [SerializeField]

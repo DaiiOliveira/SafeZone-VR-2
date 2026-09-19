@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: beeb8aec705d34b4784b1bf9739b672b, type: 3}
+  m_Name: Scenario_Incendio
+  m_EditorClassIdentifier: Assembly-CSharp::SafeZoneVR.ScenarioSO
+  m_ScenarioId: incendio
+  m_DisplayName: "Inc\xEAndio em Casa"
+  m_Description: "A panela pegou fogo e, depois, um benjamim sobrecarregado atr\xE1s
+    da TV. Aprenda a apagar s\xF3 o que \xE9 pequeno, sem \xE1gua no \xF3leo ou na
+    eletricidade, e a sair abaixado, fechar a porta sem trancar e ligar 193."
+  m_SceneName: Incendio_EmCasa
+  m_IsAvailable: 1
+  m_TargetTimeSeconds: 300
+  m_GoodTimeSeconds: 480
+  m_TimeLimitSeconds: 480
+  m_Steps:
+  - {fileID: 11400000, guid: 6efa7f1b2cd55d84fa6833b7d2828ffa, type: 2}
+  - {fileID: 11400000, guid: a6dd9ecee3f74b44fb6c8487ce4b5258, type: 2}
+  - {fileID: 11400000, guid: def73c5d195f05241aed4d842b6cb0c1, type: 2}
+  - {fileID: 11400000, guid: ed1c25de19eb4ad46846641e19af5892, type: 2}
+  - {fileID: 11400000, guid: d6d8f3e64b89fcf4a883a0c0c7e1b8c7, type: 2}
+  - {fileID: 11400000, guid: 312b6a9cc42975b4fbbb14cfb37e8c9e, type: 2}
+  - {fileID: 11400000, guid: 455007e7ce8293648ac43bbc2532d467, type: 2}
+  - {fileID: 11400000, guid: dbba029683b1dd34b8839cc5048579fd, type: 2}
+  - {fileID: 11400000, guid: 4d7f7dc038befa44ab7b1ec843e356e0, type: 2}
+  m_RecapCards:
+  - {fileID: 11400000, guid: fa5b5867ea4f2a247abcd1b2d55d5e9d, type: 2}
+  - {fileID: 11400000, guid: d4e1fbcc956f9b54483a16593730bfd2, type: 2}
+  - {fileID: 11400000, guid: ae7776d54a1434042bc489c4aae6bd3a, type: 2}
+  - {fileID: 11400000, guid: ac246fba27157c7409d61f5f084150a0, type: 2}
+  - {fileID: 11400000, guid: c9280888b8d01274a8053aaffb3f839d, type: 2}
+  - {fileID: 11400000, guid: ea9b1bfb29bc64848a1ec2db4f1efd39, type: 2}
+  - {fileID: 11400000, guid: f40765a06b59b564ea9104b3a1511c38, type: 2}
+  - {fileID: 11400000, guid: 9ab927cd60beeb548816761fcdace0d9, type: 2}
+  - {fileID: 11400000, guid: bb44f9e350829fe448a1867cd94fabf9, type: 2}
+  - {fileID: 11400000, guid: f753d70763860af489dcdcfee8e8cce8, type: 2}

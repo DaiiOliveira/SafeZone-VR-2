@@ -3,10 +3,6 @@ using UnityEngine;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Orientação visual diegética (RF04): marcadores flutuantes sobre os alvos do passo atual e
-    /// ativação de sinalizações de rota (setas no chão, placas) registradas nos <see cref="ObjectiveTarget"/>.
-    /// </summary>
     public class ObjectiveBeaconSystem : MonoBehaviour
     {
         [SerializeField]
@@ -46,7 +42,6 @@ namespace SafeZoneVR
         public ScenarioManager scenarioManager { get => m_ScenarioManager; set => m_ScenarioManager = value; }
         public GameObject markerTemplate { get => m_MarkerTemplate; set => m_MarkerTemplate = value; }
 
-        /// <summary>Posição do alvo mais próximo ainda pendente do passo atual (para a bússola do pulso).</summary>
         public bool TryGetNearestActiveTarget(Vector3 from, out Vector3 position)
         {
             position = Vector3.zero;

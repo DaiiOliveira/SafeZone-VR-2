@@ -1,15 +1,22 @@
+using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace SafeZoneVR
 {
-    /// <summary>
-    /// Painel de conforto e acessibilidade (RNF04): locomoção, giro, vinheta, modo sentado, recentrar,
-    /// reiniciar fase e voltar ao menu. Usado na fase (via botão do pulso) e no menu principal.
-    /// </summary>
     public class OptionsPanelController : MonoBehaviour
     {
+        [Serializable]
+        public class VolumeRow
+        {
+            public AudioCategory category;
+            public Button minus;
+            public Button plus;
+            public TextMeshProUGUI label;
+        }
+
         [SerializeField]
         GameObject m_Root;
 
@@ -38,6 +45,15 @@ namespace SafeZoneVR
         TextMeshProUGUI m_SeatedLabel;
 
         [SerializeField]
+        Button m_DominantHandButton;
+
+        [SerializeField]
+        TextMeshProUGUI m_DominantHandLabel;
+
+        [SerializeField]
+        List<VolumeRow> m_VolumeRows = new List<VolumeRow>();
+
+        [SerializeField]
         Button m_RecenterButton;
 
         [SerializeField]
@@ -61,6 +77,9 @@ namespace SafeZoneVR
         public TextMeshProUGUI vignetteLabel { get => m_VignetteLabel; set => m_VignetteLabel = value; }
         public Button seatedButton { get => m_SeatedButton; set => m_SeatedButton = value; }
         public TextMeshProUGUI seatedLabel { get => m_SeatedLabel; set => m_SeatedLabel = value; }
+        public Button dominantHandButton { get => m_DominantHandButton; set => m_DominantHandButton = value; }
+        public TextMeshProUGUI dominantHandLabel { get => m_DominantHandLabel; set => m_DominantHandLabel = value; }
+        public List<VolumeRow> volumeRows => m_VolumeRows;
         public Button recenterButton { get => m_RecenterButton; set => m_RecenterButton = value; }
         public Button restartButton { get => m_RestartButton; set => m_RestartButton = value; }
         public Button menuButton { get => m_MenuButton; set => m_MenuButton = value; }
@@ -78,6 +97,14 @@ namespace SafeZoneVR
             Bind(m_TurnButton, () => { ComfortSettings.ToggleTurn(); RefreshLabels(); });
             Bind(m_VignetteButton, () => { ComfortSettings.ToggleVignette(); RefreshLabels(); });
             Bind(m_SeatedButton, () => { ComfortSettings.ToggleSeated(); RefreshLabels(); });
+            Bind(m_DominantHandButton, () => { ComfortSettings.ToggleDominantHand(); RefreshLabels(); });
+            foreach (var row in m_VolumeRows)
+            {
+                if (row == null) continue;
+                var category = row.category;
+                Bind(row.minus, () => { AudioVolumes.Decrease(category); RefreshLabels(); });
+                Bind(row.plus, () => { AudioVolumes.Increase(category); RefreshLabels(); });
+            }
             Bind(m_RecenterButton, ComfortSettingsApplier.Recenter);
             Bind(m_RestartButton, SceneFlow.ReloadCurrent);
             Bind(m_MenuButton, SceneFlow.LoadMenu);
@@ -123,6 +150,16 @@ namespace SafeZoneVR
             SetText(m_SeatedLabel, ComfortSettings.seatedMode
                 ? "Posição: Sentado"
                 : "Posição: Em pé");
+            SetText(m_DominantHandLabel, ComfortSettings.leftHanded
+                ? "Mão dominante: Esquerda"
+                : "Mão dominante: Direita");
+            foreach (var row in m_VolumeRows)
+            {
+                if (row == null) continue;
+                SetText(row.label, $"{AudioVolumes.Label(row.category)}: {Mathf.RoundToInt(AudioVolumes.Get(row.category) * 100f)}%");
+                if (row.minus != null) row.minus.interactable = AudioVolumes.Get(row.category) > 0.001f;
+                if (row.plus != null) row.plus.interactable = AudioVolumes.Get(row.category) < 0.999f;
+            }
         }
 
         static void Bind(Button b, UnityEngine.Events.UnityAction action)
