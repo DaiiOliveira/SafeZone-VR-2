@@ -16,10 +16,11 @@ namespace SafeZoneVR.Editor
         static readonly Vector3 k_PlayerStart = new Vector3(-4.9f, 0f, 13.4f);
         static readonly Vector3 k_JoaquimBench = new Vector3(-7.9f, 0f, 16.1f);
 
-        static readonly Vector3 k_Ubs = new Vector3(12f, 0f, 17.8f);
+        static readonly Vector3 k_Ubs = new Vector3(15.8f, 0f, 19f);
         static readonly Vector3 k_UbsSize = new Vector3(8f, 3f, 8.4f);
-        const float k_UbsDoorZ = 16f;
+        const float k_UbsDoorZ = 19.45f;
         const float k_UbsFloorY = 0.15f;
+        const float k_UbsYaw = 180f;
         static readonly Vector3 k_BusStop = new Vector3(-10f, 0f, 6.3f);
         static readonly Vector3 k_Shack = new Vector3(-22.4f, 0.12f, 20f);
         const float k_StreetLaneZ = 10.9f;
@@ -29,7 +30,7 @@ namespace SafeZoneVR.Editor
         static readonly Vector3 k_SpotB = new Vector3(24.5f, -0.06f, k_StreetLaneZ);
         static readonly Vector3 k_SpotC = new Vector3(-12.5f, -0.06f, k_StreetLaneZ);
         static readonly Vector3 k_Billboard = new Vector3(-30.5f, 0f, 13.3f);
-        static readonly Vector3 k_Tower = new Vector3(24.5f, 0f, 16f);
+        static readonly Vector3 k_Tower = new Vector3(27.5f, 0f, 16f);
         const float k_BusStopYaw = 0f;
         const float k_BillboardYaw = 0f;
         const float k_SpotYaw = 90f;
@@ -309,41 +310,39 @@ namespace SafeZoneVR.Editor
 
         static Bounds CreateUbs(Transform parent, out GameObject roof)
         {
-            var g = UIBuilderUtil.Child(parent, "UBS");
-            var wallMat = UIBuilderUtil.GetOrCreateMaterial("Mat_UBS", new Color(0.93f, 0.9f, 0.82f), false, false, 0.1f);
-            var h = k_UbsSize.y;
-            var minX = k_Ubs.x - k_UbsSize.x * 0.5f; var maxX = k_Ubs.x + k_UbsSize.x * 0.5f;
-            var minZ = k_Ubs.z - k_UbsSize.z * 0.5f; var maxZ = k_Ubs.z + k_UbsSize.z * 0.5f;
-            const float t = 0.25f;
-            const float door = 1.8f;
+            var g = ScenarioSceneKit.CreateModelVisual(parent, "UBS",
+                $"{ScenarioSceneKit.k_ItemsFolder}/UBS.fbx", new Vector3(k_Ubs.x, 0f, k_Ubs.z), new Vector3(0f, k_UbsYaw, 0f));
 
-            var floor = UIBuilderUtil.Primitive(PrimitiveType.Cube, "PisoUBS", g.transform, new Vector3(k_Ubs.x, k_UbsFloorY * 0.5f, k_Ubs.z), Vector3.zero,
-                new Vector3(k_UbsSize.x, k_UbsFloorY, k_UbsSize.z), ScenarioSceneKit.MatConcrete);
-            ScenarioSceneKit.AddTeleportArea(floor);
+            roof = null;
+            var interior = new Bounds();
+            var achouInterior = false;
+            foreach (var mf in g.GetComponentsInChildren<MeshFilter>(true))
+            {
+                if (mf.sharedMesh == null) continue;
+                var mc = mf.gameObject.AddComponent<MeshCollider>();
+                mc.sharedMesh = mf.sharedMesh;
+                UIBuilderUtil.MarkStatic(mf.gameObject);
 
-            var southLen = k_UbsDoorZ - door * 0.5f - minZ;
-            var northLen = maxZ - (k_UbsDoorZ + door * 0.5f);
-            UIBuilderUtil.Primitive(PrimitiveType.Cube, "ParedeOeste_Sul", g.transform, new Vector3(minX, h * 0.5f, minZ + southLen * 0.5f), Vector3.zero, new Vector3(t, h, southLen), wallMat);
-            UIBuilderUtil.Primitive(PrimitiveType.Cube, "ParedeOeste_Norte", g.transform, new Vector3(minX, h * 0.5f, maxZ - northLen * 0.5f), Vector3.zero, new Vector3(t, h, northLen), wallMat);
-            UIBuilderUtil.Primitive(PrimitiveType.Cube, "ParedeOeste_Verga", g.transform, new Vector3(minX, 2.6f, k_UbsDoorZ), Vector3.zero, new Vector3(t, 0.8f, door + 0.1f), wallMat);
-            UIBuilderUtil.Primitive(PrimitiveType.Cube, "ParedeLeste", g.transform, new Vector3(maxX, h * 0.5f, k_Ubs.z), Vector3.zero, new Vector3(t, h, k_UbsSize.z), wallMat);
-            UIBuilderUtil.Primitive(PrimitiveType.Cube, "ParedeSul", g.transform, new Vector3(k_Ubs.x, h * 0.5f, minZ), Vector3.zero, new Vector3(k_UbsSize.x + t, h, t), wallMat);
-            UIBuilderUtil.Primitive(PrimitiveType.Cube, "ParedeNorte", g.transform, new Vector3(k_Ubs.x, h * 0.5f, maxZ), Vector3.zero, new Vector3(k_UbsSize.x + t, h, t), wallMat);
-            roof = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Laje", g.transform, new Vector3(k_Ubs.x, h + 0.1f, k_Ubs.z), Vector3.zero,
-                new Vector3(k_UbsSize.x + 0.6f, 0.2f, k_UbsSize.z + 0.6f), ScenarioSceneKit.MatConcrete);
+                if (mf.name.StartsWith("Laje")) roof = mf.gameObject;
+                if (mf.name.StartsWith("PisoUBS") || mf.name.StartsWith("SalaEspera")
+                    || mf.name.StartsWith("Corredor") || mf.name.StartsWith("Consultorio"))
+                {
+                    ScenarioSceneKit.AddTeleportArea(mf.gameObject);
+                    var b = mf.GetComponent<Renderer>().bounds;
+                    if (!achouInterior) { interior = b; achouInterior = true; } else interior.Encapsulate(b);
+                }
+            }
 
-            UIBuilderUtil.Primitive(PrimitiveType.Cube, "BancoInterno", g.transform, new Vector3(maxX - 0.5f, k_UbsFloorY + 0.45f, k_Ubs.z - 2f), Vector3.zero, new Vector3(0.45f, 0.06f, 2.5f), ScenarioSceneKit.MatWood);
-            UIBuilderUtil.Primitive(PrimitiveType.Cube, "BancoInterno", g.transform, new Vector3(maxX - 0.5f, k_UbsFloorY + 0.45f, k_Ubs.z + 2f), Vector3.zero, new Vector3(0.45f, 0.06f, 2.5f), ScenarioSceneKit.MatWood);
+            foreach (var luz in g.GetComponentsInChildren<Light>(true))
+            {
+                luz.lightmapBakeType = LightmapBakeType.Realtime;
+                luz.shadows = LightShadows.None;
+            }
 
-            var lightGo = UIBuilderUtil.Child(g.transform, "Luz");
-            lightGo.transform.position = new Vector3(k_Ubs.x, 2.7f, k_Ubs.z);
-            var light = lightGo.AddComponent<Light>(); light.type = LightType.Point; light.range = 8f; light.intensity = 1.2f; light.shadows = LightShadows.None;
-
-            var sign = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Placa", g.transform, new Vector3(minX - 0.15f, 2.6f, k_UbsDoorZ), Vector3.zero, new Vector3(0.05f, 0.6f, 3f), ScenarioSceneKit.MatSign);
-            UIBuilderUtil.WorldText(sign.transform, "Texto", "UBS — ABRIGO\n<size=60%>alvenaria com laje</size>", 1.8f, Color.white,
-                new Vector3(minX - 0.19f, 2.6f, k_UbsDoorZ), new Vector3(0f, 90f, 0f), new Vector2(2.9f, 0.6f));
-            UIBuilderUtil.MarkStatic(g);
-            return new Bounds(new Vector3(k_Ubs.x, 1.5f, k_Ubs.z), new Vector3(k_UbsSize.x - 0.4f, 3f, k_UbsSize.z - 0.4f));
+            if (roof == null) roof = g;
+            if (!achouInterior) interior = new Bounds(new Vector3(k_Ubs.x, 1.5f, k_Ubs.z), k_UbsSize);
+            return new Bounds(new Vector3(interior.center.x, 1.5f, interior.center.z),
+                new Vector3(Mathf.Max(1f, interior.size.x - 0.6f), 3f, Mathf.Max(1f, interior.size.z - 0.6f)));
         }
 
         static GameObject CreateBusStop(Transform parent)
@@ -525,7 +524,7 @@ namespace SafeZoneVR.Editor
 
             follower.waypoints.AddRange(ScenarioSceneKit.CreateWaypoints(routes.transform, "WP",
                 k_JoaquimBench, new Vector3(-5f, 0f, 16.5f), new Vector3(-5f, 0f, 12.35f), new Vector3(5.9f, 0f, 12.35f),
-                new Vector3(6.9f, 0f, 13.5f), new Vector3(6.9f, 0f, k_UbsDoorZ), new Vector3(9.5f, k_UbsFloorY, k_UbsDoorZ), new Vector3(11.5f, k_UbsFloorY, 17f)));
+                new Vector3(6.9f, 0f, 13.5f), new Vector3(6.9f, 0f, k_UbsDoorZ), new Vector3(9.5f, k_UbsFloorY, k_UbsDoorZ), new Vector3(13f, k_UbsFloorY, 19f)));
             var target = npc.AddComponent<ObjectiveTarget>();
             target.step = step; target.markerHeightOffset = 0.5f;
             return follower;

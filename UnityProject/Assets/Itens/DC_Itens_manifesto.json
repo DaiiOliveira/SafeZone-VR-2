@@ -516,52 +516,6 @@
       "fbx": "PontoOnibus.fbx"
     },
     {
-      "objeto": "UBS",
-      "medida_unity_m": [
-        11.12,
-        3.7,
-        10.8
-      ],
-      "alvo_unity_m": [
-        11.2,
-        3.7,
-        11.0
-      ],
-      "fora_da_tolerancia": [],
-      "excecao": "o predio tem os 8 x 9 m da tabela; a medida inclui a calcada em volta e a rampa da entrada",
-      "pivo_blender": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "base_z": 0.0,
-      "triangulos": 3764,
-      "arestas_abertas": 0,
-      "filhos": [
-        "Balcao",
-        "BancoInterno",
-        "BancoInterno2",
-        "Bebedouro",
-        "Laje",
-        "Marquise",
-        "Mural",
-        "ParedeInterna",
-        "ParedeLeste",
-        "ParedeNorte",
-        "ParedeOeste",
-        "ParedeSul",
-        "PisoUBS",
-        "Placa",
-        "Porta",
-        "Teto"
-      ],
-      "materiais": [
-        "DC_M_Itens_Atlas",
-        "DC_M_Itens_Translucido"
-      ],
-      "fbx": "UBS.fbx"
-    },
-    {
       "objeto": "Placa",
       "medida_unity_m": [
         6.2,
@@ -654,6 +608,68 @@
         "DC_M_Itens_Atlas"
       ],
       "fbx": "Forro.fbx"
+    },
+    {
+      "objeto": "UBS",
+      "medida_unity_m": [
+        18.6,
+        4.0,
+        13.2
+      ],
+      "alvo_unity_m": [
+        17.6,
+        4.2,
+        13.2
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "o predio tem 14,0 x 10,0 m (a tabela pedia ~8 x 9); a medida inclui calcada, rampa e marquise",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": 0.0,
+      "triangulos": 23372,
+      "arestas_abertas": 0,
+      "filhos": [
+        "Balcao",
+        "BancoInterno",
+        "Consultorio1",
+        "Consultorio2",
+        "Corredor",
+        "DC_LUZ_UBS_Entrada",
+        "DC_LUZ_UBS_Forro0",
+        "DC_LUZ_UBS_Forro1",
+        "DC_LUZ_UBS_Forro2",
+        "DC_LUZ_UBS_Forro3",
+        "DC_LUZ_UBS_Forro4",
+        "DC_LUZ_UBS_Forro5",
+        "DC_LUZ_UBS_Forro6",
+        "DC_LUZ_UBS_Forro7",
+        "DC_LUZ_UBS_Forro8",
+        "DC_LUZ_UBS_Marquise",
+        "Laje",
+        "Marquise",
+        "PainelRecepcao",
+        "ParedeCorredorNorte",
+        "ParedeCorredorSul",
+        "ParedeInterna",
+        "ParedeLeste",
+        "ParedeNorte",
+        "ParedeOeste",
+        "ParedeSul",
+        "PisoUBS",
+        "Placa",
+        "Porta",
+        "PortaB",
+        "SalaEspera",
+        "Teto"
+      ],
+      "materiais": [
+        "DC_M_Itens_Atlas",
+        "DC_M_Itens_Translucido"
+      ],
+      "fbx": "UBS.fbx"
     }
   ]
 }

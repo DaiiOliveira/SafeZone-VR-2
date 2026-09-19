@@ -8,7 +8,7 @@ cores e decalques em `itens_atlas.py`). **Um FBX por item**, cada um na origem.
 | Arquivo | O que é |
 |---|---|
 | `<Objeto>.fbx` | um item por arquivo; objeto raiz com o nome do placeholder |
-| `Texturas/DC_T_Itens_Atlas.png` | atlas único do conjunto (1024²) — **copie junto** |
+| `Texturas/DC_T_Itens_Atlas.png` | atlas único do conjunto (2048²) — **copie junto** |
 | `Editor/DCItensImportador.cs` | configura import, textura e materiais sozinho |
 | `DC_Itens_manifesto.json` | medidas, triângulos, filhos e materiais de cada item |
 
@@ -77,15 +77,36 @@ o builder deve pôr o modelo na altura da superfície em vez de `+ meia altura`.
 | ├ `PosteA` / `PosteB` | filhos | — | tubos azuis com sapata |
 | ├ `Fundo` | filho | — | painel de fundo (lado +Z) |
 | └ `Cobertura` | filho | — | telha ondulada; **pivô no apoio**, já inclinada 7° |
-| `UBS` | 11,12 × 3,70 × 10,80 | 3764 | abrigo **certo**: o jogador entra durante o granizo. O prédio tem 8 × 9 m; a medida inclui a calçada e a rampa. Porta na face **oeste (−X)** |
-| ├ `PisoUBS` / `Laje` / `Teto` | filhos | — | piso com faixa de entrada, laje com platibanda e forro do salão com 4 luminárias |
-| ├ `ParedeNorte/Sul/Leste/Oeste` | filhos | — | vão de porta de 1,80 × 2,40 na oeste; janelas com vidro e fundo escuro |
-| ├ `Porta` | filho | — | folha de vidro, **pivô na dobradiça**, já aberta 100° para dentro (o vão fica livre) |
-| ├ `Marquise` | filho | — | cobertura sobre a entrada: abriga o jogador na aproximação |
-| ├ `ParedeInterna` | filho | — | separa a espera (lado da porta) dos consultórios, com passagem de 1,40 |
-| ├ `BancoInterno` / `BancoInterno2` | filhos | — | dois bancos de espera, ambos do lado da porta |
-| ├ `Balcao` / `Mural` / `Bebedouro` | filhos | — | recepção, mural de avisos e bebedouro |
-| └ `Placa` | filho | — | letreiro "UBS" na platibanda, acima da marquise |
+| `UBS` | 18,60 × 4,00 × 13,20 | 23372 | refeita a partir de `referencia_ubs.png`. Prédio de 14 × 10 m, porta na face **oeste (−X)**; a medida inclui calçada, rampa e marquise. O jogador entra durante o granizo |
+| ├ `PisoUBS` / `Teto` / `Laje` | filhos | — | porcelanato com juntas, forro com 9 luminárias, laje com platibanda e 2 condensadoras |
+| ├ `ParedeNorte/Sul/Leste/Oeste` | filhos | — | janelas **abertas** (caixilho, montante, vidro e peitoril — dá para ver a rua); faixa azul até 1,05 m por fora e por dentro, interrompida nos vãos de porta |
+| ├ `Porta` / `PortaB` | filhos | — | duas folhas de vidro da entrada, **pivô na dobradiça**, abertas para dentro |
+| ├ `Marquise` | filho | — | cobertura azul sobre a entrada, em duas colunas |
+| ├ `Placa` | filho | — | letreiro "UBS · UNIDADE BÁSICA DE SAÚDE" na fachada |
+| ├ `ParedeInterna` | filho | — | separa espera/recepção do corredor, com passagem de 1,30 |
+| ├ `ParedeCorredorNorte/Sul` | filhos | — | corredor de 2,2 m com as portas dos consultórios (folha de madeira e placa) |
+| ├ `Balcao` / `PainelRecepcao` | filhos | — | balcão com frente azul, monitor, painel "UBS" e placa "RECEPÇÃO" |
+| ├ `BancoInterno` / `SalaEspera` | filhos | — | 3 filas de cadeiras (levemente desalinhadas) mais uma cadeira solta, painel de chamada com senha atual e próxima, totem "retire sua senha", lixeira hospitalar de pedal, álcool em gel, cartazes e vasos |
+| ├ `Corredor` | filho | — | 3 cadeiras, extintor, planta e o cartaz da rota de saída |
+| ├ `Consultorio1` / `Consultorio2` | filhos | — | mesa com monitor e receituário, cadeira giratória e cadeira do paciente **viradas uma para a outra**, maca com lençol e travesseiro verde-água (contraste com o colchão azul) e rolo de papel, bancada com cuba e o aparelho de pressão (mostrador virado para a porta, é o equipamento que se lê de longe), armário de 2 portas com vitrine, quadro branco, cartazes, lixeira de pedal e dispenser de álcool |
+| └ `DC_LUZ_UBS_*` | 11 Empties | — | marcadores de luz: viram Point Lights *Baked* no import (forro 1900 lm / 4000 K, marquise 1500 lm / 3000 K) |
+
+### Padrão de portas, placas e cartazes (etapa de polimento)
+
+| | Medida |
+|---|---|
+| vão de passagem | 1,00 × 2,20 m (todos: consultórios, serviço e saída) |
+| folha | 0,98 × 2,12 m, maçaneta a 1,05 m |
+| placa de porta/parede | 0,62 × 0,17 m, base a 2,32 m do piso |
+| cartaz funcional | 0,72 × 0,92 m, centro a 1,72 m |
+
+Os três cartazes funcionais são conteúdo de jogo, não enfeite:
+
+| Cartaz | Onde | O que diz |
+|---|---|---|
+| `cartaz_granizo` | sala de espera | os 5 passos do que fazer no granizo |
+| `cartaz_apoio` | sala de espera | ponto de apoio da Defesa Civil, com o **logo oficial** e o 199 |
+| `cartaz_rota` | corredor | planta com a rota até a saída |
 | `Placa` (outdoor) | 6,20 × 4,90 × 0,84 | 568 | painel de 6,0 × 2,0 m a 4,8 m do chão, face para **−Z**, com o aviso de granizo e dois projetores |
 | └ `PostePlaca` | filho | — | poste central com sapata |
 | `Vaga` | 2,70 × 2,02 × 5,66 | 512 | **não é vaga pintada de rua**: é o local sugerido (2,6 × 5,2 m) onde o jogador induz o NPC a parar o carro. Cantoneiras amarelas de alvo, "P" no chão e piso de realce raso (10 mm) — dá para acender/apagar trocando o material do realce |
@@ -95,8 +116,9 @@ o builder deve pôr o modelo na altura da superfície em vez de `+ meia altura`.
 | ├ `Barriga` | filho | — | calota da infiltração; **pivô no centro** — dá para crescer por escala conforme a água acumula |
 | └ `Trinca` | filho | — | risco logo abaixo da superfície |
 
-Todos os itens de mão estão abaixo do orçamento (1,5k tris); caminhão (3,3k) e
-UBS (3,8k) estão dentro do orçamento de construção (8k).
+Todos os itens de mão estão abaixo do orçamento (1,5k tris); o caminhão (3,3k) está dentro do orçamento de construção (8k).
+A **UBS (23,4k)** passa dele de propósito: é um prédio com interior completo,
+não uma peça de fundo — na cena ela aparece uma vez só.
 
 ### Nomes repetidos
 
