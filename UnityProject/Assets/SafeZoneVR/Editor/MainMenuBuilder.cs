@@ -21,7 +21,8 @@ namespace SafeZoneVR.Editor
         static readonly Vector3 k_SpawnPosition = new Vector3(0f, 0f, 5.9f);
         const float k_SpawnYaw = 180f;
 
-        const float k_FichaAltura = 1.3f;
+        const float k_FichaAltura = 1.05f;
+        const float k_FichaTopo = 1.28f;
 
         static readonly Quaternion k_FacingEntrance = Quaternion.Euler(0f, 180f, 0f);
 
@@ -190,6 +191,7 @@ namespace SafeZoneVR.Editor
         static List<HubKiosk> CreateKiosks(Transform parent, GameObject hub, ScenarioCatalogSO catalog)
         {
             var kiosks = new List<HubKiosk>();
+            var oculto = UIBuilderUtil.GetOrCreateMaterial("Mat_HubTextoOculto", new Color(0f, 0f, 0f, 0f), true, true, 0f, 3000);
 
             foreach (var map in k_Kiosks)
             {
@@ -207,6 +209,7 @@ namespace SafeZoneVR.Editor
                 var kiosk = go.AddComponent<HubKiosk>();
                 kiosk.scenario = scenario;
 
+                EsconderNomeGravado(panel, oculto);
                 CreateKioskCanvas(kiosk, go.transform, hub, map, panel);
                 kiosk.Refresh();
                 kiosks.Add(kiosk);
@@ -219,21 +222,36 @@ namespace SafeZoneVR.Editor
         {
             var art = ScenarioSceneKit.FindChildRecursive(hub.transform, map.objectName + "_Art");
             var artRenderer = art != null ? art.GetComponent<Renderer>() : null;
-            var baseY = artRenderer != null ? artRenderer.bounds.min.y : panel.position.y + 1.57f;
             var frenteZ = artRenderer != null ? artRenderer.bounds.center.z : panel.position.z - 0.08f;
-            var ficha = new Vector3(panel.position.x, baseY - k_FichaAltura * 0.5f - 0.06f, frenteZ);
+            var ficha = new Vector3(panel.position.x, k_FichaTopo - k_FichaAltura * 0.5f, frenteZ);
 
-            var canvas = UIBuilderUtil.CreateWorldCanvas("Canvas", parent, new Vector2(440f, 260f), 0.005f);
+            var canvas = UIBuilderUtil.CreateWorldCanvas("Canvas", parent, new Vector2(440f, 210f), 0.005f);
             canvas.transform.SetPositionAndRotation(ficha + new Vector3(0f, 0f, 0.03f), k_FacingEntrance);
 
             var face = canvas.transform;
             UIBuilderUtil.Panel(face, "Background", UIBuilderUtil.PanelColor, Vector2.zero, Vector2.one, new Vector2(12f, 12f), new Vector2(-12f, -12f));
-            UIBuilderUtil.Panel(face, "HeaderBar", map.accent, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(12f, -62f), new Vector2(-12f, -12f));
-            kiosk.titleLabel = UIBuilderUtil.TopText(face, "Title", "Cenário", 30f, Color.white, TextAlignmentOptions.Center, 14f, 44f, 22f, FontStyles.Bold);
-            kiosk.descriptionLabel = UIBuilderUtil.TopText(face, "Description", string.Empty, 17f, UIBuilderUtil.MutedText, TextAlignmentOptions.TopLeft, 62f, 74f, 26f);
-            kiosk.statusLabel = UIBuilderUtil.TopText(face, "Status", string.Empty, 17f, UIBuilderUtil.AccentGreen, TextAlignmentOptions.Center, 140f, 24f, 22f);
-            kiosk.playButton = UIBuilderUtil.BottomButton(face, "Play", "Jogar", 26f, map.accent, 14f, 56f, 0.14f, 0.86f, 0f, out var playLabel);
+            UIBuilderUtil.Panel(face, "HeaderBar", map.accent, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(12f, -50f), new Vector2(-12f, -12f));
+            kiosk.titleLabel = UIBuilderUtil.TopText(face, "Title", "Cenário", 26f, Color.white, TextAlignmentOptions.Center, 12f, 36f, 22f, FontStyles.Bold);
+            kiosk.descriptionLabel = UIBuilderUtil.TopText(face, "Description", string.Empty, 16f, UIBuilderUtil.MutedText, TextAlignmentOptions.TopLeft, 52f, 76f, 24f);
+            kiosk.statusLabel = UIBuilderUtil.TopText(face, "Status", string.Empty, 16f, UIBuilderUtil.AccentGreen, TextAlignmentOptions.Center, 130f, 22f, 22f);
+            kiosk.playButton = UIBuilderUtil.BottomButton(face, "Play", "Jogar", 24f, map.accent, 8f, 46f, 0.14f, 0.86f, 0f, out var playLabel);
             kiosk.playLabel = playLabel;
+        }
+
+        static void EsconderNomeGravado(Transform panel, Material oculto)
+        {
+            var renderer = panel.GetComponent<MeshRenderer>();
+            if (renderer == null) return;
+            var materiais = renderer.sharedMaterials;
+            var mudou = false;
+            for (var i = 0; i < materiais.Length; i++)
+            {
+                if (materiais[i] == null || materiais[i].name != "DC_M_White") continue;
+                materiais[i] = oculto;
+                mudou = true;
+            }
+            if (mudou) renderer.sharedMaterials = materiais;
+            else Debug.LogWarning($"[SafeZone VR] Nome gravado do totem {panel.name} não encontrado (submalha DC_M_White).");
         }
 
         static Button CreateDiscButton(Transform parent, GameObject hub, string objectName, string name)
