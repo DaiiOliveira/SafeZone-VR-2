@@ -66,13 +66,19 @@ filha e tem interagível próprio. A etiqueta da chave não herda a escala dela 
 | `k_Ceiling` | (−2,9; 2,68; −8,9) | forro do quarto de casal |
 | `k_GateZone` | (−4,9; 1,2; 4,4) | logo depois do portão de pedestres |
 
-UBS modelada (`UBS.fbx`, 23 mil triângulos) no lote à direita da praça: prédio em x 8,7..22,9,
+UBS modelada (`UBS.fbx`, 18 mil triângulos depois da limpeza) no lote à direita da praça: prédio em x 8,7..22,9,
 z 14,0..24,1, mais calçada e marquise até x 5,6..24,2. Fica em `k_Ubs` (15,8; 0; 19) com
 **yaw 180**, porque a entrada do modelo nasce em +X e precisa olhar para a praça. O piso interno
 fica em y 0,154 (`k_UbsFloorY`). A entrada **não** é a peça `Porta`: essas são folhas fechadas da
 fachada, e o vão que dá passagem tem 0,9 m em **z 19,45** (`k_UbsDoorZ`). O modelo traz 11
 marcadores `DC_LUZ_*` que o importador converte em Point Lights; o builder as força para Realtime
-sem sombra, porque a cena não tem lightmap assado. A torre de transmissão foi para x 27,5 para
+sem sombra, porque a cena não tem lightmap assado. **Só o consultório sul é acessível:** as paredes
+do corredor são maciças nos dois lados, então `Corredor` e `Consultorio1` nunca deram passagem, e
+`PainelRecepcao` flutuava a 0,9 m do chão atravessando o forro. `RemoverAlaNorte` apaga esses três
+mais `ParedeCorredorNorte` e as luzes Forro3/5/7/8; `FecharAlaNorte` tapa o hall em z 18 com uma
+cópia estreitada da `ParedeCorredorSul` (`ParedeFechaAlaNorte`, x 14,75..16,35). Teleporte fica em
+`PisoUBS`, `SalaEspera` e `Consultorio2` (`k_UbsPisoNavegavel`). Isso baixou a UBS de 23.372 para
+18.268 triângulos e de 11 para 7 luzes. A torre de transmissão foi para x 27,5 para
 abrir espaço: o prédio não cabia entre a praça (x 5,5) e a torre onde ela estava. Montanhas da praça a ~190 m, nuvens a
 ~320 m. Céu de tempestade: `RenderSettings.skybox = null` e a câmera passa a pintar o céu de
 cinza (ver `SetupStormCamera`). O ponto de ônibus é montado de costas para a rua e recebe meia
