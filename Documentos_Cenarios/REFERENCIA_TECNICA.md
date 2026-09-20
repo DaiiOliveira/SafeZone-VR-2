@@ -90,18 +90,20 @@ Os três totens são `DC_PANEL_Flood`, `DC_PANEL_Fire` e `DC_PANEL_Hail`, cada u
 (`DC_M_PanelFlood`, `DC_M_PanelFire`, `DC_M_PanelHail`). A ficha de UI do totem fica **abaixo**
 da foto, centrada em y 0,86 e com topo em 1,51, justamente para não cobri-la.
 
-O totem é usado **como o modelo veio**: foto em y 1,57..3,43, ícone hexagonal (`DC_M_Icon*`) em
-1,30..1,60 e nome gravado (submalha `DC_M_White`) em 0,65..1,01, todos visíveis. A UI acrescenta
-apenas dois elementos, encaixados nas folgas entre eles e **sem fundo**, para não tapar nada:
+O totem mostra a **foto** (`_Art`, y 1,57..3,43) sobre o corpo de pedra, e a ficha de UI logo
+abaixo (y 0,21..1,51) com título, descrição, melhor pontuação e o botão Jogar.
 
-| Elemento | Faixa em Y | Onde |
+Três materiais do modelo são trocados por `Mat_HubTextoOculto` no builder, via
+`k_MateriaisOcultos`, porque disputavam espaço com a ficha:
+
+| Material | O que era | Por que saiu |
 |---|---|---|
-| Melhor pontuação | 1,05..1,28 | entre o nome gravado e o ícone |
-| Botão Jogar | 0,32..0,58 | entre a base e o nome gravado |
+| `DC_M_Glow*` | moldura colorida por fase (azul, amarela, roxa) | pedido de remoção |
+| `DC_M_Icon*` | hexágono da fase, y 1,30..1,60 | cortava o texto da ficha ao meio |
+| `DC_M_White` | nome gravado e subtítulo, y 0,65..1,01 | duplicava o título e aparecia por trás da descrição |
 
-Título e descrição saíram da UI: quem nomeia a fase é a gravação do próprio totem. Mexer nas
-constantes `k_FichaTopo` e `k_FichaAltura` sem conferir essas faixas faz os elementos se
-sobreporem — foi o que aconteceu nas duas primeiras tentativas.
+Continuam visíveis `DC_M_Stone`, `DC_M_Navy` e `DC_M_PanelFrame` — o corpo do totem e a moldura
+neutra em volta da foto.
 
 As texturas **não são embutidas**: o FBX aponta para a pasta `DC_Hub.fbm`, que precisa ser
 copiada junto. Sem ela o modelo importa com 32 materiais e nenhuma textura, e os painéis ficam
