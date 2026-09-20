@@ -14,9 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SafeZoneVR.ScenarioSO
   m_ScenarioId: granizo
   m_DisplayName: Granizo
-  m_Description: "Tempestade com granizo chegando e voc\xEA na pra\xE7a em frente
-    de casa. Oriente onde estacionar, ajude o Seu Joaquim, escolha um abrigo resistente
-    e, depois, volte com cuidado e aja se o telhado amea\xE7ar ceder."
+  m_Description: "Granizo a caminho da pra\xE7a: proteja o carro, ajude o Seu Joaquim,
+    busque um abrigo resistente e volte com cuidado."
   m_SceneName: Granizo_Praca
   m_IsAvailable: 1
   m_TargetTimeSeconds: 360

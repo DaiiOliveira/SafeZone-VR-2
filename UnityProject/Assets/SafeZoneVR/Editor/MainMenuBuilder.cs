@@ -21,8 +21,14 @@ namespace SafeZoneVR.Editor
         static readonly Vector3 k_SpawnPosition = new Vector3(0f, 0f, 5.9f);
         const float k_SpawnYaw = 180f;
 
-        const float k_FichaAltura = 1.3f;
-
+        const float k_FotoAltura = 1.65f;
+        const float k_FichaAltura = 1.12f;
+        const float k_FichaLargura = 1.95f;
+        const float k_FichaEscala = 0.005f;
+        const float k_FichaFrente = 0.14f;
+
+
+
         static readonly string[] k_MateriaisOcultos = { "DC_M_Glow", "DC_M_Icon", "DC_M_White" };
 
         static readonly Quaternion k_FacingEntrance = Quaternion.Euler(0f, 180f, 0f);
@@ -222,22 +228,45 @@ namespace SafeZoneVR.Editor
         static void CreateKioskCanvas(HubKiosk kiosk, Transform parent, GameObject hub, KioskMap map, Transform panel)
         {
             var art = ScenarioSceneKit.FindChildRecursive(hub.transform, map.objectName + "_Art");
-            var artRenderer = art != null ? art.GetComponent<Renderer>() : null;
-            var baseY = artRenderer != null ? artRenderer.bounds.min.y : panel.position.y + 1.57f;
-            var frenteZ = artRenderer != null ? artRenderer.bounds.center.z : panel.position.z - 0.08f;
-            var ficha = new Vector3(panel.position.x, baseY - k_FichaAltura * 0.5f - 0.06f, frenteZ);
+            var centroX = panel.position.x;
+            var foto = AjustarFoto(art, centroX);
+            var topo = foto.HasValue ? foto.Value.min.y - 0.06f : panel.position.y + 1.7f;
+            var frenteZ = foto.HasValue ? foto.Value.center.z : panel.position.z - 0.08f;
+            var centro = new Vector3(centroX, topo - k_FichaAltura * 0.5f, frenteZ + k_FichaFrente);
 
-            var canvas = UIBuilderUtil.CreateWorldCanvas("Canvas", parent, new Vector2(440f, 260f), 0.005f);
-            canvas.transform.SetPositionAndRotation(ficha + new Vector3(0f, 0f, 0.03f), k_FacingEntrance);
+            var tamanho = new Vector2(k_FichaLargura / k_FichaEscala, k_FichaAltura / k_FichaEscala);
+            var canvas = UIBuilderUtil.CreateWorldCanvas("Canvas", parent, tamanho, k_FichaEscala);
+            canvas.transform.SetPositionAndRotation(centro, k_FacingEntrance);
 
             var face = canvas.transform;
-            UIBuilderUtil.Panel(face, "Background", UIBuilderUtil.PanelColor, Vector2.zero, Vector2.one, new Vector2(12f, 12f), new Vector2(-12f, -12f));
-            UIBuilderUtil.Panel(face, "HeaderBar", map.accent, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(12f, -62f), new Vector2(-12f, -12f));
-            kiosk.titleLabel = UIBuilderUtil.TopText(face, "Title", "Cenário", 30f, Color.white, TextAlignmentOptions.Center, 14f, 44f, 22f, FontStyles.Bold);
-            kiosk.descriptionLabel = UIBuilderUtil.TopText(face, "Description", string.Empty, 17f, UIBuilderUtil.MutedText, TextAlignmentOptions.TopLeft, 62f, 74f, 26f);
-            kiosk.statusLabel = UIBuilderUtil.TopText(face, "Status", string.Empty, 17f, UIBuilderUtil.AccentGreen, TextAlignmentOptions.Center, 140f, 24f, 22f);
-            kiosk.playButton = UIBuilderUtil.BottomButton(face, "Play", "Jogar", 26f, map.accent, 14f, 56f, 0.14f, 0.86f, 0f, out var playLabel);
+            UIBuilderUtil.Panel(face, "Background", UIBuilderUtil.PanelColor, Vector2.zero, Vector2.one, new Vector2(10f, 10f), new Vector2(-10f, -10f));
+            UIBuilderUtil.Panel(face, "HeaderBar", map.accent, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(10f, -54f), new Vector2(-10f, -10f));
+            kiosk.titleLabel = UIBuilderUtil.TopText(face, "Title", "Cenário", 26f, Color.white, TextAlignmentOptions.Center, 12f, 40f, 20f, FontStyles.Bold);
+            kiosk.descriptionLabel = UIBuilderUtil.TopText(face, "Description", string.Empty, 15f, UIBuilderUtil.MutedText, TextAlignmentOptions.TopLeft, 58f, 62f, 22f);
+            kiosk.statusLabel = UIBuilderUtil.TopText(face, "Status", string.Empty, 15f, UIBuilderUtil.AccentGreen, TextAlignmentOptions.Center, 122f, 22f, 20f);
+            kiosk.playButton = UIBuilderUtil.BottomButton(face, "Play", "Jogar", 22f, map.accent, 10f, 48f, 0.14f, 0.86f, 0f, out var playLabel);
             kiosk.playLabel = playLabel;
+        }
+
+        static Bounds? AjustarFoto(Transform art, float centroX)
+        {
+            var renderer = art != null ? art.GetComponent<Renderer>() : null;
+            if (renderer == null)
+            {
+                Debug.LogWarning("[SafeZone VR] Foto do totem não encontrada no modelo do hub.");
+                return null;
+            }
+
+            var antes = renderer.bounds;
+            var escala = k_FotoAltura / antes.size.y;
+            if (escala < 0.999f)
+            {
+                art.localScale *= escala;
+                var depois = renderer.bounds;
+                art.position += new Vector3(centroX - depois.center.x, antes.max.y - depois.max.y, 0f);
+            }
+
+            return renderer.bounds;
         }
 
         static void EsconderArteDoTotem(Transform panel, Material oculto)

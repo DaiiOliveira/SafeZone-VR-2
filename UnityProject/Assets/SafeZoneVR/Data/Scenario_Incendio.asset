@@ -14,9 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SafeZoneVR.ScenarioSO
   m_ScenarioId: incendio
   m_DisplayName: "Inc\xEAndio em Casa"
-  m_Description: "A panela pegou fogo e, depois, um benjamim sobrecarregado atr\xE1s
-    da TV. Aprenda a apagar s\xF3 o que \xE9 pequeno, sem \xE1gua no \xF3leo ou na
-    eletricidade, e a sair abaixado, fechar a porta sem trancar e ligar 193."
+  m_Description: "Fogo na panela e no benjamim atr\xE1s da TV: apague s\xF3 o que
+    \xE9 pequeno, saia abaixado e chame os bombeiros no 193."
   m_SceneName: Incendio_EmCasa
   m_IsAvailable: 1
   m_TargetTimeSeconds: 300

@@ -14,9 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SafeZoneVR.ScenarioSO
   m_ScenarioId: alagamento_em_casa
   m_DisplayName: Alagamento em Casa
-  m_Description: "Chuva forte, alerta da Defesa Civil e a \xE1gua come\xE7ando a
-    subir na rua. Pratique as decis\xF5es certas dentro de casa: proteger documentos,
-    desligar energia, fechar o registro, montar o kit e evacuar pela rota segura."
+  m_Description: "A \xE1gua sobe na rua: proteja os documentos, desligue a energia,
+    feche o registro, monte o kit e evacue pela rota segura."
   m_SceneName: Alagamento_EmCasa
   m_IsAvailable: 1
   m_TargetTimeSeconds: 240
