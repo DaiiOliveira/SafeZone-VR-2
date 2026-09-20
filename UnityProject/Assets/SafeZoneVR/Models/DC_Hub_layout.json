@@ -1,0 +1,792 @@
+{
+  "unit": "meter",
+  "up_axis": "Y",
+  "objects": [
+    {
+      "name": "DC_BANNER_Left",
+      "unity_position": [
+        -5.7,
+        3.95,
+        -3.16
+      ],
+      "unity_rotation_euler_deg": [
+        90.0,
+        0.0,
+        0.0
+      ],
+      "unity_size_m": [
+        1.4,
+        0.046,
+        2.45
+      ],
+      "triangles": 4642,
+      "materials": [
+        "DC_M_White",
+        "DC_M_Navy",
+        "DC_M_Orange"
+      ]
+    },
+    {
+      "name": "DC_BANNER_Right",
+      "unity_position": [
+        5.7,
+        3.95,
+        -3.16
+      ],
+      "unity_rotation_euler_deg": [
+        90.0,
+        0.0,
+        0.0
+      ],
+      "unity_size_m": [
+        1.4,
+        0.046,
+        2.45
+      ],
+      "triangles": 4808,
+      "materials": [
+        "DC_M_White",
+        "DC_M_Navy",
+        "DC_M_Orange"
+      ]
+    },
+    {
+      "name": "DC_ENV_Backdrop",
+      "unity_position": [
+        0.0,
+        8.0,
+        46.0
+      ],
+      "unity_rotation_euler_deg": [
+        90.0,
+        0.0,
+        0.0
+      ],
+      "unity_size_m": [
+        90.0,
+        0.0,
+        40.0
+      ],
+      "triangles": 2,
+      "materials": [
+        "DC_M_Sky"
+      ]
+    },
+    {
+      "name": "DC_ENV_CeilingBeams",
+      "unity_position": [
+        0.0,
+        6.4,
+        -4.2
+      ],
+      "unity_rotation_euler_deg": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "unity_size_m": [
+        13.9,
+        0.82,
+        12.0
+      ],
+      "triangles": 108,
+      "materials": [
+        "DC_M_Wood",
+        "DC_M_Stone"
+      ]
+    },
+    {
+      "name": "DC_ENV_Floor",
+      "unity_position": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "unity_rotation_euler_deg": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "unity_size_m": [
+        18.0,
+        0.0,
+        16.0
+      ],
+      "triangles": 2,
+      "materials": [
+        "DC_M_Floor"
+      ]
+    },
+    {
+      "name": "DC_ENV_FloorInlay",
+      "unity_position": [
+        0.0,
+        0.005,
+        0.6
+      ],
+      "unity_rotation_euler_deg": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "unity_size_m": [
+        11.16,
+        0.0,
+        8.8
+      ],
+      "triangles": 2,
+      "materials": [
+        "DC_M_FloorInlay"
+      ]
+    },
+    {
+      "name": "DC_ENV_FloorLines",
+      "unity_position": [
+        -2.0,
+        0.008,
+        0.6
+      ],
+      "unity_rotation_euler_deg": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "unity_size_m": [
+        11.16,
+        0.0,
+        8.8
+      ],
+      "triangles": 6,
+      "materials": [
+        "DC_M_Stone"
+      ]
+    },
+    {
+      "name": "DC_ENV_GroundFar",
+      "unity_position": [
+        0.0,
+        -1.6,
+        30.0
+      ],
+      "unity_rotation_euler_deg": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "unity_size_m": [
+        120.0,
+        0.0,
+        44.0
+      ],
+      "triangles": 2,
+      "materials": [
+        "DC_M_Ground"
+      ]
+    },
+    {
+      "name": "DC_ENV_Mountains_Far",
+      "unity_position": [
+        -44.64505,
+        2.90476,
+        47.77523
+      ],
+      "unity_rotation_euler_deg": [
+        0.0,
+        68.33,
+        0.0
+      ],
+      "unity_size_m": [
+        43.417,
+        10.239,
+        92.514
+      ],
+      "triangles": 74,
+      "materials": [
+        "DC_M_MountainFar"
+      ]
+    },
+    {
+      "name": "DC_ENV_Mountains_Mid",
+      "unity_position": [
+        -32.88239,
+        1.84614,
+        37.18446
+      ],
+      "unity_rotation_euler_deg": [
+        0.0,
+        111.979,
+        0.0
+      ],
+      "unity_size_m": [
+        34.071,
+        7.91,
+        66.503
+      ],
+      "triangles": 64,
+      "materials": [
+        "DC_M_MountainMid"
+      ]
+    },
+    {
+      "name": "DC_ENV_Mountains_Near",
+      "unity_position": [
+        -26.37856,
+        1.27769,
+        31.83263
+      ],
+      "unity_rotation_euler_deg": [
+        0.0,
+        65.785,
+        0.0
+      ],
+      "unity_size_m": [
+        33.514,
+        6.131,
+        60.636
+      ],
+      "triangles": 50,
+      "materials": [
+        "DC_M_MountainNear"
+      ]
+    },
+    {
+      "name": "DC_ENV_Pillars",
+      "unity_position": [
+        -6.0,
+        0.0,
+        -2.6
+      ],
+      "unity_rotation_euler_deg": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "unity_size_m": [
+        13.9,
+        6.4,
+        9.05
+      ],
+      "triangles": 224,
+      "materials": [
+        "DC_M_Stone"
+      ]
+    },
+    {
+      "name": "DC_ENV_Railing",
+      "unity_position": [
+        -4.8,
+        0.0,
+        1.4
+      ],
+      "unity_rotation_euler_deg": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "unity_size_m": [
+        10.02,
+        1.05,
+        10.81
+      ],
+      "triangles": 72,
+      "materials": [
+        "DC_M_Stone",
+        "DC_M_Navy"
+      ]
+    },
+    {
+      "name": "DC_PANEL_Fire",
+      "unity_position": [
+        0.0,
+        0.0,
+        1.2
+      ],
+      "unity_rotation_euler_deg": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "unity_size_m": [
+        2.625,
+        3.595,
+        2.625
+      ],
+      "triangles": 4730,
+      "materials": [
+        "DC_M_Stone",
+        "DC_M_Navy",
+        "DC_M_GlowFire",
+        "DC_M_PanelFrame",
+        "DC_M_IconFire",
+        "DC_M_White"
+      ]
+    },
+    {
+      "name": "DC_PANEL_Fire_Art",
+      "unity_position": [
+        0.0,
+        2.5,
+        1.12
+      ],
+      "unity_rotation_euler_deg": [
+        90.0,
+        0.0,
+        0.0
+      ],
+      "unity_size_m": [
+        2.2,
+        0.0,
+        1.86
+      ],
+      "triangles": 2,
+      "materials": [
+        "DC_M_PanelFire"
+      ]
+    },
+    {
+      "name": "DC_PANEL_Flood",
+      "unity_position": [
+        -3.4,
+        0.0,
+        1.2
+      ],
+      "unity_rotation_euler_deg": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "unity_size_m": [
+        2.625,
+        3.595,
+        2.625
+      ],
+      "triangles": 4650,
+      "materials": [
+        "DC_M_Stone",
+        "DC_M_Navy",
+        "DC_M_GlowFlood",
+        "DC_M_PanelFrame",
+        "DC_M_IconFlood",
+        "DC_M_White"
+      ]
+    },
+    {
+      "name": "DC_PANEL_Flood_Art",
+      "unity_position": [
+        -3.4,
+        2.5,
+        1.12
+      ],
+      "unity_rotation_euler_deg": [
+        90.0,
+        0.0,
+        0.0
+      ],
+      "unity_size_m": [
+        2.2,
+        0.0,
+        1.86
+      ],
+      "triangles": 2,
+      "materials": [
+        "DC_M_PanelFlood"
+      ]
+    },
+    {
+      "name": "DC_PANEL_Hail",
+      "unity_position": [
+        3.4,
+        0.0,
+        1.2
+      ],
+      "unity_rotation_euler_deg": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "unity_size_m": [
+        2.625,
+        3.595,
+        2.625
+      ],
+      "triangles": 4528,
+      "materials": [
+        "DC_M_Stone",
+        "DC_M_Navy",
+        "DC_M_GlowHail",
+        "DC_M_PanelFrame",
+        "DC_M_IconHail",
+        "DC_M_White"
+      ]
+    },
+    {
+      "name": "DC_PANEL_Hail_Art",
+      "unity_position": [
+        3.4,
+        2.5,
+        1.12
+      ],
+      "unity_rotation_euler_deg": [
+        90.0,
+        0.0,
+        0.0
+      ],
+      "unity_size_m": [
+        2.2,
+        0.0,
+        1.86
+      ],
+      "triangles": 2,
+      "materials": [
+        "DC_M_PanelHail"
+      ]
+    },
+    {
+      "name": "DC_PROP_Backpack",
+      "unity_position": [
+        4.63,
+        0.75,
+        -3.05
+      ],
+      "unity_rotation_euler_deg": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "unity_size_m": [
+        0.368,
+        0.46,
+        0.464
+      ],
+      "triangles": 1494,
+      "materials": [
+        "DC_M_Orange"
+      ]
+    },
+    {
+      "name": "DC_PROP_BookStack",
+      "unity_position": [
+        -5.33373,
+        0.75,
+        -3.07862
+      ],
+      "unity_rotation_euler_deg": [
+        0.0,
+        -4.0,
+        0.0
+      ],
+      "unity_size_m": [
+        0.352,
+        0.22,
+        0.248
+      ],
+      "triangles": 96,
+      "materials": [
+        "DC_M_Book0",
+        "DC_M_Paper",
+        "DC_M_Book1",
+        "DC_M_Book2",
+        "DC_M_Book3"
+      ]
+    },
+    {
+      "name": "DC_PROP_Helmet_L",
+      "unity_position": [
+        -4.95,
+        0.75,
+        -3.3
+      ],
+      "unity_rotation_euler_deg": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "unity_size_m": [
+        0.18,
+        0.19,
+        0.228
+      ],
+      "triangles": 900,
+      "materials": [
+        "DC_M_White"
+      ]
+    },
+    {
+      "name": "DC_PROP_Helmet_R",
+      "unity_position": [
+        5.43,
+        0.75,
+        -3.22
+      ],
+      "unity_rotation_euler_deg": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "unity_size_m": [
+        0.18,
+        0.19,
+        0.228
+      ],
+      "triangles": 900,
+      "materials": [
+        "DC_M_White"
+      ]
+    },
+    {
+      "name": "DC_PROP_MapSheet",
+      "unity_position": [
+        -4.63,
+        0.754,
+        -3.12
+      ],
+      "unity_rotation_euler_deg": [
+        0.0,
+        -12.0,
+        0.0
+      ],
+      "unity_size_m": [
+        0.62,
+        0.002,
+        0.44
+      ],
+      "triangles": 7,
+      "materials": [
+        "DC_M_Paper",
+        "DC_M_MapGreen"
+      ]
+    },
+    {
+      "name": "DC_PROP_Radio",
+      "unity_position": [
+        -4.33,
+        0.75,
+        -2.92
+      ],
+      "unity_rotation_euler_deg": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "unity_size_m": [
+        0.072,
+        0.29,
+        0.054
+      ],
+      "triangles": 700,
+      "materials": [
+        "DC_M_Rubber"
+      ]
+    },
+    {
+      "name": "DC_PROP_Table_L",
+      "unity_position": [
+        -5.05,
+        0.0,
+        -3.1
+      ],
+      "unity_rotation_euler_deg": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "unity_size_m": [
+        1.7,
+        0.75,
+        0.85
+      ],
+      "triangles": 264,
+      "materials": [
+        "DC_M_Wood",
+        "DC_M_Navy"
+      ]
+    },
+    {
+      "name": "DC_PROP_Table_R",
+      "unity_position": [
+        5.05,
+        0.0,
+        -3.1
+      ],
+      "unity_rotation_euler_deg": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "unity_size_m": [
+        1.7,
+        0.75,
+        0.85
+      ],
+      "triangles": 264,
+      "materials": [
+        "DC_M_Wood",
+        "DC_M_Navy"
+      ]
+    },
+    {
+      "name": "DC_SIGN_FloorDecal",
+      "unity_position": [
+        0.0,
+        0.012,
+        -1.3
+      ],
+      "unity_rotation_euler_deg": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "unity_size_m": [
+        3.89,
+        0.008,
+        1.152
+      ],
+      "triangles": 3126,
+      "materials": [
+        "DC_M_Navy",
+        "DC_M_Orange"
+      ]
+    },
+    {
+      "name": "DC_SIGN_LogoDefesaCivil",
+      "unity_position": [
+        -2.55,
+        5.5,
+        1.46
+      ],
+      "unity_rotation_euler_deg": [
+        90.0,
+        0.0,
+        0.0
+      ],
+      "unity_size_m": [
+        0.772,
+        0.0,
+        0.78
+      ],
+      "triangles": 2,
+      "materials": [
+        "DC_M_DC_SIGN_LogoDefesaCivil"
+      ]
+    },
+    {
+      "name": "DC_SIGN_LogoUDESC",
+      "unity_position": [
+        2.32,
+        5.62,
+        1.42
+      ],
+      "unity_rotation_euler_deg": [
+        90.0,
+        0.0,
+        0.0
+      ],
+      "unity_size_m": [
+        1.613,
+        0.0,
+        0.4
+      ],
+      "triangles": 2,
+      "materials": [
+        "DC_M_DC_SIGN_LogoUDESC"
+      ]
+    },
+    {
+      "name": "DC_SIGN_MainBoard",
+      "unity_position": [
+        0.0,
+        4.875,
+        1.6
+      ],
+      "unity_rotation_euler_deg": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "unity_size_m": [
+        7.0,
+        2.345,
+        0.45
+      ],
+      "triangles": 5840,
+      "materials": [
+        "DC_M_Navy",
+        "DC_M_Orange",
+        "DC_M_Stone",
+        "DC_M_White",
+        "DC_M_GlowAmber"
+      ]
+    },
+    {
+      "name": "DC_SIGN_SubHeader",
+      "unity_position": [
+        0.0,
+        3.875,
+        1.5
+      ],
+      "unity_rotation_euler_deg": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "unity_size_m": [
+        5.2,
+        0.95,
+        0.215
+      ],
+      "triangles": 7330,
+      "materials": [
+        "DC_M_PanelFrame",
+        "DC_M_White"
+      ]
+    },
+    {
+      "name": "DC_UI_ButtonExit",
+      "unity_position": [
+        1.55,
+        0.15493,
+        -5.015
+      ],
+      "unity_rotation_euler_deg": [
+        90.0,
+        0.0,
+        0.0
+      ],
+      "unity_size_m": [
+        0.6,
+        0.13,
+        0.765
+      ],
+      "triangles": 608,
+      "materials": [
+        "DC_M_PanelFrame",
+        "DC_M_Navy",
+        "DC_M_White"
+      ]
+    },
+    {
+      "name": "DC_UI_ButtonSettings",
+      "unity_position": [
+        -1.54963,
+        0.14005,
+        -5.015
+      ],
+      "unity_rotation_euler_deg": [
+        90.0,
+        0.0,
+        0.0
+      ],
+      "unity_size_m": [
+        0.623,
+        0.13,
+        0.78
+      ],
+      "triangles": 2058,
+      "materials": [
+        "DC_M_PanelFrame",
+        "DC_M_Navy",
+        "DC_M_White"
+      ]
+    }
+  ]
+}

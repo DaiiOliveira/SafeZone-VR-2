@@ -83,6 +83,20 @@ atalho escorregadio é atravessar a rua gelada fora dela.
 **Colliders do granizo são grossos**, com o topo na superfície visível: partículas rápidas
 atravessam colliders finos quando a qualidade de colisão é "Low".
 
+## Hub (`DC_Hub.fbx`, 20/09/2026)
+
+Os três totens são `DC_PANEL_Flood`, `DC_PANEL_Fire` e `DC_PANEL_Hail`, cada um com um filho
+`_Art`: um plano de 2,2 × 1,86 m em y 1,57..3,43 que carrega a **foto** da fase
+(`DC_M_PanelFlood`, `DC_M_PanelFire`, `DC_M_PanelHail`). A ficha de UI do totem fica **abaixo**
+da foto, centrada em y 0,86 e com topo em 1,51, justamente para não cobri-la.
+
+As texturas **não são embutidas**: o FBX aponta para a pasta `DC_Hub.fbm`, que precisa ser
+copiada junto. Sem ela o modelo importa com 32 materiais e nenhuma textura, e os painéis ficam
+lisos — foi o que aconteceu na primeira tentativa. O mesmo vale para `DC_Praca.fbm`.
+
+Os nomes dos totens agora batem com as fases, então o remendo que escondia o texto gravado
+"TERREMOTOS" (submalha `DC_M_White`) foi removido do builder.
+
 ## Modelos importados
 
 Os FBX saem do Blender deitados (altura no eixo Z). O `ScenarioSceneKit` gira a raiz em

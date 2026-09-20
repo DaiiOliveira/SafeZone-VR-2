@@ -1297,11 +1297,11 @@ namespace SafeZoneVR.Editor
         {
             var go = UIBuilderUtil.Child(parent, "SafetyNoticePanel");
             UIBuilderUtil.AddLazyFollow(go, camera, new Vector3(0f, 0f, 1.5f), 3f);
-            var canvas = UIBuilderUtil.CreateWorldCanvas("Canvas", go.transform, new Vector2(820f, 720f), 0.0011f);
+            var canvas = UIBuilderUtil.CreateWorldCanvas("Canvas", go.transform, new Vector2(900f, 860f), 0.0016f);
             var panel = canvas.transform;
             UIBuilderUtil.FullPanel(panel, "Background", new Color(0.08f, 0.11f, 0.16f, 1f));
-            UIBuilderUtil.Panel(panel, "HeaderBar", new Color(0.85f, 0.55f, 0.15f), new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -70f), Vector2.zero);
-            UIBuilderUtil.TopText(panel, "Title", "Antes de começar: sua segurança", 30f, Color.white, TextAlignmentOptions.Center, 12f, 48f, 24f, FontStyles.Bold);
+            UIBuilderUtil.Panel(panel, "HeaderBar", new Color(0.85f, 0.55f, 0.15f), new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -86f), Vector2.zero);
+            UIBuilderUtil.TopText(panel, "Title", "Antes de começar: sua segurança", 38f, Color.white, TextAlignmentOptions.Center, 16f, 58f, 24f, FontStyles.Bold);
             UIBuilderUtil.TopText(panel, "Body",
                 "• <b>Área livre:</b> afaste móveis, objetos e pessoas e confirme o limite de segurança (Guardian) do headset.\n" +
                 "• <b>Desconforto:</b> a realidade virtual pode causar enjoo, tontura, dor de cabeça ou cansaço visual. " +
@@ -1309,10 +1309,10 @@ namespace SafeZoneVR.Editor
                 "• <b>Sensibilidade à luz:</b> há fogo, fumaça e luzes piscando. Quem tem epilepsia ou sensibilidade à luz deve consultar um médico antes de jogar.\n" +
                 "• <b>Acompanhante:</b> jogue com alguém por perto; crianças sempre com supervisão de um adulto.\n" +
                 "• <b>Pausas:</b> faça intervalos entre as fases. Isto é um treino: em uma emergência real, siga a Defesa Civil (199) e os Bombeiros (193).",
-                21f, UIBuilderUtil.TextColor, TextAlignmentOptions.TopLeft, 92f, 500f, 36f);
+                28f, UIBuilderUtil.TextColor, TextAlignmentOptions.TopLeft, 112f, 626f, 40f);
             var ctrl = go.AddComponent<SafetyNoticePanel>();
             ctrl.root = go;
-            ctrl.acceptButton = UIBuilderUtil.BottomButton(panel, "Accept", "Li e entendi", 26f, UIBuilderUtil.AccentGreen, 24f, 64f, 0.25f, 0.75f, 0f, out _);
+            ctrl.acceptButton = UIBuilderUtil.BottomButton(panel, "Accept", "Li e entendi", 32f, UIBuilderUtil.AccentGreen, 26f, 78f, 0.22f, 0.78f, 0f, out _);
             return ctrl;
         }
 
