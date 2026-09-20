@@ -90,11 +90,18 @@ Os três totens são `DC_PANEL_Flood`, `DC_PANEL_Fire` e `DC_PANEL_Hail`, cada u
 (`DC_M_PanelFlood`, `DC_M_PanelFire`, `DC_M_PanelHail`). A ficha de UI do totem fica **abaixo**
 da foto, centrada em y 0,86 e com topo em 1,51, justamente para não cobri-la.
 
-A faixa da frente do totem é disputada: a foto ocupa y 1,57..3,43, o **ícone hexagonal**
-(`DC_M_Icon*`) fica em y 1,30..1,60 e o **nome gravado** (submalha `DC_M_White`) em y 0,65..1,01.
-A decisão foi **manter o ícone e esconder o nome gravado**, porque ele duplica o título da ficha,
-que mostra o nome completo. A ficha então tem 2,2 × 1,05 m com o topo em **y 1,28**, 2 cm abaixo
-do ícone. Mexer nessas alturas sem conferir essas três faixas faz os elementos se sobreporem.
+O totem é usado **como o modelo veio**: foto em y 1,57..3,43, ícone hexagonal (`DC_M_Icon*`) em
+1,30..1,60 e nome gravado (submalha `DC_M_White`) em 0,65..1,01, todos visíveis. A UI acrescenta
+apenas dois elementos, encaixados nas folgas entre eles e **sem fundo**, para não tapar nada:
+
+| Elemento | Faixa em Y | Onde |
+|---|---|---|
+| Melhor pontuação | 1,05..1,28 | entre o nome gravado e o ícone |
+| Botão Jogar | 0,32..0,58 | entre a base e o nome gravado |
+
+Título e descrição saíram da UI: quem nomeia a fase é a gravação do próprio totem. Mexer nas
+constantes `k_FichaTopo` e `k_FichaAltura` sem conferir essas faixas faz os elementos se
+sobreporem — foi o que aconteceu nas duas primeiras tentativas.
 
 As texturas **não são embutidas**: o FBX aponta para a pasta `DC_Hub.fbm`, que precisa ser
 copiada junto. Sem ela o modelo importa com 32 materiais e nenhuma textura, e os painéis ficam
