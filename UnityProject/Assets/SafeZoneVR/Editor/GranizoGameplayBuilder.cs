@@ -21,6 +21,14 @@ namespace SafeZoneVR.Editor
         const float k_UbsDoorZ = 19.45f;
         const float k_UbsFloorY = 0.15f;
         const float k_UbsYaw = 180f;
+
+        static readonly string[] k_UbsAlaNorte =
+        {
+            "Consultorio1", "Corredor", "ParedeCorredorNorte", "PainelRecepcao",
+            "DC_LUZ_UBS_Forro3", "DC_LUZ_UBS_Forro5", "DC_LUZ_UBS_Forro7", "DC_LUZ_UBS_Forro8",
+        };
+
+        static readonly string[] k_UbsPisoNavegavel = { "PisoUBS", "SalaEspera", "Consultorio2" };
         static readonly Vector3 k_BusStop = new Vector3(-10f, 0f, 6.3f);
         static readonly Vector3 k_Shack = new Vector3(-22.4f, 0.12f, 20f);
         const float k_StreetLaneZ = 10.9f;
@@ -313,6 +321,9 @@ namespace SafeZoneVR.Editor
             var g = ScenarioSceneKit.CreateModelVisual(parent, "UBS",
                 $"{ScenarioSceneKit.k_ItemsFolder}/UBS.fbx", new Vector3(k_Ubs.x, 0f, k_Ubs.z), new Vector3(0f, k_UbsYaw, 0f));
 
+            RemoverAlaNorte(g);
+            FecharAlaNorte(g);
+
             roof = null;
             var interior = new Bounds();
             var achouInterior = false;
@@ -324,8 +335,7 @@ namespace SafeZoneVR.Editor
                 UIBuilderUtil.MarkStatic(mf.gameObject);
 
                 if (mf.name.StartsWith("Laje")) roof = mf.gameObject;
-                if (mf.name.StartsWith("PisoUBS") || mf.name.StartsWith("SalaEspera")
-                    || mf.name.StartsWith("Corredor") || mf.name.StartsWith("Consultorio"))
+                if (System.Array.IndexOf(k_UbsPisoNavegavel, mf.name) >= 0)
                 {
                     ScenarioSceneKit.AddTeleportArea(mf.gameObject);
                     var b = mf.GetComponent<Renderer>().bounds;
@@ -343,6 +353,44 @@ namespace SafeZoneVR.Editor
             if (!achouInterior) interior = new Bounds(new Vector3(k_Ubs.x, 1.5f, k_Ubs.z), k_UbsSize);
             return new Bounds(new Vector3(interior.center.x, 1.5f, interior.center.z),
                 new Vector3(Mathf.Max(1f, interior.size.x - 0.6f), 3f, Mathf.Max(1f, interior.size.z - 0.6f)));
+        }
+
+        static void RemoverAlaNorte(GameObject ubs)
+        {
+            foreach (var nome in k_UbsAlaNorte)
+            {
+                var part = ScenarioSceneKit.ModelPart(ubs, nome);
+                if (part != null)
+                    Object.DestroyImmediate(part.gameObject);
+                else
+                    Debug.LogWarning($"[SafeZone VR] {nome} não existe no modelo da UBS.");
+            }
+        }
+
+        static void FecharAlaNorte(GameObject ubs)
+        {
+            var sul = ScenarioSceneKit.ModelPart(ubs, "ParedeCorredorSul");
+            var interna = ScenarioSceneKit.ModelPart(ubs, "ParedeInterna");
+            if (sul == null || interna == null)
+            {
+                Debug.LogWarning("[SafeZone VR] Paredes da UBS não encontradas: a ala norte fica aberta.");
+                return;
+            }
+
+            var inicio = BoundsDaMalha(interna).min.x - 0.05f;
+            var largura = BoundsDaMalha(sul).min.x + 0.15f - inicio;
+
+            var copia = Object.Instantiate(sul.gameObject, sul.parent);
+            copia.name = "ParedeFechaAlaNorte";
+            var atual = BoundsDaMalha(copia.transform);
+            copia.transform.localScale = Vector3.Scale(copia.transform.localScale, new Vector3(largura / atual.size.x, 1f, 1f));
+            copia.transform.position += new Vector3(inicio - BoundsDaMalha(copia.transform).min.x, 0f, 0f);
+        }
+
+        static Bounds BoundsDaMalha(Transform t)
+        {
+            var mf = t.GetComponent<MeshFilter>();
+            return GeometryUtility.CalculateBounds(mf.sharedMesh.vertices, t.localToWorldMatrix);
         }
 
         static GameObject CreateBusStop(Transform parent)
