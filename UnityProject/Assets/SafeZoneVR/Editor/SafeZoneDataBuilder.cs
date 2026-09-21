@@ -97,7 +97,7 @@ namespace SafeZoneVR.Editor
             data.scenario.EditorInitialize(
                 "alagamento_em_casa",
                 "Alagamento em Casa",
-                "Chuva forte, alerta da Defesa Civil e a água começando a subir na rua. Pratique as decisões certas dentro de casa: proteger documentos, desligar energia, fechar o registro, montar o kit e evacuar pela rota segura.",
+                "A água sobe na rua: proteja os documentos, desligue a energia, feche o registro, monte o kit e evacue pela rota segura.",
                 k_AlagamentoSceneName,
                 true,
                 240f,
@@ -234,7 +234,7 @@ namespace SafeZoneVR.Editor
 
             d.scenario = CreateOrLoad<ScenarioSO>($"{k_DataFolder}/Scenario_Incendio.asset");
             d.scenario.EditorInitialize("incendio", "Incêndio em Casa",
-                "A panela pegou fogo e, depois, um benjamim sobrecarregado atrás da TV. Aprenda a apagar só o que é pequeno, sem água no óleo ou na eletricidade, e a sair abaixado, fechar a porta sem trancar e ligar 193.",
+                "Fogo na panela e no benjamim atrás da TV: apague só o que é pequeno, saia abaixado e chame os bombeiros no 193.",
                 k_IncendioSceneName, true, 300f, 480f,
                 new List<MissionStepSO> { d.gas, d.tampa, d.ventilar, d.energia, d.sair, d.porta, d.ligar, d.vizinho, d.encontro }, cards);
             d.scenario.EditorSetTimeLimit(480f);
@@ -310,7 +310,7 @@ namespace SafeZoneVR.Editor
 
             d.scenario = CreateOrLoad<ScenarioSO>($"{k_DataFolder}/Scenario_Granizo.asset");
             d.scenario.EditorInitialize("granizo", "Granizo",
-                "Tempestade com granizo chegando e você na praça em frente de casa. Oriente onde estacionar, ajude o Seu Joaquim, escolha um abrigo resistente e, depois, volte com cuidado e aja se o telhado ameaçar ceder.",
+                "Granizo a caminho da praça: proteja o carro, ajude o Seu Joaquim, busque um abrigo resistente e volte com cuidado.",
                 k_GranizoSceneName, true, 360f, 600f,
                 new List<MissionStepSO> { d.vaga, d.joaquim, d.abrigo, d.aguardar, d.voltar, d.forro, d.sair, d.comunicar }, cards);
             d.scenario.EditorSetTimeLimit(600f);

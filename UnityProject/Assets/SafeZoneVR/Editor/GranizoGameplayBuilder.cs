@@ -21,6 +21,16 @@ namespace SafeZoneVR.Editor
         const float k_UbsDoorZ = 19.45f;
         const float k_UbsFloorY = 0.15f;
         const float k_UbsYaw = 180f;
+
+        static readonly string[] k_UbsAlaNorte =
+        {
+            "Consultorio1", "Corredor", "ParedeCorredorNorte", "PainelRecepcao",
+            "DC_LUZ_UBS_Forro3", "DC_LUZ_UBS_Forro5", "DC_LUZ_UBS_Forro7", "DC_LUZ_UBS_Forro8",
+        };
+
+        static readonly string[] k_UbsPisoNavegavel = { "PisoUBS", "SalaEspera", "Consultorio2" };
+
+        static readonly Bounds k_UbsCadeira = new Bounds(new Vector3(-4.625f, 0.62f, 3.94f), new Vector3(0.66f, 1.06f, 0.7f));
         static readonly Vector3 k_BusStop = new Vector3(-10f, 0f, 6.3f);
         static readonly Vector3 k_Shack = new Vector3(-22.4f, 0.12f, 20f);
         const float k_StreetLaneZ = 10.9f;
@@ -34,7 +44,9 @@ namespace SafeZoneVR.Editor
         const float k_BusStopYaw = 0f;
         const float k_BillboardYaw = 0f;
         const float k_SpotYaw = 90f;
-        static readonly Vector3 k_Ladder = new Vector3(-10f, 0f, 1.25f);
+        static readonly Vector3 k_Ladder = new Vector3(-9.4f, 0f, 1.84f);
+        const float k_LadderLength = 3.2f;
+        const float k_LadderLean = -20f;
         static readonly Vector3 k_Ceiling = new Vector3(-2.9f, 2.68f, -8.9f);
         static readonly Vector3 k_GateZone = new Vector3(-4.9f, 1.2f, 4.4f);
         static readonly Color k_StormSky = new Color(0.55f, 0.58f, 0.63f);
@@ -83,11 +95,11 @@ namespace SafeZoneVR.Editor
 
             var env = UIBuilderUtil.Child(root.transform, "Environment");
             var iceLayers = CreateIce(env.transform);
-            var ubsZoneBounds = CreateUbs(env.transform, out var ubsRoof);
+            var ubsZoneBounds = CreateUbs(env.transform, out var ubsRoof, out var ubsMarquise);
             var busRoof = CreateBusStop(env.transform);
             var shackRoof = CreateShack(env.transform);
             CreateBillboardAndTower(env.transform);
-            CreateHailBlockers(env.transform, hailLayer, ubsRoof, busRoof, shackRoof);
+            CreateHailBlockers(env.transform, hailLayer, ubsRoof, ubsMarquise, busRoof, shackRoof);
             var hail = CreateHail(env.transform, hailLayer, iceLayers, data.aguardar, k_Ubs + new Vector3(0f, 3.2f, 0f), k_SpotC + new Vector3(0f, 1.2f, 0f));
 
             ScenarioSceneKit.SetupHouseLights(house, root.transform, null);
@@ -308,12 +320,18 @@ namespace SafeZoneVR.Editor
             }
         }
 
-        static Bounds CreateUbs(Transform parent, out GameObject roof)
+        static Bounds CreateUbs(Transform parent, out GameObject roof, out GameObject marquise)
         {
             var g = ScenarioSceneKit.CreateModelVisual(parent, "UBS",
                 $"{ScenarioSceneKit.k_ItemsFolder}/UBS.fbx", new Vector3(k_Ubs.x, 0f, k_Ubs.z), new Vector3(0f, k_UbsYaw, 0f));
 
+            RemoverAlaNorte(g);
+            FecharAlaNorte(g);
+            AfastarPlaca(g);
+            GirarCadeira(g);
+
             roof = null;
+            marquise = null;
             var interior = new Bounds();
             var achouInterior = false;
             foreach (var mf in g.GetComponentsInChildren<MeshFilter>(true))
@@ -324,8 +342,8 @@ namespace SafeZoneVR.Editor
                 UIBuilderUtil.MarkStatic(mf.gameObject);
 
                 if (mf.name.StartsWith("Laje")) roof = mf.gameObject;
-                if (mf.name.StartsWith("PisoUBS") || mf.name.StartsWith("SalaEspera")
-                    || mf.name.StartsWith("Corredor") || mf.name.StartsWith("Consultorio"))
+                if (mf.name.StartsWith("Marquise")) marquise = mf.gameObject;
+                if (System.Array.IndexOf(k_UbsPisoNavegavel, mf.name) >= 0)
                 {
                     ScenarioSceneKit.AddTeleportArea(mf.gameObject);
                     var b = mf.GetComponent<Renderer>().bounds;
@@ -340,9 +358,145 @@ namespace SafeZoneVR.Editor
             }
 
             if (roof == null) roof = g;
+            if (marquise == null) Debug.LogWarning("[SafeZone VR] Marquise da UBS não encontrada: o granizo atravessa a entrada.");
             if (!achouInterior) interior = new Bounds(new Vector3(k_Ubs.x, 1.5f, k_Ubs.z), k_UbsSize);
             return new Bounds(new Vector3(interior.center.x, 1.5f, interior.center.z),
-                new Vector3(Mathf.Max(1f, interior.size.x - 0.6f), 3f, Mathf.Max(1f, interior.size.z - 0.6f)));
+                new Vector3(Mathf.Max(1f, interior.size.x - 0.2f), 3f, Mathf.Max(1f, interior.size.z - 0.2f)));
+        }
+
+        static void RemoverAlaNorte(GameObject ubs)
+        {
+            foreach (var nome in k_UbsAlaNorte)
+            {
+                var part = ScenarioSceneKit.ModelPart(ubs, nome);
+                if (part != null)
+                    Object.DestroyImmediate(part.gameObject);
+                else
+                    Debug.LogWarning($"[SafeZone VR] {nome} não existe no modelo da UBS.");
+            }
+        }
+
+        static void FecharAlaNorte(GameObject ubs)
+        {
+            var sul = ScenarioSceneKit.ModelPart(ubs, "ParedeCorredorSul");
+            var interna = ScenarioSceneKit.ModelPart(ubs, "ParedeInterna");
+            if (sul == null || interna == null)
+            {
+                Debug.LogWarning("[SafeZone VR] Paredes da UBS não encontradas: a ala norte fica aberta.");
+                return;
+            }
+
+            var paredeSul = BoundsDaMalha(sul);
+            var destinoIni = BoundsDaMalha(interna).min.x - 0.05f;
+            var destinoFim = paredeSul.min.x + 0.15f;
+            var origemFim = paredeSul.max.x - 0.1f;
+            var origemIni = origemFim - 3.5f;
+
+            var copia = Object.Instantiate(sul.gameObject, sul.parent);
+            copia.name = "ParedeFechaAlaNorte";
+            var mf = copia.GetComponent<MeshFilter>();
+            mf.sharedMesh = FatiaDaParede(mf.sharedMesh, copia.transform, origemIni, origemFim, destinoIni, destinoFim);
+        }
+
+        static Mesh FatiaDaParede(Mesh origem, Transform t, float origemIni, float origemFim, float destinoIni, float destinoFim)
+        {
+            var malha = Object.Instantiate(origem);
+            malha.name = "ParedeFechaAlaNorte";
+
+            var vertices = malha.vertices;
+            var mundo = new float[vertices.Length];
+            for (var i = 0; i < vertices.Length; i++)
+                mundo[i] = t.TransformPoint(vertices[i]).x;
+
+            for (var s = 0; s < malha.subMeshCount; s++)
+            {
+                var tris = malha.GetTriangles(s);
+                var mantidos = new List<int>();
+                for (var i = 0; i < tris.Length; i += 3)
+                {
+                    var menor = Mathf.Min(mundo[tris[i]], Mathf.Min(mundo[tris[i + 1]], mundo[tris[i + 2]]));
+                    var maior = Mathf.Max(mundo[tris[i]], Mathf.Max(mundo[tris[i + 1]], mundo[tris[i + 2]]));
+                    if (maior < origemIni || menor > origemFim) continue;
+                    mantidos.Add(tris[i]);
+                    mantidos.Add(tris[i + 1]);
+                    mantidos.Add(tris[i + 2]);
+                }
+
+                malha.SetTriangles(mantidos, s);
+            }
+
+            for (var i = 0; i < vertices.Length; i++)
+            {
+                var p = t.TransformPoint(vertices[i]);
+                p.x = Mathf.Lerp(destinoIni, destinoFim, Mathf.InverseLerp(origemIni, origemFim, Mathf.Clamp(p.x, origemIni, origemFim)));
+                vertices[i] = t.InverseTransformPoint(p);
+            }
+
+            malha.vertices = vertices;
+            malha.RecalculateBounds();
+            return malha;
+        }
+
+        static void AfastarPlaca(GameObject ubs)
+        {
+            var placa = ScenarioSceneKit.ModelPart(ubs, "Placa");
+            var laje = ScenarioSceneKit.ModelPart(ubs, "Laje");
+            if (placa == null || laje == null)
+            {
+                Debug.LogWarning("[SafeZone VR] Placa ou laje da UBS não encontradas.");
+                return;
+            }
+
+            var recuo = BoundsDaMalha(placa).max.x - (BoundsDaMalha(laje).min.x - 0.15f);
+            if (recuo > 0f)
+                placa.position -= new Vector3(recuo, 0f, 0f);
+        }
+
+        static void GirarCadeira(GameObject ubs)
+        {
+            var sala = ScenarioSceneKit.ModelPart(ubs, "Consultorio2");
+            var mf = sala != null ? sala.GetComponent<MeshFilter>() : null;
+            if (mf == null || mf.sharedMesh == null)
+            {
+                Debug.LogWarning("[SafeZone VR] Consultorio2 não encontrado: a cadeira fica de costas.");
+                return;
+            }
+
+            var malha = Object.Instantiate(mf.sharedMesh);
+            malha.name = mf.sharedMesh.name + "_CadeiraVirada";
+            var vertices = malha.vertices;
+            var normais = malha.normals;
+            var giro = Quaternion.Euler(0f, 180f, 0f);
+            var girados = 0;
+
+            for (var i = 0; i < vertices.Length; i++)
+            {
+                var local = ubs.transform.InverseTransformPoint(sala.TransformPoint(vertices[i]));
+                if (!k_UbsCadeira.Contains(local)) continue;
+                local = k_UbsCadeira.center + giro * (local - k_UbsCadeira.center);
+                vertices[i] = sala.InverseTransformPoint(ubs.transform.TransformPoint(local));
+                if (normais != null && normais.Length == vertices.Length)
+                    normais[i] = giro * normais[i];
+                girados++;
+            }
+
+            if (girados == 0)
+            {
+                Debug.LogWarning("[SafeZone VR] Nenhum vértice da cadeira do consultório foi encontrado.");
+                return;
+            }
+
+            malha.vertices = vertices;
+            if (normais != null && normais.Length == vertices.Length)
+                malha.normals = normais;
+            malha.RecalculateBounds();
+            mf.sharedMesh = malha;
+        }
+
+        static Bounds BoundsDaMalha(Transform t)
+        {
+            var mf = t.GetComponent<MeshFilter>();
+            return GeometryUtility.CalculateBounds(mf.sharedMesh.vertices, t.localToWorldMatrix);
         }
 
         static GameObject CreateBusStop(Transform parent)
@@ -429,7 +583,7 @@ namespace SafeZoneVR.Editor
             return b;
         }
 
-        static void CreateHailBlockers(Transform parent, int layer, GameObject ubsRoof, GameObject busRoof, GameObject shackRoof)
+        static void CreateHailBlockers(Transform parent, int layer, GameObject ubsRoof, GameObject ubsMarquise, GameObject busRoof, GameObject shackRoof)
         {
             var g = UIBuilderUtil.Child(parent, "HailBlockers");
             void Block(string name, Vector3 center, Vector3 size)
@@ -444,6 +598,12 @@ namespace SafeZoneVR.Editor
             Block("Chao", new Vector3(-5f, -0.5f, 10f), new Vector3(90f, 1f, 60f));
             var laje = RoofBounds(ubsRoof);
             Block("LajeUBS", new Vector3(laje.center.x, laje.max.y - 0.6f, laje.center.z), new Vector3(laje.size.x, 1.2f, laje.size.z));
+            if (ubsMarquise != null)
+            {
+                var marquise = RoofBounds(ubsMarquise);
+                Block("MarquiseUBS", new Vector3(marquise.center.x, marquise.max.y - 0.5f, marquise.center.z), new Vector3(marquise.size.x, 1f, marquise.size.z));
+            }
+
             var bus = RoofBounds(busRoof);
             Block("CoberturaPonto", new Vector3(bus.center.x, bus.max.y - 0.5f, bus.center.z), new Vector3(bus.size.x, 1f, bus.size.z));
             Block("TelhadoBarraca", shackRoof.transform.position + new Vector3(0f, -0.4f, 0f), new Vector3(3.2f, 1.2f, 3.2f));
@@ -631,27 +791,31 @@ namespace SafeZoneVR.Editor
         static void CreateLadder(Transform parent)
         {
             var g = UIBuilderUtil.Child(parent, "EscadaTelhado");
-            g.transform.SetPositionAndRotation(k_Ladder, Quaternion.Euler(-20f, 0f, 0f));
-            var rail1 = UIBuilderUtil.Primitive(PrimitiveType.Cube, "LateralA", g.transform, Vector3.zero, Vector3.zero, new Vector3(0.06f, 3.4f, 0.06f), ScenarioSceneKit.MatMetal, false);
-            rail1.transform.localPosition = new Vector3(-0.25f, 1.7f, 0f);
-            var rail2 = UIBuilderUtil.Primitive(PrimitiveType.Cube, "LateralB", g.transform, Vector3.zero, Vector3.zero, new Vector3(0.06f, 3.4f, 0.06f), ScenarioSceneKit.MatMetal, false);
-            rail2.transform.localPosition = new Vector3(0.25f, 1.7f, 0f);
+            g.transform.SetPositionAndRotation(k_Ladder, Quaternion.Euler(k_LadderLean, 0f, 0f));
+
+            PecaDaEscada(g.transform, "LateralA", new Vector3(-0.22f, k_LadderLength * 0.5f, 0f), new Vector3(0.07f, k_LadderLength, 0.07f));
+            PecaDaEscada(g.transform, "LateralB", new Vector3(0.22f, k_LadderLength * 0.5f, 0f), new Vector3(0.07f, k_LadderLength, 0.07f));
             for (var i = 0; i < 9; i++)
-            {
-                var rung = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Degrau" + i, g.transform, Vector3.zero, Vector3.zero, new Vector3(0.5f, 0.04f, 0.04f), ScenarioSceneKit.MatMetal, false);
-                rung.transform.localPosition = new Vector3(0f, 0.3f + i * 0.36f, 0f);
-            }
+                PecaDaEscada(g.transform, "Degrau" + i, new Vector3(0f, 0.35f + i * 0.33f, 0f), new Vector3(0.44f, 0.05f, 0.05f));
+
             var col = g.AddComponent<BoxCollider>();
-            col.center = new Vector3(0f, 1.7f, 0f);
-            col.size = new Vector3(0.6f, 3.4f, 0.15f);
+            col.center = new Vector3(0f, k_LadderLength * 0.5f, 0f);
+            col.size = new Vector3(0.6f, k_LadderLength, 0.2f);
             g.AddComponent<XRSimpleInteractable>();
             var wrong = g.AddComponent<WrongActionInteractable>();
             wrong.mistakeId = "subir_telhado";
             wrong.message = "Não suba em telhados molhados: há risco de queda. Peça a vistoria às autoridades.";
             wrong.kind = ActionKind.ErroGrave;
             wrong.advice = "Não suba no telhado: ligue 199 ou 193 e peça vistoria.";
-            UIBuilderUtil.WorldText(g.transform, "Label", "Subir no telhado?", 0.7f, new Color(1f, 0.75f, 0.35f), k_Ladder + new Vector3(0f, 2.2f, 0.6f), Vector3.zero, new Vector2(1.4f, 0.2f))
+            UIBuilderUtil.WorldText(g.transform, "Label", "Subir no telhado?", 0.7f, new Color(1f, 0.75f, 0.35f), k_Ladder + new Vector3(0f, 1.9f, -0.34f), Vector3.zero, new Vector2(1.4f, 0.2f))
                 .gameObject.AddComponent<FacePlayer>().yawOnly = true;
+        }
+
+        static void PecaDaEscada(Transform parent, string nome, Vector3 posicaoLocal, Vector3 escala)
+        {
+            var peca = UIBuilderUtil.Primitive(PrimitiveType.Cube, nome, parent, Vector3.zero, Vector3.zero, escala, ScenarioSceneKit.MatMetal, false);
+            peca.transform.localRotation = Quaternion.identity;
+            peca.transform.localPosition = posicaoLocal;
         }
 
         static void CreateRoofDamage(Transform parent)

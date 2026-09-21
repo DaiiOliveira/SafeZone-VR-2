@@ -62,17 +62,37 @@ filha e tem interagível próprio. A etiqueta da chave não herda a escala dela 
 | `k_SpotA` | (−30,5; −0,06; 10,9) | vaga embaixo da placa de propaganda |
 | `k_SpotB` | (24,5; −0,06; 10,9) | vaga em frente à torre de transmissão |
 | `k_SpotC` | (−12,5; −0,06; 10,9) | vaga longe das duas (a correta) |
-| `k_Ladder` | (−10; 0; 1,25) | encostada na fachada |
+| `k_Ladder` | (−9,4; 0; 1,84) | pé fora dos arbustos; topo em (−9,4; 3,01; 0,75), na tabeira |
 | `k_Ceiling` | (−2,9; 2,68; −8,9) | forro do quarto de casal |
 | `k_GateZone` | (−4,9; 1,2; 4,4) | logo depois do portão de pedestres |
 
-UBS modelada (`UBS.fbx`, 23 mil triângulos) no lote à direita da praça: prédio em x 8,7..22,9,
+UBS modelada (`UBS.fbx`, 18 mil triângulos depois da limpeza) no lote à direita da praça: prédio em x 8,7..22,9,
 z 14,0..24,1, mais calçada e marquise até x 5,6..24,2. Fica em `k_Ubs` (15,8; 0; 19) com
 **yaw 180**, porque a entrada do modelo nasce em +X e precisa olhar para a praça. O piso interno
 fica em y 0,154 (`k_UbsFloorY`). A entrada **não** é a peça `Porta`: essas são folhas fechadas da
 fachada, e o vão que dá passagem tem 0,9 m em **z 19,45** (`k_UbsDoorZ`). O modelo traz 11
 marcadores `DC_LUZ_*` que o importador converte em Point Lights; o builder as força para Realtime
-sem sombra, porque a cena não tem lightmap assado. A torre de transmissão foi para x 27,5 para
+sem sombra, porque a cena não tem lightmap assado. **Só o consultório sul é acessível:** as paredes
+do corredor são maciças nos dois lados, então `Corredor` e `Consultorio1` nunca deram passagem, e
+`PainelRecepcao` flutuava a 0,9 m do chão atravessando o forro. `RemoverAlaNorte` apaga esses três
+mais `ParedeCorredorNorte` e as luzes Forro3/5/7/8; `FecharAlaNorte` tapa o hall em z 18 com uma
+cópia da `ParedeCorredorSul` (`ParedeFechaAlaNorte`, x 14,75..16,35). Essa parede tem uma porta
+entre x 17,43 e 18,57, então a cópia não é escalada: `FatiaDaParede` descarta os triângulos fora de
+um trecho liso de 3,5 m e remapeia o resto para o vão, senão a porta sai espremida. `AfastarPlaca`
+recua a `Placa` em X até sair de baixo da `Laje`, que avança até x 8,66 e cortava o letreiro ao meio.
+`UIBuilderUtil.Primitive` aplica a rotação em **mundo**: sob um pai inclinado, as peças ficam
+alinhadas aos eixos e só a posição acompanha o giro. Era isso que desmontava a escada do telhado
+(montantes na vertical, degraus espalhados na diagonal) e por isso `CreateLadder` e
+`CreateRouteChevrons` zeram `localRotation` depois de criar cada peça.
+
+`GirarCadeira` gira 180° os vértices dentro de `k_UbsCadeira` (caixa em coordenadas da UBS): a
+cadeira atrás da mesa vinha de costas para ela. A zona de abrigo (`Validator_03_Abrigo` e `Validator_04_Aguardar`) é o
+interior menos 20 cm, x 8,90..22,70 e z 14,10..23,90, e cobre todo o piso alcançável:
+`StepCompleteOnStayInZone` testa a posição da cabeça, um ponto só, então a caixa precisa encostar
+nas paredes. A marquise tem bloqueio próprio de granizo (`MarquiseUBS`): o `LajeUBS` começa em
+x 8,66 e o granizo atravessava a cobertura da entrada, que fica em x 5,95..9,00. Teleporte fica em
+`PisoUBS`, `SalaEspera` e `Consultorio2` (`k_UbsPisoNavegavel`). Isso baixou a UBS de 23.372 para
+18.268 triângulos e de 11 para 7 luzes. A torre de transmissão foi para x 27,5 para
 abrir espaço: o prédio não cabia entre a praça (x 5,5) e a torre onde ela estava. Montanhas da praça a ~190 m, nuvens a
 ~320 m. Céu de tempestade: `RenderSettings.skybox = null` e a câmera passa a pintar o céu de
 cinza (ver `SetupStormCamera`). O ponto de ônibus é montado de costas para a rua e recebe meia
@@ -82,6 +102,35 @@ atalho escorregadio é atravessar a rua gelada fora dela.
 
 **Colliders do granizo são grossos**, com o topo na superfície visível: partículas rápidas
 atravessam colliders finos quando a qualidade de colisão é "Low".
+
+## Hub (`DC_Hub.fbx`, 20/09/2026)
+
+Os três totens são `DC_PANEL_Flood`, `DC_PANEL_Fire` e `DC_PANEL_Hail`, cada um com um filho
+`_Art`: um plano de 2,2 × 1,86 m em y 1,57..3,43 que carrega a **foto** da fase
+(`DC_M_PanelFlood`, `DC_M_PanelFire`, `DC_M_PanelHail`). A ficha de UI do totem fica **abaixo**
+da foto, centrada em y 0,86 e com topo em 1,51, justamente para não cobri-la.
+
+O totem mostra a **foto** (`_Art`, y 1,57..3,43) sobre o corpo de pedra, e a ficha de UI logo
+abaixo (y 0,21..1,51) com título, descrição, melhor pontuação e o botão Jogar.
+
+Três materiais do modelo são trocados por `Mat_HubTextoOculto` no builder, via
+`k_MateriaisOcultos`, porque disputavam espaço com a ficha:
+
+| Material | O que era | Por que saiu |
+|---|---|---|
+| `DC_M_Glow*` | moldura colorida por fase (azul, amarela, roxa) | pedido de remoção |
+| `DC_M_Icon*` | hexágono da fase, y 1,30..1,60 | cortava o texto da ficha ao meio |
+| `DC_M_White` | nome gravado e subtítulo, y 0,65..1,01 | duplicava o título e aparecia por trás da descrição |
+
+Continuam visíveis `DC_M_Stone`, `DC_M_Navy` e `DC_M_PanelFrame` — o corpo do totem e a moldura
+neutra em volta da foto.
+
+As texturas **não são embutidas**: o FBX aponta para a pasta `DC_Hub.fbm`, que precisa ser
+copiada junto. Sem ela o modelo importa com 32 materiais e nenhuma textura, e os painéis ficam
+lisos — foi o que aconteceu na primeira tentativa. O mesmo vale para `DC_Praca.fbm`.
+
+Os nomes dos totens agora batem com as fases, então o remendo que escondia o texto gravado
+"TERREMOTOS" (submalha `DC_M_White`) foi removido do builder.
 
 ## Modelos importados
 

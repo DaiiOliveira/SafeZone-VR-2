@@ -21,7 +21,15 @@ namespace SafeZoneVR.Editor
         static readonly Vector3 k_SpawnPosition = new Vector3(0f, 0f, 5.9f);
         const float k_SpawnYaw = 180f;
 
-        const float k_BoardFontSize = 1.05f;
+        const float k_FotoAltura = 1.65f;
+        const float k_FichaAltura = 1.12f;
+        const float k_FichaLargura = 1.95f;
+        const float k_FichaEscala = 0.005f;
+        const float k_FichaFrente = 0.14f;
+
+
+
+        static readonly string[] k_MateriaisOcultos = { "DC_M_Glow", "DC_M_Icon", "DC_M_White" };
 
         static readonly Quaternion k_FacingEntrance = Quaternion.Euler(0f, 180f, 0f);
 
@@ -30,27 +38,20 @@ namespace SafeZoneVR.Editor
             public string objectName;
             public int catalogIndex;
             public Color accent;
-            public string boardTitle;
-            public string boardSubtitle;
         }
 
         static readonly KioskMap[] k_Kiosks =
         {
-            new KioskMap { objectName = "DC_PANEL_Rain", catalogIndex = 0, accent = new Color(0.24f, 0.55f, 0.84f) },
+            new KioskMap { objectName = "DC_PANEL_Flood", catalogIndex = 0, accent = new Color(0.24f, 0.55f, 0.84f) },
             new KioskMap { objectName = "DC_PANEL_Fire", catalogIndex = 1, accent = new Color(0.88f, 0.57f, 0.2f) },
-
-            new KioskMap
-            {
-                objectName = "DC_PANEL_Quake", catalogIndex = 2, accent = new Color(0.13f, 0.62f, 0.32f),
-                boardTitle = "GRANIZO", boardSubtitle = "Chuva de pedras e abrigo",
-            },
+            new KioskMap { objectName = "DC_PANEL_Hail", catalogIndex = 2, accent = new Color(0.13f, 0.62f, 0.32f) },
         };
 
         static readonly string[] k_NoColliderParts =
         {
             "DC_ENV_Backdrop", "DC_ENV_GroundFar", "DC_ENV_Mountains_Far", "DC_ENV_Mountains_Mid", "DC_ENV_Mountains_Near",
             "DC_ENV_FloorInlay", "DC_ENV_FloorLines", "DC_SIGN_FloorDecal",
-            "DC_PANEL_Fire_Art", "DC_PANEL_Rain_Art", "DC_PANEL_Quake_Art",
+            "DC_PANEL_Fire_Art", "DC_PANEL_Flood_Art", "DC_PANEL_Hail_Art",
         };
 
         [MenuItem("SafeZone VR/Build/3. Menu principal (gerar cena)")]
@@ -197,7 +198,7 @@ namespace SafeZoneVR.Editor
         static List<HubKiosk> CreateKiosks(Transform parent, GameObject hub, ScenarioCatalogSO catalog)
         {
             var kiosks = new List<HubKiosk>();
-            var hidden = UIBuilderUtil.GetOrCreateMaterial("Mat_HubTextoOculto", new Color(0f, 0f, 0f, 0f), true, true, 0f, 3000);
+            var oculto = UIBuilderUtil.GetOrCreateMaterial("Mat_HubTextoOculto", new Color(0f, 0f, 0f, 0f), true, true, 0f, 3000);
 
             foreach (var map in k_Kiosks)
             {
@@ -215,11 +216,8 @@ namespace SafeZoneVR.Editor
                 var kiosk = go.AddComponent<HubKiosk>();
                 kiosk.scenario = scenario;
 
+                EsconderArteDoTotem(panel, oculto);
                 CreateKioskCanvas(kiosk, go.transform, hub, map, panel);
-
-                if (!string.IsNullOrEmpty(map.boardTitle))
-                    CreateBoardLabel(kiosk, go.transform, panel, map, hidden);
-
                 kiosk.Refresh();
                 kiosks.Add(kiosk);
             }
@@ -230,49 +228,66 @@ namespace SafeZoneVR.Editor
         static void CreateKioskCanvas(HubKiosk kiosk, Transform parent, GameObject hub, KioskMap map, Transform panel)
         {
             var art = ScenarioSceneKit.FindChildRecursive(hub.transform, map.objectName + "_Art");
-            var artRenderer = art != null ? art.GetComponent<Renderer>() : null;
-            var center = artRenderer != null ? artRenderer.bounds.center : panel.position + new Vector3(0f, 2.5f, 0.08f);
+            var centroX = panel.position.x;
+            var foto = AjustarFoto(art, centroX);
+            var topo = foto.HasValue ? foto.Value.min.y - 0.06f : panel.position.y + 1.7f;
+            var frenteZ = foto.HasValue ? foto.Value.center.z : panel.position.z - 0.08f;
+            var centro = new Vector3(centroX, topo - k_FichaAltura * 0.5f, frenteZ + k_FichaFrente);
 
-            var canvas = UIBuilderUtil.CreateWorldCanvas("Canvas", parent, new Vector2(440f, 372f), 0.005f);
-            canvas.transform.SetPositionAndRotation(center + new Vector3(0f, 0f, 0.03f), k_FacingEntrance);
+            var tamanho = new Vector2(k_FichaLargura / k_FichaEscala, k_FichaAltura / k_FichaEscala);
+            var canvas = UIBuilderUtil.CreateWorldCanvas("Canvas", parent, tamanho, k_FichaEscala);
+            canvas.transform.SetPositionAndRotation(centro, k_FacingEntrance);
 
             var face = canvas.transform;
-            UIBuilderUtil.Panel(face, "Background", UIBuilderUtil.PanelColor, Vector2.zero, Vector2.one, new Vector2(12f, 12f), new Vector2(-12f, -12f));
-            UIBuilderUtil.Panel(face, "HeaderBar", map.accent, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(12f, -74f), new Vector2(-12f, -12f));
-            kiosk.titleLabel = UIBuilderUtil.TopText(face, "Title", "Cenário", 28f, Color.white, TextAlignmentOptions.Center, 24f, 42f, 26f, FontStyles.Bold);
-            kiosk.descriptionLabel = UIBuilderUtil.TopText(face, "Description", string.Empty, 15f, UIBuilderUtil.MutedText, TextAlignmentOptions.TopLeft, 92f, 142f, 32f);
-            kiosk.statusLabel = UIBuilderUtil.TopText(face, "Status", string.Empty, 16f, UIBuilderUtil.AccentGreen, TextAlignmentOptions.Center, 240f, 26f, 26f);
-            kiosk.playButton = UIBuilderUtil.BottomButton(face, "Play", "Jogar", 24f, map.accent, 26f, 62f, 0.14f, 0.86f, 0f, out var playLabel);
+            UIBuilderUtil.Panel(face, "Background", UIBuilderUtil.PanelColor, Vector2.zero, Vector2.one, new Vector2(10f, 10f), new Vector2(-10f, -10f));
+            UIBuilderUtil.Panel(face, "HeaderBar", map.accent, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(10f, -54f), new Vector2(-10f, -10f));
+            kiosk.titleLabel = UIBuilderUtil.TopText(face, "Title", "Cenário", 26f, Color.white, TextAlignmentOptions.Center, 12f, 40f, 20f, FontStyles.Bold);
+            kiosk.descriptionLabel = UIBuilderUtil.TopText(face, "Description", string.Empty, 15f, UIBuilderUtil.MutedText, TextAlignmentOptions.TopLeft, 58f, 62f, 22f);
+            kiosk.statusLabel = UIBuilderUtil.TopText(face, "Status", string.Empty, 15f, UIBuilderUtil.AccentGreen, TextAlignmentOptions.Center, 122f, 22f, 20f);
+            kiosk.playButton = UIBuilderUtil.BottomButton(face, "Play", "Jogar", 22f, map.accent, 10f, 48f, 0.14f, 0.86f, 0f, out var playLabel);
             kiosk.playLabel = playLabel;
         }
 
-        static void CreateBoardLabel(HubKiosk kiosk, Transform parent, Transform panel, KioskMap map, Material hidden)
+        static Bounds? AjustarFoto(Transform art, float centroX)
         {
-            var renderer = panel.GetComponent<MeshRenderer>();
-            if (renderer != null)
+            var renderer = art != null ? art.GetComponent<Renderer>() : null;
+            if (renderer == null)
             {
-                var materials = renderer.sharedMaterials;
-                var changed = false;
-                for (var i = 0; i < materials.Length; i++)
-                {
-                    if (materials[i] == null || materials[i].name != "DC_M_White")
-                        continue;
-                    materials[i] = hidden;
-                    changed = true;
-                }
-                if (changed)
-                    renderer.sharedMaterials = materials;
-                else
-                    Debug.LogWarning($"[SafeZone VR] Texto gravado do totem {map.objectName} não encontrado (submalha DC_M_White).");
+                Debug.LogWarning("[SafeZone VR] Foto do totem não encontrada no modelo do hub.");
+                return null;
             }
 
-            var label = UIBuilderUtil.WorldText(parent, "Placa", map.boardTitle, k_BoardFontSize, new Color(0.93f, 0.91f, 0.87f),
-                panel.position + new Vector3(0f, 0.84f, 0.13f), new Vector3(0f, 180f, 0f), new Vector2(1.7f, 0.5f));
-            label.fontStyle = FontStyles.Bold;
-            label.characterSpacing = 6f;
-            kiosk.boardLabel = label;
-            kiosk.boardTitle = map.boardTitle;
-            kiosk.boardSubtitle = map.boardSubtitle;
+            var antes = renderer.bounds;
+            var escala = k_FotoAltura / antes.size.y;
+            if (escala < 0.999f)
+            {
+                art.localScale *= escala;
+                var depois = renderer.bounds;
+                art.position += new Vector3(centroX - depois.center.x, antes.max.y - depois.max.y, 0f);
+            }
+
+            return renderer.bounds;
+        }
+
+        static void EsconderArteDoTotem(Transform panel, Material oculto)
+        {
+            var renderer = panel.GetComponent<MeshRenderer>();
+            if (renderer == null) return;
+            var materiais = renderer.sharedMaterials;
+            var escondidos = 0;
+            for (var i = 0; i < materiais.Length; i++)
+            {
+                if (materiais[i] == null) continue;
+                foreach (var prefixo in k_MateriaisOcultos)
+                {
+                    if (!materiais[i].name.StartsWith(prefixo)) continue;
+                    materiais[i] = oculto;
+                    escondidos++;
+                    break;
+                }
+            }
+            if (escondidos > 0) renderer.sharedMaterials = materiais;
+            else Debug.LogWarning($"[SafeZone VR] Nenhuma arte escondida no totem {panel.name}.");
         }
 
         static Button CreateDiscButton(Transform parent, GameObject hub, string objectName, string name)
