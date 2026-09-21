@@ -93,11 +93,11 @@ namespace SafeZoneVR.Editor
 
             var env = UIBuilderUtil.Child(root.transform, "Environment");
             var iceLayers = CreateIce(env.transform);
-            var ubsZoneBounds = CreateUbs(env.transform, out var ubsRoof);
+            var ubsZoneBounds = CreateUbs(env.transform, out var ubsRoof, out var ubsMarquise);
             var busRoof = CreateBusStop(env.transform);
             var shackRoof = CreateShack(env.transform);
             CreateBillboardAndTower(env.transform);
-            CreateHailBlockers(env.transform, hailLayer, ubsRoof, busRoof, shackRoof);
+            CreateHailBlockers(env.transform, hailLayer, ubsRoof, ubsMarquise, busRoof, shackRoof);
             var hail = CreateHail(env.transform, hailLayer, iceLayers, data.aguardar, k_Ubs + new Vector3(0f, 3.2f, 0f), k_SpotC + new Vector3(0f, 1.2f, 0f));
 
             ScenarioSceneKit.SetupHouseLights(house, root.transform, null);
@@ -318,7 +318,7 @@ namespace SafeZoneVR.Editor
             }
         }
 
-        static Bounds CreateUbs(Transform parent, out GameObject roof)
+        static Bounds CreateUbs(Transform parent, out GameObject roof, out GameObject marquise)
         {
             var g = ScenarioSceneKit.CreateModelVisual(parent, "UBS",
                 $"{ScenarioSceneKit.k_ItemsFolder}/UBS.fbx", new Vector3(k_Ubs.x, 0f, k_Ubs.z), new Vector3(0f, k_UbsYaw, 0f));
@@ -329,6 +329,7 @@ namespace SafeZoneVR.Editor
             GirarCadeira(g);
 
             roof = null;
+            marquise = null;
             var interior = new Bounds();
             var achouInterior = false;
             foreach (var mf in g.GetComponentsInChildren<MeshFilter>(true))
@@ -339,6 +340,7 @@ namespace SafeZoneVR.Editor
                 UIBuilderUtil.MarkStatic(mf.gameObject);
 
                 if (mf.name.StartsWith("Laje")) roof = mf.gameObject;
+                if (mf.name.StartsWith("Marquise")) marquise = mf.gameObject;
                 if (System.Array.IndexOf(k_UbsPisoNavegavel, mf.name) >= 0)
                 {
                     ScenarioSceneKit.AddTeleportArea(mf.gameObject);
@@ -354,9 +356,10 @@ namespace SafeZoneVR.Editor
             }
 
             if (roof == null) roof = g;
+            if (marquise == null) Debug.LogWarning("[SafeZone VR] Marquise da UBS não encontrada: o granizo atravessa a entrada.");
             if (!achouInterior) interior = new Bounds(new Vector3(k_Ubs.x, 1.5f, k_Ubs.z), k_UbsSize);
             return new Bounds(new Vector3(interior.center.x, 1.5f, interior.center.z),
-                new Vector3(Mathf.Max(1f, interior.size.x - 0.6f), 3f, Mathf.Max(1f, interior.size.z - 0.6f)));
+                new Vector3(Mathf.Max(1f, interior.size.x - 0.2f), 3f, Mathf.Max(1f, interior.size.z - 0.2f)));
         }
 
         static void RemoverAlaNorte(GameObject ubs)
@@ -578,7 +581,7 @@ namespace SafeZoneVR.Editor
             return b;
         }
 
-        static void CreateHailBlockers(Transform parent, int layer, GameObject ubsRoof, GameObject busRoof, GameObject shackRoof)
+        static void CreateHailBlockers(Transform parent, int layer, GameObject ubsRoof, GameObject ubsMarquise, GameObject busRoof, GameObject shackRoof)
         {
             var g = UIBuilderUtil.Child(parent, "HailBlockers");
             void Block(string name, Vector3 center, Vector3 size)
@@ -593,6 +596,12 @@ namespace SafeZoneVR.Editor
             Block("Chao", new Vector3(-5f, -0.5f, 10f), new Vector3(90f, 1f, 60f));
             var laje = RoofBounds(ubsRoof);
             Block("LajeUBS", new Vector3(laje.center.x, laje.max.y - 0.6f, laje.center.z), new Vector3(laje.size.x, 1.2f, laje.size.z));
+            if (ubsMarquise != null)
+            {
+                var marquise = RoofBounds(ubsMarquise);
+                Block("MarquiseUBS", new Vector3(marquise.center.x, marquise.max.y - 0.5f, marquise.center.z), new Vector3(marquise.size.x, 1f, marquise.size.z));
+            }
+
             var bus = RoofBounds(busRoof);
             Block("CoberturaPonto", new Vector3(bus.center.x, bus.max.y - 0.5f, bus.center.z), new Vector3(bus.size.x, 1f, bus.size.z));
             Block("TelhadoBarraca", shackRoof.transform.position + new Vector3(0f, -0.4f, 0f), new Vector3(3.2f, 1.2f, 3.2f));

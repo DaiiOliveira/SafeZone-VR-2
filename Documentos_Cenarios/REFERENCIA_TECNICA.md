@@ -81,7 +81,11 @@ entre x 17,43 e 18,57, então a cópia não é escalada: `FatiaDaParede` descart
 um trecho liso de 3,5 m e remapeia o resto para o vão, senão a porta sai espremida. `AfastarPlaca`
 recua a `Placa` em X até sair de baixo da `Laje`, que avança até x 8,66 e cortava o letreiro ao meio.
 `GirarCadeira` gira 180° os vértices dentro de `k_UbsCadeira` (caixa em coordenadas da UBS): a
-cadeira atrás da mesa vinha de costas para ela. Teleporte fica em
+cadeira atrás da mesa vinha de costas para ela. A zona de abrigo (/) é o interior
+menos 20 cm, x 8,90..22,70 e z 14,10..23,90, e cobre todo o piso alcançável — 
+testa a posição da cabeça, ponto único, então a caixa precisa encostar nas paredes. A marquise tem
+bloqueio próprio de granizo (): a  começa em x 8,66 e o granizo atravessava a
+cobertura da entrada, que fica em x 5,95..9,00. Teleporte fica em
 `PisoUBS`, `SalaEspera` e `Consultorio2` (`k_UbsPisoNavegavel`). Isso baixou a UBS de 23.372 para
 18.268 triângulos e de 11 para 7 luzes. A torre de transmissão foi para x 27,5 para
 abrir espaço: o prédio não cabia entre a praça (x 5,5) e a torre onde ela estava. Montanhas da praça a ~190 m, nuvens a
