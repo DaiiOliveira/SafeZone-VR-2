@@ -44,7 +44,9 @@ namespace SafeZoneVR.Editor
         const float k_BusStopYaw = 0f;
         const float k_BillboardYaw = 0f;
         const float k_SpotYaw = 90f;
-        static readonly Vector3 k_Ladder = new Vector3(-10f, 0f, 1.25f);
+        static readonly Vector3 k_Ladder = new Vector3(-9.4f, 0f, 1.84f);
+        const float k_LadderLength = 3.2f;
+        const float k_LadderLean = -20f;
         static readonly Vector3 k_Ceiling = new Vector3(-2.9f, 2.68f, -8.9f);
         static readonly Vector3 k_GateZone = new Vector3(-4.9f, 1.2f, 4.4f);
         static readonly Color k_StormSky = new Color(0.55f, 0.58f, 0.63f);
@@ -789,27 +791,31 @@ namespace SafeZoneVR.Editor
         static void CreateLadder(Transform parent)
         {
             var g = UIBuilderUtil.Child(parent, "EscadaTelhado");
-            g.transform.SetPositionAndRotation(k_Ladder, Quaternion.Euler(-20f, 0f, 0f));
-            var rail1 = UIBuilderUtil.Primitive(PrimitiveType.Cube, "LateralA", g.transform, Vector3.zero, Vector3.zero, new Vector3(0.06f, 3.4f, 0.06f), ScenarioSceneKit.MatMetal, false);
-            rail1.transform.localPosition = new Vector3(-0.25f, 1.7f, 0f);
-            var rail2 = UIBuilderUtil.Primitive(PrimitiveType.Cube, "LateralB", g.transform, Vector3.zero, Vector3.zero, new Vector3(0.06f, 3.4f, 0.06f), ScenarioSceneKit.MatMetal, false);
-            rail2.transform.localPosition = new Vector3(0.25f, 1.7f, 0f);
+            g.transform.SetPositionAndRotation(k_Ladder, Quaternion.Euler(k_LadderLean, 0f, 0f));
+
+            PecaDaEscada(g.transform, "LateralA", new Vector3(-0.22f, k_LadderLength * 0.5f, 0f), new Vector3(0.07f, k_LadderLength, 0.07f));
+            PecaDaEscada(g.transform, "LateralB", new Vector3(0.22f, k_LadderLength * 0.5f, 0f), new Vector3(0.07f, k_LadderLength, 0.07f));
             for (var i = 0; i < 9; i++)
-            {
-                var rung = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Degrau" + i, g.transform, Vector3.zero, Vector3.zero, new Vector3(0.5f, 0.04f, 0.04f), ScenarioSceneKit.MatMetal, false);
-                rung.transform.localPosition = new Vector3(0f, 0.3f + i * 0.36f, 0f);
-            }
+                PecaDaEscada(g.transform, "Degrau" + i, new Vector3(0f, 0.35f + i * 0.33f, 0f), new Vector3(0.44f, 0.05f, 0.05f));
+
             var col = g.AddComponent<BoxCollider>();
-            col.center = new Vector3(0f, 1.7f, 0f);
-            col.size = new Vector3(0.6f, 3.4f, 0.15f);
+            col.center = new Vector3(0f, k_LadderLength * 0.5f, 0f);
+            col.size = new Vector3(0.6f, k_LadderLength, 0.2f);
             g.AddComponent<XRSimpleInteractable>();
             var wrong = g.AddComponent<WrongActionInteractable>();
             wrong.mistakeId = "subir_telhado";
             wrong.message = "Não suba em telhados molhados: há risco de queda. Peça a vistoria às autoridades.";
             wrong.kind = ActionKind.ErroGrave;
             wrong.advice = "Não suba no telhado: ligue 199 ou 193 e peça vistoria.";
-            UIBuilderUtil.WorldText(g.transform, "Label", "Subir no telhado?", 0.7f, new Color(1f, 0.75f, 0.35f), k_Ladder + new Vector3(0f, 2.2f, 0.6f), Vector3.zero, new Vector2(1.4f, 0.2f))
+            UIBuilderUtil.WorldText(g.transform, "Label", "Subir no telhado?", 0.7f, new Color(1f, 0.75f, 0.35f), k_Ladder + new Vector3(0f, 1.9f, -0.34f), Vector3.zero, new Vector2(1.4f, 0.2f))
                 .gameObject.AddComponent<FacePlayer>().yawOnly = true;
+        }
+
+        static void PecaDaEscada(Transform parent, string nome, Vector3 posicaoLocal, Vector3 escala)
+        {
+            var peca = UIBuilderUtil.Primitive(PrimitiveType.Cube, nome, parent, Vector3.zero, Vector3.zero, escala, ScenarioSceneKit.MatMetal, false);
+            peca.transform.localRotation = Quaternion.identity;
+            peca.transform.localPosition = posicaoLocal;
         }
 
         static void CreateRoofDamage(Transform parent)

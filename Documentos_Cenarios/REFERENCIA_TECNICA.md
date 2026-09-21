@@ -62,7 +62,7 @@ filha e tem interagível próprio. A etiqueta da chave não herda a escala dela 
 | `k_SpotA` | (−30,5; −0,06; 10,9) | vaga embaixo da placa de propaganda |
 | `k_SpotB` | (24,5; −0,06; 10,9) | vaga em frente à torre de transmissão |
 | `k_SpotC` | (−12,5; −0,06; 10,9) | vaga longe das duas (a correta) |
-| `k_Ladder` | (−10; 0; 1,25) | encostada na fachada |
+| `k_Ladder` | (−9,4; 0; 1,84) | pé fora dos arbustos; topo em (−9,4; 3,01; 0,75), na tabeira |
 | `k_Ceiling` | (−2,9; 2,68; −8,9) | forro do quarto de casal |
 | `k_GateZone` | (−4,9; 1,2; 4,4) | logo depois do portão de pedestres |
 
@@ -80,6 +80,11 @@ cópia da `ParedeCorredorSul` (`ParedeFechaAlaNorte`, x 14,75..16,35). Essa pare
 entre x 17,43 e 18,57, então a cópia não é escalada: `FatiaDaParede` descarta os triângulos fora de
 um trecho liso de 3,5 m e remapeia o resto para o vão, senão a porta sai espremida. `AfastarPlaca`
 recua a `Placa` em X até sair de baixo da `Laje`, que avança até x 8,66 e cortava o letreiro ao meio.
+`UIBuilderUtil.Primitive` aplica a rotação em **mundo**: sob um pai inclinado, as peças ficam
+alinhadas aos eixos e só a posição acompanha o giro. Era isso que desmontava a escada do telhado
+(montantes na vertical, degraus espalhados na diagonal) e por isso `CreateLadder` e
+`CreateRouteChevrons` zeram `localRotation` depois de criar cada peça.
+
 `GirarCadeira` gira 180° os vértices dentro de `k_UbsCadeira` (caixa em coordenadas da UBS): a
 cadeira atrás da mesa vinha de costas para ela. A zona de abrigo (`Validator_03_Abrigo` e `Validator_04_Aguardar`) é o
 interior menos 20 cm, x 8,90..22,70 e z 14,10..23,90, e cobre todo o piso alcançável:
