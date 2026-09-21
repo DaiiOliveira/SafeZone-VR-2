@@ -76,7 +76,12 @@ sem sombra, porque a cena não tem lightmap assado. **Só o consultório sul é 
 do corredor são maciças nos dois lados, então `Corredor` e `Consultorio1` nunca deram passagem, e
 `PainelRecepcao` flutuava a 0,9 m do chão atravessando o forro. `RemoverAlaNorte` apaga esses três
 mais `ParedeCorredorNorte` e as luzes Forro3/5/7/8; `FecharAlaNorte` tapa o hall em z 18 com uma
-cópia estreitada da `ParedeCorredorSul` (`ParedeFechaAlaNorte`, x 14,75..16,35). Teleporte fica em
+cópia da `ParedeCorredorSul` (`ParedeFechaAlaNorte`, x 14,75..16,35). Essa parede tem uma porta
+entre x 17,43 e 18,57, então a cópia não é escalada: `FatiaDaParede` descarta os triângulos fora de
+um trecho liso de 3,5 m e remapeia o resto para o vão, senão a porta sai espremida. `AfastarPlaca`
+recua a `Placa` em X até sair de baixo da `Laje`, que avança até x 8,66 e cortava o letreiro ao meio.
+`GirarCadeira` gira 180° os vértices dentro de `k_UbsCadeira` (caixa em coordenadas da UBS): a
+cadeira atrás da mesa vinha de costas para ela. Teleporte fica em
 `PisoUBS`, `SalaEspera` e `Consultorio2` (`k_UbsPisoNavegavel`). Isso baixou a UBS de 23.372 para
 18.268 triângulos e de 11 para 7 luzes. A torre de transmissão foi para x 27,5 para
 abrir espaço: o prédio não cabia entre a praça (x 5,5) e a torre onde ela estava. Montanhas da praça a ~190 m, nuvens a

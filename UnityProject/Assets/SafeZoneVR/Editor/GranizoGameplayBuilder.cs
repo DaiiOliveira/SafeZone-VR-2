@@ -29,6 +29,8 @@ namespace SafeZoneVR.Editor
         };
 
         static readonly string[] k_UbsPisoNavegavel = { "PisoUBS", "SalaEspera", "Consultorio2" };
+
+        static readonly Bounds k_UbsCadeira = new Bounds(new Vector3(-4.625f, 0.62f, 3.94f), new Vector3(0.66f, 1.06f, 0.7f));
         static readonly Vector3 k_BusStop = new Vector3(-10f, 0f, 6.3f);
         static readonly Vector3 k_Shack = new Vector3(-22.4f, 0.12f, 20f);
         const float k_StreetLaneZ = 10.9f;
@@ -323,6 +325,8 @@ namespace SafeZoneVR.Editor
 
             RemoverAlaNorte(g);
             FecharAlaNorte(g);
+            AfastarPlaca(g);
+            GirarCadeira(g);
 
             roof = null;
             var interior = new Bounds();
@@ -377,14 +381,111 @@ namespace SafeZoneVR.Editor
                 return;
             }
 
-            var inicio = BoundsDaMalha(interna).min.x - 0.05f;
-            var largura = BoundsDaMalha(sul).min.x + 0.15f - inicio;
+            var paredeSul = BoundsDaMalha(sul);
+            var destinoIni = BoundsDaMalha(interna).min.x - 0.05f;
+            var destinoFim = paredeSul.min.x + 0.15f;
+            var origemFim = paredeSul.max.x - 0.1f;
+            var origemIni = origemFim - 3.5f;
 
             var copia = Object.Instantiate(sul.gameObject, sul.parent);
             copia.name = "ParedeFechaAlaNorte";
-            var atual = BoundsDaMalha(copia.transform);
-            copia.transform.localScale = Vector3.Scale(copia.transform.localScale, new Vector3(largura / atual.size.x, 1f, 1f));
-            copia.transform.position += new Vector3(inicio - BoundsDaMalha(copia.transform).min.x, 0f, 0f);
+            var mf = copia.GetComponent<MeshFilter>();
+            mf.sharedMesh = FatiaDaParede(mf.sharedMesh, copia.transform, origemIni, origemFim, destinoIni, destinoFim);
+        }
+
+        static Mesh FatiaDaParede(Mesh origem, Transform t, float origemIni, float origemFim, float destinoIni, float destinoFim)
+        {
+            var malha = Object.Instantiate(origem);
+            malha.name = "ParedeFechaAlaNorte";
+
+            var vertices = malha.vertices;
+            var mundo = new float[vertices.Length];
+            for (var i = 0; i < vertices.Length; i++)
+                mundo[i] = t.TransformPoint(vertices[i]).x;
+
+            for (var s = 0; s < malha.subMeshCount; s++)
+            {
+                var tris = malha.GetTriangles(s);
+                var mantidos = new List<int>();
+                for (var i = 0; i < tris.Length; i += 3)
+                {
+                    var menor = Mathf.Min(mundo[tris[i]], Mathf.Min(mundo[tris[i + 1]], mundo[tris[i + 2]]));
+                    var maior = Mathf.Max(mundo[tris[i]], Mathf.Max(mundo[tris[i + 1]], mundo[tris[i + 2]]));
+                    if (maior < origemIni || menor > origemFim) continue;
+                    mantidos.Add(tris[i]);
+                    mantidos.Add(tris[i + 1]);
+                    mantidos.Add(tris[i + 2]);
+                }
+
+                malha.SetTriangles(mantidos, s);
+            }
+
+            for (var i = 0; i < vertices.Length; i++)
+            {
+                var p = t.TransformPoint(vertices[i]);
+                p.x = Mathf.Lerp(destinoIni, destinoFim, Mathf.InverseLerp(origemIni, origemFim, Mathf.Clamp(p.x, origemIni, origemFim)));
+                vertices[i] = t.InverseTransformPoint(p);
+            }
+
+            malha.vertices = vertices;
+            malha.RecalculateBounds();
+            return malha;
+        }
+
+        static void AfastarPlaca(GameObject ubs)
+        {
+            var placa = ScenarioSceneKit.ModelPart(ubs, "Placa");
+            var laje = ScenarioSceneKit.ModelPart(ubs, "Laje");
+            if (placa == null || laje == null)
+            {
+                Debug.LogWarning("[SafeZone VR] Placa ou laje da UBS não encontradas.");
+                return;
+            }
+
+            var recuo = BoundsDaMalha(placa).max.x - (BoundsDaMalha(laje).min.x - 0.15f);
+            if (recuo > 0f)
+                placa.position -= new Vector3(recuo, 0f, 0f);
+        }
+
+        static void GirarCadeira(GameObject ubs)
+        {
+            var sala = ScenarioSceneKit.ModelPart(ubs, "Consultorio2");
+            var mf = sala != null ? sala.GetComponent<MeshFilter>() : null;
+            if (mf == null || mf.sharedMesh == null)
+            {
+                Debug.LogWarning("[SafeZone VR] Consultorio2 não encontrado: a cadeira fica de costas.");
+                return;
+            }
+
+            var malha = Object.Instantiate(mf.sharedMesh);
+            malha.name = mf.sharedMesh.name + "_CadeiraVirada";
+            var vertices = malha.vertices;
+            var normais = malha.normals;
+            var giro = Quaternion.Euler(0f, 180f, 0f);
+            var girados = 0;
+
+            for (var i = 0; i < vertices.Length; i++)
+            {
+                var local = ubs.transform.InverseTransformPoint(sala.TransformPoint(vertices[i]));
+                if (!k_UbsCadeira.Contains(local)) continue;
+                local = k_UbsCadeira.center + giro * (local - k_UbsCadeira.center);
+                vertices[i] = sala.InverseTransformPoint(ubs.transform.TransformPoint(local));
+                if (normais != null && normais.Length == vertices.Length)
+                    normais[i] = giro * normais[i];
+                girados++;
+            }
+
+            if (girados == 0)
+            {
+                Debug.LogWarning("[SafeZone VR] Nenhum vértice da cadeira do consultório foi encontrado.");
+                return;
+            }
+
+            malha.vertices = vertices;
+            if (normais != null && normais.Length == vertices.Length)
+                malha.normals = normais;
+            malha.RecalculateBounds();
+            mf.sharedMesh = malha;
         }
 
         static Bounds BoundsDaMalha(Transform t)
