@@ -148,6 +148,46 @@ namespace SafeZoneVR
             return Build(name, data);
         }
 
+        public static AudioClip CreateWindLoop(string name, float seconds = 6f, float volume = 0.3f)
+        {
+            var n = Mathf.RoundToInt(seconds * k_SampleRate);
+            var data = new float[n];
+            var rng = new System.Random(11);
+            var lp = 0f;
+            for (var i = 0; i < n; i++)
+            {
+                var t = i / (float)k_SampleRate;
+                lp += 0.02f * ((float)(rng.NextDouble() * 2.0 - 1.0) - lp);
+                var gust = 0.6f + 0.4f * Mathf.Sin(2f * Mathf.PI * t / seconds);
+                data[i] = lp * 4f * gust * volume;
+            }
+            var fade = Mathf.RoundToInt(0.2f * k_SampleRate);
+            for (var i = 0; i < fade; i++)
+            {
+                var k = i / (float)fade;
+                data[i] *= k;
+                data[n - 1 - i] *= k;
+            }
+            Clamp(data);
+            return Build(name, data);
+        }
+
+        public static AudioClip CreateHubLoop(string name, float seconds = 8f, float volume = 0.12f)
+        {
+            var n = Mathf.RoundToInt(seconds * k_SampleRate);
+            var data = new float[n];
+            var chord = new[] { 220f, 277.5f, 330f };
+            for (var i = 0; i < n; i++)
+            {
+                var t = i / (float)k_SampleRate;
+                var s = 0f;
+                for (var c = 0; c < chord.Length; c++)
+                    s += Mathf.Sin(2f * Mathf.PI * chord[c] * t) * (0.75f + 0.25f * Mathf.Sin(2f * Mathf.PI * (c + 1) * t / seconds));
+                data[i] = s / chord.Length * volume;
+            }
+            return Build(name, data);
+        }
+
         static void Clamp(float[] data)
         {
             for (var i = 0; i < data.Length; i++)

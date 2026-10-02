@@ -10,6 +10,23 @@ está explícito.
 
 ---
 
+## Execução (30/09/2026)
+
+Feito no mínimo necessário, sem complexidade extra:
+
+- **A1** `CreatePokeButton` + componente `PokeButton` (afunda a tampa e toca o clique; substitui o
+  `XRPokeFollowAffordance`, que é do sistema de affordance depreciado).
+- **A2** celular (modelo `Itens/Celular.fbx`) com teclado numérico de poke no Incêndio e no
+  Granizo — o jogador digita o número de verdade (refeito em 02/10, no lugar do painel com 4 teclas).
+- **Grupo 2 de poke:** em vez dos três botões avulsos da casa (A3), um botão **JOGAR** físico em
+  cada totem do hub — três botões iguais, usados em toda partida, sem mexer nos validadores.
+- **B1/B2** som de fundo no hub e no Incêndio. **B4** o clique sai do próprio `PokeButton`.
+- **D2** registrado em `REFERENCIA_TECNICA.md`.
+- Não feitos por decisão de simplicidade: A3, A4, B3 (`AmbientZone`), C (conferência automática),
+  D1, D3, D4. Pendente: testar o poke no headset.
+
+---
+
 ## Contexto
 
 O enunciado do T2 lista seis requisitos essenciais para o sistema de RV e os transforma em

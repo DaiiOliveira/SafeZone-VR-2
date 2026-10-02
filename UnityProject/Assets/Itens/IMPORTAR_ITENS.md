@@ -120,6 +120,28 @@ Todos os itens de mão estão abaixo do orçamento (1,5k tris); o caminhão (3,3
 A **UBS (23,4k)** passa dele de propósito: é um prédio com interior completo,
 não uma peça de fundo — na cena ela aparece uma vez só.
 
+### Celular (relógio do jogo)
+
+| Objeto | Medida | Tris | Notas |
+|---|---|---:|---|
+| `Celular` | 0,074 × 0,149 × 0,011 m | 884 | aparelho de 72 × 148 × 8,5 mm; **pivô no centro** (item de mão); tela virada para **−Z**; `dc_interacao = "celular_hora"` |
+| ├ `Tela` | filho | — | **teclado numérico** (estado inicial): cabeçalho, 12 teclas e o botão verde de chamada |
+| ├ `TelaRelogio` | filho | — | a mesma tela com o relógio e o alerta, 0,4 mm atrás; troque as duas com `SetActive` |
+| └ `DC_UI_Tela` | Empty | — | âncora do canvas, no centro da tela: `largura_m = 0,0655`, `altura_m = 0,121`, `dc_ui = "relogio"` |
+
+**Como trocar de tela:** `Tela` (teclado) e `TelaRelogio` ocupam o mesmo lugar,
+uma 0,4 mm atrás da outra. Ligue só uma por vez — com as duas ativas, aparece o
+teclado. Ambas têm a hora na barra de status, que é onde o canvas escreve.
+
+**Como pôr a hora real:** instancie um Canvas em *World Space* no `DC_UI_Tela`
+(ele já está na posição e na orientação certas, 1,2 mm à frente do vidro),
+dimensione pelos `largura_m`/`altura_m` e escreva `System.DateTime.Now` num
+`TextMeshProUGUI` a cada segundo. O desenho do atlas continua embaixo, então o
+celular nunca fica com a tela apagada se o canvas não carregar.
+
+Alternativa sem canvas: trocar o material do filho `Tela` por um com
+`RenderTexture`, ou desenhar os dígitos numa textura própria.
+
 ### Nomes repetidos
 
 `Placa` e `Poste` aparecem em mais de um conjunto (`Plataforma`, `Vaga`, `UBS`

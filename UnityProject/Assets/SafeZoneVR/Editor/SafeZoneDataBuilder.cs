@@ -202,7 +202,7 @@ namespace SafeZoneVR.Editor
                 "Porta da frente",
                 "A porta fechada segura o fogo e a fumaça lá dentro; destrancada, não atrapalha quem precisa entrar ou sair.");
             d.ligar = StepAt(f, "Step_07_Ligar", "inc_07_193", 6, "Ligue para os Bombeiros",
-                "Na calçada, em segurança, ligue 193 pelo relógio.",
+                "Na calçada, em segurança, abra o celular no relógio e digite 193.",
                 "Ponto de encontro (calçada)",
                 "Ligar 193 depois de sair garante o socorro sem que você fique perto do fogo.");
             d.vizinho = StepAt(f, "Step_08_Vizinho", "inc_08_vizinho", 7, "Não deixe ninguém entrar",
@@ -287,7 +287,7 @@ namespace SafeZoneVR.Editor
                 "Quarto → sala",
                 "Se o telhado ou o forro puder desabar, saia do local imediatamente.");
             d.comunicar = StepAt(f, "Step_08_Comunicar", "gran_08_comunicar", 7, "Comunique às autoridades",
-                "Ligue para a Defesa Civil (199) ou para os Bombeiros (193) pelo relógio e conte o que viu.",
+                "Ligue para a Defesa Civil (199) ou para os Bombeiros (193): abra o celular no relógio, digite o número e conte o que viu.",
                 "Relógio de pulso",
                 "Avisar as autoridades permite vistoriar o telhado e evitar acidentes.");
 

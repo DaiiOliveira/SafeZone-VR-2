@@ -15,7 +15,8 @@ MonoBehaviour:
   m_StepId: inc_07_193
   m_OrderIndex: 6
   m_Title: Ligue para os Bombeiros
-  m_InstructionText: "Na cal\xE7ada, em seguran\xE7a, ligue 193 pelo rel\xF3gio."
+  m_InstructionText: "Na cal\xE7ada, em seguran\xE7a, abra o celular no rel\xF3gio
+    e digite 193."
   m_LocationHint: "Ponto de encontro (cal\xE7ada)"
   m_WhyItMatters: "Ligar 193 depois de sair garante o socorro sem que voc\xEA fique
     perto do fogo."

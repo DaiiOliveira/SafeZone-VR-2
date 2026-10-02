@@ -89,6 +89,7 @@ namespace SafeZoneVR.Editor
             var comfort = systems.AddComponent<ComfortSettingsApplier>();
             comfort.origin = origin;
             comfort.vignette = cam.GetComponentInChildren<TunnelingVignetteController>(true);
+            ScenarioSceneKit.CreateAmbientLoop(systems.transform, SimpleLoopSound.ClipKind.Hub, 1f);
 
             var options = ScenarioSceneKit.CreateOptionsPanel(root.transform, cam.transform, false);
 
@@ -218,6 +219,7 @@ namespace SafeZoneVR.Editor
 
                 EsconderArteDoTotem(panel, oculto);
                 CreateKioskCanvas(kiosk, go.transform, hub, map, panel);
+                CreateKioskPokeButton(kiosk, go.transform, map, panel);
                 kiosk.Refresh();
                 kiosks.Add(kiosk);
             }
@@ -246,6 +248,20 @@ namespace SafeZoneVR.Editor
             kiosk.statusLabel = UIBuilderUtil.TopText(face, "Status", string.Empty, 15f, UIBuilderUtil.AccentGreen, TextAlignmentOptions.Center, 122f, 22f, 20f);
             kiosk.playButton = UIBuilderUtil.BottomButton(face, "Play", "Jogar", 22f, map.accent, 10f, 48f, 0.14f, 0.86f, 0f, out var playLabel);
             kiosk.playLabel = playLabel;
+        }
+
+        static void CreateKioskPokeButton(HubKiosk kiosk, Transform parent, KioskMap map, Transform panel)
+        {
+            var bounds = ScenarioSceneKit.PartBounds(panel);
+            var basePos = new Vector3(panel.position.x + 0.8f, 0f, bounds.max.z + 0.45f);
+            UIBuilderUtil.Primitive(PrimitiveType.Cube, "Pedestal", parent, basePos + new Vector3(0f, 0.47f, 0f), Vector3.zero,
+                new Vector3(0.14f, 0.94f, 0.14f), ScenarioSceneKit.MatMetal);
+
+            var holder = UIBuilderUtil.Child(parent, "BotaoJogar");
+            holder.transform.SetPositionAndRotation(basePos + new Vector3(0f, 0.96f, 0f), k_FacingEntrance);
+            var mat = UIBuilderUtil.GetOrCreateMaterial("Mat_BotaoTotem_" + map.objectName.Replace("DC_PANEL_", string.Empty), map.accent);
+            var button = ScenarioSceneKit.CreatePokeButton(holder.transform, "Botao", Vector3.zero, Quaternion.identity, 0.1f, mat, "JOGAR");
+            UnityEditor.Events.UnityEventTools.AddPersistentListener(button.onPressed, kiosk.Play);
         }
 
         static Bounds? AjustarFoto(Transform art, float centroX)

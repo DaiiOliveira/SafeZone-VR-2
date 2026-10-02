@@ -670,6 +670,38 @@
         "DC_M_Itens_Translucido"
       ],
       "fbx": "UBS.fbx"
+    },
+    {
+      "objeto": "Celular",
+      "medida_unity_m": [
+        0.0744,
+        0.1492,
+        0.0114
+      ],
+      "alvo_unity_m": [
+        0.072,
+        0.148,
+        0.011
+      ],
+      "fora_da_tolerancia": [],
+      "excecao": "os 11 mm incluem a saliencia da camera traseira; o corpo tem 8,5 mm",
+      "pivo_blender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "base_z": -0.0746,
+      "triangulos": 884,
+      "arestas_abertas": 0,
+      "filhos": [
+        "DC_UI_Tela",
+        "Tela",
+        "TelaRelogio"
+      ],
+      "materiais": [
+        "DC_M_Itens_Atlas"
+      ],
+      "fbx": "Celular.fbx"
     }
   ]
 }
