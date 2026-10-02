@@ -4,7 +4,7 @@ namespace SafeZoneVR
 {
     public class SimpleLoopSound : MonoBehaviour
     {
-        public enum ClipKind { SmokeAlarm, DistantSiren, Crackle, Hail, Rain }
+        public enum ClipKind { SmokeAlarm, DistantSiren, Crackle, Hail, Rain, Wind, Hub }
 
         [SerializeField] AudioSource m_Source;
         [SerializeField] ClipKind m_Kind = ClipKind.SmokeAlarm;
@@ -35,6 +35,8 @@ namespace SafeZoneVR
                     case ClipKind.Crackle: m_Source.clip = ProceduralAudio.CreateCrackleLoop("sz_crackle"); break;
                     case ClipKind.Hail: m_Source.clip = ProceduralAudio.CreateHailLoop("sz_hail"); break;
                     case ClipKind.Rain: m_Source.clip = ProceduralAudio.CreateRainLoop("sz_rain2"); break;
+                    case ClipKind.Wind: m_Source.clip = ProceduralAudio.CreateWindLoop("sz_wind"); break;
+                    case ClipKind.Hub: m_Source.clip = ProceduralAudio.CreateHubLoop("sz_hub"); break;
                 }
             }
         }

@@ -102,6 +102,8 @@ namespace SafeZoneVR
 
         public void Play()
         {
+            if (m_PlayButton != null && !m_PlayButton.interactable)
+                return;
             SceneFlow.LoadScenario(m_Scenario);
         }
     }

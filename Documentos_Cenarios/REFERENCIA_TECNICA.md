@@ -228,6 +228,26 @@ o ajuste não vale para o que já está importado.
   apertar alterna. A distância **não** pode usar `GetDistanceSqrToInteractor`: o Near-Far mede pelo
   attach, que num agarre à distância pula para o ponto atingido pelo raio (`InteractionDistance`).
 
+## Poke e som de fundo (requisitos do T2, 30/09/2026)
+
+- Todo botão de poke sai de `ScenarioSceneKit.CreatePokeButton`: `XRSimpleInteractable` +
+  `XRPokeFilter` (`NegativeY`: a face do botão é o **+Y local** da raiz) + `PokeButton` (afunda a
+  tampa, toca o clique e dispara `onPressed`). O `Poke Interactor` do rig tem `requirePokeFilter`
+  ligado: sem o filtro o dedo não seleciona nada. O raio também aperta (o filtro só vale para poke).
+- Grupos de poke: **celular** (Incêndio e Granizo) e **botões JOGAR** dos três totens do hub
+  (pedestal ao lado de cada totem, chama `HubKiosk.Play`, que respeita o aviso de segurança).
+- O celular (`CreateCallPanel` → `EmergencyCallPanel`) usa o modelo `Itens/Celular.fbx` (1,8× o tamanho
+  real, tela do teclado; `TelaRelogio` desligada). No Unity a tela do FBX olha para **+Z**, por isso o
+  modelo gira 180° dentro do aparelho. Abre e fecha pelo botão "Celular" do relógio e aparece no centro
+  da visão a ~50 cm (`LazyFollow`). As teclas desenhadas na textura recebem zonas de poke invisíveis
+  (`CreatePokeZone`) com um brilho ao tocar; as posições estão em pixels da imagem de frente do
+  modelo (`PhonePoint`, 780 px = 0,1492 m). 0–9, * e # digitam; ← apaga; o botão verde liga; a barra
+  inferior fecha. O número aparece abaixo de "Telefone". O balão acima do aparelho mostra a dica "Números de emergência" (os aceitos pela fase em verde) e, depois de ligar, a resposta; ao voltar a digitar, a dica volta. A hora da barra de status é a do aparelho (`DateTime.Now`): o "10:24" pintado no atlas é coberto por um remendo do mesmo material com UV de um trecho liso da barra (`CoverPhoneClock`).
+  Só 199/193 (conforme a fase) disparam `onAcceptedCall`; número desconhecido "não atende".
+- Som de fundo por ambiente: hub = `ClipKind.Hub` (acorde suave); Alagamento = chuva do
+  `FeedbackPlayer`; Incêndio = `ClipKind.Wind` + alarme/crepitar/sirene; Granizo = chuva + granizo.
+  Os loops de fundo novos saem de `ScenarioSceneKit.CreateAmbientLoop` (2D, categoria Ambiente).
+
 ## Conforto, som, dicas e aviso
 
 - Mão dominante: a mão **não dominante** anda no modo contínuo e a dominante gira/teleporta; o

@@ -15,8 +15,8 @@ MonoBehaviour:
   m_StepId: gran_08_comunicar
   m_OrderIndex: 7
   m_Title: "Comunique \xE0s autoridades"
-  m_InstructionText: "Ligue para a Defesa Civil (199) ou para os Bombeiros (193)
-    pelo rel\xF3gio e conte o que viu."
+  m_InstructionText: "Ligue para a Defesa Civil (199) ou para os Bombeiros (193):
+    abra o celular no rel\xF3gio, digite o n\xFAmero e conte o que viu."
   m_LocationHint: "Rel\xF3gio de pulso"
   m_WhyItMatters: Avisar as autoridades permite vistoriar o telhado e evitar acidentes.
   m_OrderGroup: 0

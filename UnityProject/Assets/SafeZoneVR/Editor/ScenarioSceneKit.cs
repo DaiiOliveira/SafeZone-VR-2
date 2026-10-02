@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit.Feedback;
+using UnityEngine.XR.Interaction.Toolkit.Filtering;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using UnityEngine.XR.Interaction.Toolkit.Locomotion;
@@ -567,6 +568,70 @@ namespace SafeZoneVR.Editor
             box.center = b.center;
             box.size = b.size + Vector3.one * (worldPadding / scale);
             return box;
+        }
+
+        public static PokeButton CreatePokeZone(Transform parent, string name, Vector3 localPos, Quaternion localRot, Vector2 size)
+        {
+            var go = UIBuilderUtil.Child(parent, name);
+            go.transform.localPosition = localPos;
+            go.transform.localRotation = localRot;
+
+            var box = go.AddComponent<BoxCollider>();
+            box.center = new Vector3(0f, -0.015f, 0f);
+            box.size = new Vector3(size.x * 1.1f, 0.06f, size.y * 1.1f);
+
+            var interactable = go.AddComponent<XRSimpleInteractable>();
+            interactable.colliders.Add(box);
+            var filter = go.AddComponent<XRPokeFilter>();
+            filter.pokeInteractable = interactable;
+            filter.pokeCollider = box;
+            filter.pokeConfiguration = new PokeThresholdDatumProperty(new PokeThresholdData
+            {
+                pokeDirection = PokeAxis.NegativeY,
+                enablePokeAngleThreshold = true,
+                pokeAngleThreshold = 60f,
+            });
+            return go.AddComponent<PokeButton>();
+        }
+
+        public static PokeButton CreatePokeButton(Transform parent, string name, Vector3 localPos, Quaternion localRot, float size, Material mat, string label)
+        {
+            var button = CreatePokeZone(parent, name, localPos, localRot, new Vector2(size, size));
+            var go = button.gameObject;
+
+            var plate = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Base", go.transform, Vector3.zero, Vector3.zero,
+                new Vector3(size * 1.35f, 0.012f, size * 1.35f), MatMetal, false);
+            plate.transform.localPosition = new Vector3(0f, -0.016f, 0f);
+            plate.transform.localRotation = Quaternion.identity;
+            var cap = UIBuilderUtil.Child(go.transform, "Tampa");
+            var body = UIBuilderUtil.Primitive(PrimitiveType.Cube, "Corpo", cap.transform, Vector3.zero, Vector3.zero,
+                new Vector3(size, 0.02f, size), mat, false);
+            body.transform.localPosition = Vector3.zero;
+            body.transform.localRotation = Quaternion.identity;
+
+            if (!string.IsNullOrEmpty(label))
+            {
+                var text = UIBuilderUtil.WorldText(cap.transform, "Label", label, size * 5f, Color.white, cap.transform.TransformPoint(0f, 0.0105f, 0f),
+                    (cap.transform.rotation * Quaternion.Euler(90f, 0f, 0f)).eulerAngles, new Vector2(size, size));
+                text.fontStyle = FontStyles.Bold;
+                text.textWrappingMode = TextWrappingModes.NoWrap;
+                text.enableAutoSizing = true;
+                text.fontSizeMin = 0.05f;
+                text.fontSizeMax = size * 5f;
+            }
+
+            button.cap = cap.transform;
+            return button;
+        }
+
+        public static SimpleLoopSound CreateAmbientLoop(Transform parent, SimpleLoopSound.ClipKind kind, float volume)
+        {
+            var go = UIBuilderUtil.Child(parent, "SomAmbiente");
+            var src = go.AddComponent<AudioSource>();
+            src.spatialBlend = 0f; src.loop = true; src.playOnAwake = false; src.volume = volume;
+            var loop = go.AddComponent<SimpleLoopSound>();
+            loop.source = src; loop.kind = kind; loop.playOnStart = true;
+            return loop;
         }
 
         public static Transform OpenHouseDoors(GameObject house, bool openFrontDoor)
@@ -1173,7 +1238,7 @@ namespace SafeZoneVR.Editor
             if (withCallButton)
             {
                 ctrl.optionsButton = UIBuilderUtil.BottomButton(panel, "OptionsButton", "Opções", 18f, UIBuilderUtil.Accent, 8f, 52f, 0f, 0.5f, 8f, out _);
-                callButton = UIBuilderUtil.BottomButton(panel, "CallButton", "Ligar  <size=70%>199/193</size>", 18f, new Color(0.75f, 0.25f, 0.2f), 8f, 52f, 0.5f, 1f, 8f, out _);
+                callButton = UIBuilderUtil.BottomButton(panel, "CallButton", "Celular", 18f, new Color(0.75f, 0.25f, 0.2f), 8f, 52f, 0.5f, 1f, 8f, out _);
             }
             else
             {
@@ -1453,44 +1518,101 @@ namespace SafeZoneVR.Editor
             return mat;
         }
 
+        const float k_PhoneScale = 1.8f;
+        const float k_PhonePixel = 0.1492f / 780f;
+
+        static Vector3 PhonePoint(float px, float py, float z)
+        {
+            return new Vector3((px - 300f) * k_PhonePixel * k_PhoneScale, (450f - py) * k_PhonePixel * k_PhoneScale, z);
+        }
+
+        static void CoverPhoneClock(Transform model, Material mat)
+        {
+            const float x0 = 0.0172f, x1 = 0.0320f, y0 = 0.0515f, y1 = 0.0598f, z = 0.0058f, blankShift = -0.025f;
+            Vector2 Uv(float x, float y) => new Vector2(Mathf.Lerp(0.7666f, 0.6396f, (x + 0.0328f) / 0.0656f), Mathf.Lerp(0.0039f, 0.2383f, (y + 0.0605f) / 0.121f));
+
+            var mesh = new Mesh { name = "Celular_TampaHora" };
+            mesh.vertices = new[] { new Vector3(x0, y0, z), new Vector3(x1, y0, z), new Vector3(x1, y1, z), new Vector3(x0, y1, z) };
+            mesh.uv = new[] { Uv(x0 + blankShift, y0), Uv(x1 + blankShift, y0), Uv(x1 + blankShift, y1), Uv(x0 + blankShift, y1) };
+            mesh.normals = new[] { Vector3.forward, Vector3.forward, Vector3.forward, Vector3.forward };
+            mesh.triangles = new[] { 0, 1, 2, 0, 2, 3, 0, 2, 1, 0, 3, 2 };
+
+            var go = UIBuilderUtil.Child(model, "TampaHora");
+            go.AddComponent<MeshFilter>().sharedMesh = mesh;
+            var renderer = go.AddComponent<MeshRenderer>();
+            renderer.sharedMaterial = mat;
+            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        }
+
         public static EmergencyCallPanel CreateCallPanel(Transform parent, Transform camera, Button openButton,
             string reply199, string reply193, string reply190, string reply192, params string[] acceptedNumbers)
         {
-            var go = UIBuilderUtil.Child(parent, "EmergencyCallPanel");
+            var go = UIBuilderUtil.Child(parent, "Celular");
             var ctrl = go.AddComponent<EmergencyCallPanel>();
-
-            var rootGo = UIBuilderUtil.Child(go.transform, "Root");
-            UIBuilderUtil.AddLazyFollow(rootGo, camera, new Vector3(0f, -0.1f, 1.1f), 4f);
-            var canvas = UIBuilderUtil.CreateWorldCanvas("Canvas", rootGo.transform, new Vector2(520f, 640f), 0.0011f);
-            var panel = canvas.transform;
-            UIBuilderUtil.FullPanel(panel, "Background", UIBuilderUtil.PanelColor);
-            UIBuilderUtil.Panel(panel, "HeaderBar", new Color(0.75f, 0.25f, 0.2f), new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -56f), Vector2.zero);
-            UIBuilderUtil.TopText(panel, "Title", "Ligar para emergência", 26f, Color.white, TextAlignmentOptions.Center, 8f, 40f, 20f, FontStyles.Bold);
-
-            ctrl.root = rootGo;
             ctrl.openButton = openButton;
-
-            var y = 76f;
-            const float h = 56f;
-            const float gap = 10f;
-            var lines = new[]
-            {
-                ("199", "Defesa Civil", reply199),
-                ("193", "Bombeiros", reply193),
-                ("190", "Polícia Militar", reply190),
-                ("192", "SAMU", reply192),
-            };
-            foreach (var (number, label, reply) in lines)
-            {
-                var b = UIBuilderUtil.TopButton(panel, "Call_" + number, $"{number}  —  {label}", 20f, UIBuilderUtil.PanelLight, y, h, 24f, out _);
-                ctrl.lines.Add(new EmergencyCallPanel.Line { number = number, label = label, reply = reply, button = b });
-                y += h + gap;
-            }
-            ctrl.replyText = UIBuilderUtil.TopText(panel, "Reply", "", 18f, UIBuilderUtil.TextColor, TextAlignmentOptions.TopLeft, y + 6f, 190f, 24f);
-            ctrl.closeButton = UIBuilderUtil.BottomButton(panel, "Close", "Fechar", 20f, UIBuilderUtil.Accent, 16f, 50f, 0.25f, 0.75f, 0f, out _);
-
+            ctrl.lines.Add(new EmergencyCallPanel.Line { number = "199", label = "Defesa Civil", reply = reply199 });
+            ctrl.lines.Add(new EmergencyCallPanel.Line { number = "193", label = "Bombeiros", reply = reply193 });
+            ctrl.lines.Add(new EmergencyCallPanel.Line { number = "190", label = "Polícia Militar", reply = reply190 });
+            ctrl.lines.Add(new EmergencyCallPanel.Line { number = "192", label = "SAMU", reply = reply192 });
             ctrl.acceptedNumbers.Clear();
             ctrl.acceptedNumbers.AddRange(acceptedNumbers);
+
+            var rootGo = UIBuilderUtil.Child(go.transform, "Aparelho");
+            UIBuilderUtil.AddLazyFollow(rootGo, camera, new Vector3(0f, -0.12f, 0.5f), 4f);
+            ctrl.root = rootGo;
+
+            var model = CreateModelVisual(rootGo.transform, "Modelo", k_ItemsFolder + "/Celular.fbx", Vector3.zero, Vector3.zero);
+            model.transform.localPosition = Vector3.zero;
+            model.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
+            model.transform.localScale = Vector3.one * k_PhoneScale;
+            var clockScreen = FindChildRecursive(model.transform, "TelaRelogio");
+            if (clockScreen != null) clockScreen.gameObject.SetActive(false);
+            var screen = FindChildRecursive(model.transform, "Tela");
+            if (screen != null) CoverPhoneClock(model.transform, screen.GetComponent<MeshRenderer>().sharedMaterial);
+
+            var clockCanvas = UIBuilderUtil.CreateWorldCanvas("Hora", rootGo.transform, new Vector2(120f, 40f), 0.0002f);
+            clockCanvas.transform.localPosition = PhonePoint(172f, 160f, -0.0115f);
+            clockCanvas.transform.localRotation = Quaternion.identity;
+            ctrl.clockText = UIBuilderUtil.Text(clockCanvas.transform, "Texto", "", 24f, Color.white, TextAlignmentOptions.Left,
+                Vector2.zero, Vector2.one, new Vector2(6f, 0f), Vector2.zero, FontStyles.Bold);
+
+            var numberCanvas = UIBuilderUtil.CreateWorldCanvas("Numero", rootGo.transform, new Vector2(260f, 40f), 0.0004f);
+            numberCanvas.transform.localPosition = PhonePoint(300f, 246f, -0.0115f);
+            numberCanvas.transform.localRotation = Quaternion.identity;
+            ctrl.numberText = UIBuilderUtil.Text(numberCanvas.transform, "Texto", "", 26f, Color.white, TextAlignmentOptions.Center,
+                Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, FontStyles.Bold);
+
+            var bubble = UIBuilderUtil.CreateWorldCanvas("Balao", rootGo.transform, new Vector2(380f, 170f), 0.0005f);
+            bubble.transform.localPosition = new Vector3(0f, 0.0746f * k_PhoneScale + 0.055f, 0f);
+            bubble.transform.localRotation = Quaternion.identity;
+            UIBuilderUtil.FullPanel(bubble.transform, "Fundo", UIBuilderUtil.PanelColor);
+            ctrl.replyText = UIBuilderUtil.Text(bubble.transform, "Resposta", "", 16f, UIBuilderUtil.TextColor, TextAlignmentOptions.Center,
+                Vector2.zero, Vector2.one, new Vector2(14f, 10f), new Vector2(-14f, -10f), FontStyles.Normal);
+
+            var touchMat = UIBuilderUtil.GetOrCreateMaterial("Mat_ToqueCelular", new Color(1f, 1f, 1f, 0.3f), true, true);
+            var keypad = UIBuilderUtil.Child(rootGo.transform, "Teclado");
+            var keys = new (string id, float x, float y, float w, float h)[]
+            {
+                ("1", 195f, 298f, 82f, 82f), ("2", 300f, 298f, 82f, 82f), ("3", 405f, 298f, 82f, 82f),
+                ("4", 195f, 400f, 82f, 82f), ("5", 300f, 400f, 82f, 82f), ("6", 405f, 400f, 82f, 82f),
+                ("7", 195f, 502f, 82f, 82f), ("8", 300f, 502f, 82f, 82f), ("9", 405f, 502f, 82f, 82f),
+                ("*", 195f, 604f, 82f, 82f), ("0", 300f, 604f, 82f, 82f), ("#", 405f, 604f, 82f, 82f),
+                ("Ligar", 300f, 696f, 184f, 84f), ("Apagar", 165f, 203f, 60f, 60f), ("Fechar", 300f, 760f, 200f, 24f),
+            };
+            foreach (var k in keys)
+            {
+                var size = new Vector2(k.w, k.h) * k_PhonePixel * k_PhoneScale;
+                var key = CreatePokeZone(keypad.transform, "Tecla_" + k.id, PhonePoint(k.x, k.y, -0.0101f), Quaternion.Euler(-90f, 0f, 0f), size);
+                var glow = UIBuilderUtil.Primitive(PrimitiveType.Cylinder, "Toque", key.transform, Vector3.zero, Vector3.zero,
+                    new Vector3(size.x, 0.0005f, size.y), touchMat, false);
+                glow.transform.localPosition = new Vector3(0f, 0.001f, 0f);
+                glow.transform.localRotation = Quaternion.identity;
+                key.pressedVisual = glow;
+                if (k.id == "Apagar") UnityEditor.Events.UnityEventTools.AddPersistentListener(key.onPressed, ctrl.Erase);
+                else if (k.id == "Ligar") UnityEditor.Events.UnityEventTools.AddPersistentListener(key.onPressed, ctrl.Dial);
+                else if (k.id == "Fechar") UnityEditor.Events.UnityEventTools.AddPersistentListener(key.onPressed, ctrl.Close);
+                else UnityEditor.Events.UnityEventTools.AddStringPersistentListener(key.onPressed, ctrl.Digit, k.id);
+            }
             return ctrl;
         }
 

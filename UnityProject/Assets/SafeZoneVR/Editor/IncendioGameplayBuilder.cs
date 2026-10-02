@@ -34,7 +34,7 @@ namespace SafeZoneVR.Editor
             "Fim de tarde. Você esquentou óleo para fritar e foi até a sala por um instante. Ao voltar, a panela <b>pegou fogo</b>. " +
             "O fogo ainda é pequeno: é um <b>princípio de incêndio</b>.\n" +
             "Mantenha a calma. Faça o que os Bombeiros orientam e, se o fogo sair do controle, saia de casa.\n\n" +
-            "O relógio no pulso esquerdo mostra cada missão e permite ligar para o 193. Aponte para o chão e aperte o gatilho para se teleportar.";
+            "O relógio no pulso esquerdo mostra cada missão e abre o celular para ligar 193. Aponte para o chão e aperte o gatilho para se teleportar.";
 
         [MenuItem("SafeZone VR/Build/2b. Fase Incêndio (montar gameplay na casa)")]
         public static void BuildMenu()
@@ -65,6 +65,7 @@ namespace SafeZoneVR.Editor
             var manager = ScenarioSceneKit.CreateCore(root.transform, origin, data.scenario, false, out _);
 
             var env = UIBuilderUtil.Child(root.transform, "Environment");
+            ScenarioSceneKit.CreateAmbientLoop(env.transform, SimpleLoopSound.ClipKind.Wind, 0.8f);
             var frontYard = ScenarioSceneKit.CreateTriggerZone(env.transform, "Zona_QuintalFrente", k_FrontYardCenter, k_FrontYardSize);
             CreateMeetingSign(env.transform);
             var truck = CreateFireTruck(env.transform);

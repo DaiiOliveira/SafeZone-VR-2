@@ -54,7 +54,7 @@ namespace SafeZoneVR.Editor
         const string k_IntroText =
             "<b>Alerta da Defesa Civil (SMS 40199):</b> tempestade com possibilidade de <b>granizo</b> no seu bairro nos próximos minutos.\n" +
             "Você está na praça, do outro lado da rua de casa. Procure um local seguro e ajude quem estiver por perto.\n\n" +
-            "O relógio no pulso esquerdo mostra cada missão e permite ligar para a Defesa Civil e os Bombeiros. " +
+            "O relógio no pulso esquerdo mostra cada missão e abre o celular para ligar para a Defesa Civil e os Bombeiros. " +
             "Aponte para o chão e aperte o gatilho para se teleportar.";
 
         [MenuItem("SafeZone VR/Build/2c. Fase Granizo (montar praça e casa)")]

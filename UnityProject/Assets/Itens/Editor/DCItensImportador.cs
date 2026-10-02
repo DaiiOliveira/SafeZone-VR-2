@@ -67,6 +67,7 @@ namespace DefesaCivil.Itens.EditorTools
             bool luz = false;
             float lumens = 1000f, kelvin = 4000f, alcance = 6f;
             string modo = "Baked";
+            string interacao = null;
             for (int i = 0; i < nomes.Length; i++)
             {
                 switch (nomes[i])
@@ -76,7 +77,14 @@ namespace DefesaCivil.Itens.EditorTools
                     case "lumens": lumens = System.Convert.ToSingle(valores[i]); break;
                     case "temperatura_k": kelvin = System.Convert.ToSingle(valores[i]); break;
                     case "alcance_m": alcance = System.Convert.ToSingle(valores[i]); break;
+                    case "dc_interacao": interacao = valores[i] as string; break;
                 }
+            }
+            if (!string.IsNullOrEmpty(interacao))
+            {
+                var c = go.AddComponent<DefesaCivil.Casa.DCInteracao>();
+                c.id = interacao;
+                c.estado = "";
             }
             if (!luz) return;
             var l = go.AddComponent<Light>();
