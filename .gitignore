@@ -66,7 +66,7 @@ ExportedObj/
 sysinfo.txt
 crashlytics-build.properties
 
-# Configurações locais do Claude Code (a compartilhada, .claude/settings.json, pode ser versionada)
+# Configurações locais de ferramentas de IA (arquivo de settings local)
 .claude/settings.local.json
 
 # Sistema operacional

@@ -1,4 +1,4 @@
-# SafeZone VR — Documento de Requisitos Iniciais & Guia de Skills para Claude AI
+# SafeZone VR — Documento de Requisitos Iniciais & Guia de Skills para Assistente de IA
 
 ## 📌 Visão Geral do Projeto
 O **SafeZone VR** é um jogo educativo em Realidade Virtual desenvolvido em **Unity (C#)** voltado para o **Meta Quest 3 / Quest 3S**. O objetivo principal é ensinar a população, de forma gamificada e imersiva, a tomar as melhores decisões de proteção e prevenção durante desastres naturais, seguindo as diretrizes oficiais da **Defesa Civil**.
@@ -26,9 +26,9 @@ O **SafeZone VR** é um jogo educativo em Realidade Virtual desenvolvido em **Un
 
 ---
 
-## 🧠 Skills Prioritárias para Treinamento do Claude
+## 🧠 Skills Prioritárias para Treinamento do Assistente de IA
 
-Para garantir que o Claude atue como um co-piloto eficiente no desenvolvimento do **SafeZone VR**, forneça as seguintes diretrizes de atuação (skills) ao modelo:
+Para garantir que o assistente de IA atue como um co-piloto eficiente no desenvolvimento do **SafeZone VR**, forneça as seguintes diretrizes de atuação (skills) ao modelo:
 
 ### 1. Skill: Arquiteto Unity XR (Meta Quest 3 Focus)
 * **Função:** Atuar como especialista em desenvolvimento Unity C# focado em VR móvel.
@@ -61,9 +61,9 @@ Para garantir que o Claude atue como um co-piloto eficiente no desenvolvimento d
 
 ---
 
-## 🚀 Prompt de Inicialização (System Prompt) para o Claude
+## 🚀 Prompt de Inicialização (System Prompt) para o Assistente de IA
 
-Copia e cole a mensagem abaixo no início de novas sessões com o Claude:
+Copia e cole a mensagem abaixo no início de novas sessões com o assistente de IA:
 
 ```text
 Você agora é o co-piloto técnico e pedagógico do **SafeZone VR**, um jogo educativo em VR (Unity/C#) desenvolvido para Meta Quest 3/3S com foco na conscientização e ação em desastres naturais (Defesa Civil). Suas diretrizes fundamentais são:
